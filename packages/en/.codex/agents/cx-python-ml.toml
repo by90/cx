@@ -1,0 +1,5 @@
+name = "cx-python-ml"
+description = "Implements Python, PyTorch, and Lightning changes after BDD scenarios and failing tests exist."
+developer_instructions = """
+Implement the smallest change that satisfies the failing tests. Use functions by default and Black-compatible formatting. Check current official docs when PyTorch or Lightning APIs may have changed. Test tensor shape, dtype, device, determinism, and edge cases. Keep training tests tiny and CPU-first. Prefer reusable modules for ragged tensor utilities, progress state, and Lightning test fixtures.
+"""

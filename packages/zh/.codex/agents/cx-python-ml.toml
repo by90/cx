@@ -1,0 +1,5 @@
+name = "cx-python-ml"
+description = "在已有 BDD 场景和失败测试后，实现 Python、PyTorch 和 Lightning 改动。"
+developer_instructions = """
+实现能满足失败测试的最小改动。默认使用函数和 Black 兼容格式。PyTorch 或 Lightning API 可能变化时，查询官方最新文档。测试 tensor shape、dtype、device、确定性和边界条件。训练测试保持小规模和 CPU 优先。优先复用 ragged tensor、progress state 和 Lightning test fixture 等通用模块。
+"""

@@ -1,0 +1,5 @@
+name = "cx-common"
+description = "抽取和维护 progress UI、ragged tensor utilities、test harnesses 等可复用模块。"
+developer_instructions = """
+创建模块前，先检查已有通用工具和 Common Module Registry。设计小而稳定的 API，并配套清晰测试。progress UI 要分离 state、rendering adapters 和 event producers。ragged tensors 要保留 dtype/device，并测试 padding、mask、length、packing 和边界情况。更新 Common Module Registry 和测试矩阵。
+"""

@@ -1,0 +1,70 @@
+{
+  "package": "cx",
+  "language": "zh",
+  "version": "1.0.0",
+  "purpose": "Codex BDD/TDD single-source engineering workflow",
+  "skills": [
+    {
+      "name": "cx-bdd-tdd",
+      "path": ".agents/skills/cx-bdd-tdd/SKILL.md"
+    },
+    {
+      "name": "cx-changelog",
+      "path": ".agents/skills/cx-changelog/SKILL.md"
+    },
+    {
+      "name": "cx-pytorch-tdd",
+      "path": ".agents/skills/cx-pytorch-tdd/SKILL.md"
+    },
+    {
+      "name": "cx-ragged-tensor",
+      "path": ".agents/skills/cx-ragged-tensor/SKILL.md"
+    },
+    {
+      "name": "cx-progress-ui",
+      "path": ".agents/skills/cx-progress-ui/SKILL.md"
+    },
+    {
+      "name": "cx-rust-ui",
+      "path": ".agents/skills/cx-rust-ui/SKILL.md"
+    },
+    {
+      "name": "cx-common-module",
+      "path": ".agents/skills/cx-common-module/SKILL.md"
+    },
+    {
+      "name": "cx-evidence",
+      "path": ".agents/skills/cx-evidence/SKILL.md"
+    }
+  ],
+  "agents": [
+    {
+      "name": "cx-spec",
+      "path": ".codex/agents/cx-spec.toml"
+    },
+    {
+      "name": "cx-bdd",
+      "path": ".codex/agents/cx-bdd.toml"
+    },
+    {
+      "name": "cx-tdd",
+      "path": ".codex/agents/cx-tdd.toml"
+    },
+    {
+      "name": "cx-python-ml",
+      "path": ".codex/agents/cx-python-ml.toml"
+    },
+    {
+      "name": "cx-rust-ui",
+      "path": ".codex/agents/cx-rust-ui.toml"
+    },
+    {
+      "name": "cx-common",
+      "path": ".codex/agents/cx-common.toml"
+    },
+    {
+      "name": "cx-review",
+      "path": ".codex/agents/cx-review.toml"
+    }
+  ]
+}
