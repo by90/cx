@@ -5,17 +5,19 @@
 This repository uses the cx single-source BDD/TDD workflow.
 
 1. Read `docs/ENGINEERING_SPEC.md` and `docs/CHANGELOG.md` before planning or editing code.
-2. Use `$cx-bdd-tdd` for feature work, bug fixes, requirements, architecture updates, and implementation planning.
-3. Do not create per-feature `spec.md`, `plan.md`, `tasks.md`, or loose design notes unless the user explicitly asks for a separate artifact.
-4. Merge new requirements, BDD scenarios, architecture notes, task breakdowns, test mappings, and verification evidence into `docs/ENGINEERING_SPEC.md`.
-5. Use `docs/CHANGELOG.md` only as a historical log. Every `CHANGE-*` entry must link back to the engineering spec.
-6. Start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
-7. Prefer reusable common modules over duplicated logic. Check the Common Module Registry before adding utilities.
-8. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
+2. Use `$cx-workflow` for workflow handling, task routing, and uncertainty about which cx skill applies.
+3. Use `$cx-bdd-tdd` for feature work, bug fixes, requirements, architecture updates, and implementation planning.
+4. Do not create per-feature `spec.md`, `plan.md`, `tasks.md`, or loose design notes unless the user explicitly asks for a separate artifact.
+5. Merge new requirements, BDD scenarios, architecture notes, task breakdowns, test mappings, and verification evidence into `docs/ENGINEERING_SPEC.md`.
+6. Use `docs/CHANGELOG.md` only as a historical log. Every `CHANGE-*` entry must link back to the engineering spec.
+7. Start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
+8. Prefer reusable common modules over duplicated logic. Check the Common Module Registry before adding utilities.
+9. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
 
 ## Skill routing
 
-- `$cx-bdd-tdd`: default entry point for feature, bugfix, and planning work.
+- `$cx-workflow`: entry point for workflow handling, task routing, and orchestration across multiple cx skills.
+- `$cx-bdd-tdd`: main BDD/TDD flow for feature, bugfix, and planning work.
 - `$cx-changelog`: changelog entries, release notes, and `CHANGE-*` consistency.
 - `$cx-pytorch-tdd`: Python, PyTorch, Lightning, tensors, training, and ML tests.
 - `$cx-ragged-tensor`: padding, masks, lengths, collation, and variable-length tensors.

@@ -5,17 +5,19 @@
 本仓库使用 cx 单一研发文档 BDD/TDD 工作流。
 
 1. 规划或修改代码前，先阅读 `docs/ENGINEERING_SPEC.md` 和 `docs/CHANGELOG.md`。
-2. 功能、缺陷、需求、架构和实现规划任务优先使用 `$cx-bdd-tdd`。
-3. 不要为每个需求新建 `spec.md`、`plan.md`、`tasks.md` 或零散设计文档，除非用户明确要求单独产物。
-4. 新需求、BDD 场景、架构说明、任务拆解、测试映射和验证证据都回写到 `docs/ENGINEERING_SPEC.md`。
-5. `docs/CHANGELOG.md` 只做历史记录。每个 `CHANGE-*` 条目都必须能映射回研发主文档。
-6. 从 BDD 行为开始，先写失败测试，再实现最小改动，然后重构。
-7. 优先封装可复用通用模块，新增工具前先检查 Common Module Registry。
-8. 修改后先运行最窄的有效测试，再按需要运行更宽的验证，并记录命令和结果。
+2. 流程处理、任务分流和不确定应使用哪个 cx skill 时，优先使用 `$cx-workflow`。
+3. 功能、缺陷、需求、架构和实现规划任务使用 `$cx-bdd-tdd`。
+4. 不要为每个需求新建 `spec.md`、`plan.md`、`tasks.md` 或零散设计文档，除非用户明确要求单独产物。
+5. 新需求、BDD 场景、架构说明、任务拆解、测试映射和验证证据都回写到 `docs/ENGINEERING_SPEC.md`。
+6. `docs/CHANGELOG.md` 只做历史记录。每个 `CHANGE-*` 条目都必须能映射回研发主文档。
+7. 从 BDD 行为开始，先写失败测试，再实现最小改动，然后重构。
+8. 优先封装可复用通用模块，新增工具前先检查 Common Module Registry。
+9. 修改后先运行最窄的有效测试，再按需要运行更宽的验证，并记录命令和结果。
 
 ## Skill 路由
 
-- `$cx-bdd-tdd`：功能、缺陷、规划和需求任务的默认入口。
+- `$cx-workflow`：流程处理、任务分流和多个 cx skills 的编排入口。
+- `$cx-bdd-tdd`：功能、缺陷、规划和需求任务的 BDD/TDD 主流程。
 - `$cx-changelog`：变更记录、发布说明、`CHANGE-*` 一致性。
 - `$cx-pytorch-tdd`：Python、PyTorch、Lightning、tensor、训练与 ML 测试。
 - `$cx-ragged-tensor`：padding、mask、length、collate、变长 tensor。

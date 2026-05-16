@@ -53,6 +53,7 @@ cx skills 建议全局安装。目标项目不需要复制 `.agents/skills`、`.
 ## 可用 skills
 
 ```text
+$cx-workflow
 $cx-bdd-tdd
 $cx-changelog
 $cx-pytorch-tdd

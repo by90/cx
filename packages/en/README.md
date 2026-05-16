@@ -50,7 +50,7 @@ Use stable cx names in your prompts. The names stay the same in both language pa
 ### Feature or bugfix request
 
 ```text
-Use $cx-bdd-tdd. Update docs/ENGINEERING_SPEC.md and docs/CHANGELOG.md first. Derive BDD scenarios and failing tests before implementation. Do not create separate spec/plan/task documents.
+Use $cx-workflow. Select the needed cx skills, update docs/ENGINEERING_SPEC.md and docs/CHANGELOG.md, derive BDD scenarios and failing tests, then implement. Do not create separate spec/plan/task documents.
 ```
 
 ### Python / PyTorch / Lightning request
@@ -87,6 +87,7 @@ ChatGPT will not automatically discover local Codex skills unless the relevant f
 
 | Skill | Use for |
 | --- | --- |
+| `$cx-workflow` | Workflow handling, task routing, and cx skill orchestration |
 | `$cx-bdd-tdd` | Main BDD/TDD single-source workflow |
 | `$cx-changelog` | `CHANGE-*` entries and changelog consistency |
 | `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensor, ML tests |

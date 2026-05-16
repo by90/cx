@@ -53,6 +53,7 @@ Project-specific guidance belongs in the target project's own `AGENTS.md`. To re
 ## Available Skills
 
 ```text
+$cx-workflow
 $cx-bdd-tdd
 $cx-changelog
 $cx-pytorch-tdd

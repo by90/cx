@@ -1,9 +1,13 @@
 {
   "package": "cx",
   "language": "zh",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "purpose": "Codex BDD/TDD single-source engineering workflow",
   "skills": [
+    {
+      "name": "cx-workflow",
+      "path": ".agents/skills/cx-workflow/SKILL.md"
+    },
     {
       "name": "cx-bdd-tdd",
       "path": ".agents/skills/cx-bdd-tdd/SKILL.md"
