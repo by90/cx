@@ -10,6 +10,8 @@ version: 1.0.0
 
 Design and maintain reusable utilities for variable-length tensor collections. The goal is to avoid rewriting fragile padding, mask, length, and collation logic across training, evaluation, and metrics code.
 
+Before adding variable-length tensor, indexed tensor series, or batch-packing utilities, use `$cx-common-module` to search the current project, the target documentation set registry, and existing skills for reusable components to extend.
+
 ## Preferred API shape
 
 Create small functions before classes:

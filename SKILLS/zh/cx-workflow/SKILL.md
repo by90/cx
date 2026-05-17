@@ -13,10 +13,11 @@ version: 1.0.0
 ## 流程入口
 
 1. 先判断任务类型：需求讨论、功能实现、缺陷修复、重构、专项技术实现、文档更新、证据审查或安装使用问题。
-2. 识别项目是否已经存在 `docs/ENGINEERING_SPEC.md`、`docs/CHANGELOG.md` 和 `AGENTS.md`。
+2. 识别项目是否已经存在 `docs/INDEX.md` 或 `docs/README.md`、一个或多个研发文档集，以及 `AGENTS.md`。
 3. 判断是否会改变代码行为、公共 API、数据结构、用户工作流或发布方式。
 4. 根据影响范围选择最小必要的 cx skills，不要一次性套用所有 skills。
-5. 给出当前步骤或直接执行；只有需求缺口会导致错误实现时才先提问。
+5. 为请求选择目标文档集；多组功能使用 `docs/<feature-group>/`，单组功能可以继续使用 `docs/` 根文档集。
+6. 给出当前步骤或直接执行；只有需求缺口会导致错误实现时才先提问。
 
 ## Skill 选择
 
@@ -26,16 +27,17 @@ version: 1.0.0
 - 变长 tensor、mask、padding、collation：叠加 `$cx-ragged-tensor`。
 - Rust、GPUI、gpui-component 桌面 UI：叠加 `$cx-rust-ui`。
 - 多任务进度、ETA、取消、后台任务适配器：叠加 `$cx-progress-ui`。
-- 抽取公共模块、稳定 API、迁移重复逻辑：叠加 `$cx-common-module`。
+- 抽取公共模块、稳定 API、复用组件、迁移重复逻辑：叠加 `$cx-common-module`。
 - 交付前检查、测试证据、文档一致性：使用 `$cx-evidence`。
 
 ## 执行顺序
 
-1. 对普通研发任务，先走 `$cx-bdd-tdd`，再叠加专项 skill。
+1. 对普通研发任务，先走 `$cx-bdd-tdd`，选择或创建目标文档集，再叠加专项 skill。
 2. 对已有实现的收尾任务，先检查文档和测试证据，再使用 `$cx-evidence`。
 3. 对仅安装、更新、语言切换或 shskills 使用问题，直接回答命令，不启动 BDD/TDD。
 4. 对只读分析或代码审查，先读相关文件并列出风险，不做代码改动，除非用户要求修复。
-5. 对跨多个模块的大改动，先把任务拆成可验证的小步骤，并把顺序写入研发主文档的 Task Queue。
+5. 对跨多个功能组的大改动，先拆成功能组文档集，并在 `docs/INDEX.md` 记录顺序、依赖和状态。
+6. 对可能复用的组件、数据结构、测试夹具或 UI 状态模型，先使用 `$cx-common-module` 搜索已有实现和 registry，再决定是否新增抽象。
 
 ## 停止条件
 

@@ -10,6 +10,8 @@ version: 1.0.0
 
 设计和维护变长 tensor 集合的可复用工具。目标是避免在训练、评估和 metrics 中反复写脆弱的 padding、mask、length 和 collation 逻辑。
 
+新增变长 tensor、indexed tensor series 或 batch packing 工具前，先使用 `$cx-common-module` 搜索当前项目、目标文档集 registry 和既有 skills，确认没有可复用组件可扩展。
+
 ## 推荐 API 形态
 
 先写小函数，再考虑类：

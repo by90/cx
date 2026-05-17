@@ -18,4 +18,4 @@
 - https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes
 - https://agents.md/
 
-核心设计决策是保留 Spec/Plan/Tasks 的阶段纪律，但把长期产物压缩成 `docs/ENGINEERING_SPEC.md` 和 `docs/CHANGELOG.md`。这样既能保留可测试行为和审计历史，又能防止按 feature 生成文档垃圾。
+核心设计决策是保留 Spec/Plan/Tasks 的阶段纪律，但把长期产物压缩进 `docs/` 下的文档集。小项目可以使用 `docs/ENGINEERING_SPEC.md` 和 `docs/CHANGELOG.md`；多功能组项目使用 `docs/INDEX.md` 加多个 `docs/<feature-group>/` 文档集。这样既能保留可测试行为和审计历史，又能防止按需求生成文档垃圾。

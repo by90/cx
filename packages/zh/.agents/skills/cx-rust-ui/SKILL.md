@@ -14,9 +14,10 @@ version: 1.0.0
 
 1. 阅读研发主文档和相关 BDD 场景。
 2. 在 UI 渲染前先抽取纯状态、reducer、validation 和 command 逻辑。
-3. 为状态和事件处理编写 Rust 单元测试。
-4. 实现最小改动。
-5. 可行时运行 `cargo fmt`、`cargo test` 和 `cargo clippy --all-targets --all-features`。
+3. 使用 Rust 内置测试机制为状态和事件处理编写单元测试，例如 `#[cfg(test)] mod tests` 和 `cargo test`。
+4. 新增可复用 UI state、组件 API 或 reducer 前，先叠加 `$cx-common-module` 搜索已有组件和 registry。
+5. 实现最小改动。
+6. 可行时运行 `cargo fmt`、`cargo test` 和 `cargo clippy --all-targets --all-features`。
 
 ## GPUI/gpui-component 规则
 
@@ -29,4 +30,4 @@ version: 1.0.0
 
 ## 测试策略
 
-单元测试状态转换、reducer、validation 和 command generation。只有纯状态无法证明的流程才增加集成测试。不要把截图作为唯一正确性证据。
+单元测试状态转换、reducer、validation 和 command generation。只有纯状态无法证明的流程才增加集成测试。涉及持久化或数据读取时，优先使用真实但缩小的测试数据，例如小型 SQLite fixture；只在外部边界难以真实控制时少量使用 mock。不要把截图作为唯一正确性证据。

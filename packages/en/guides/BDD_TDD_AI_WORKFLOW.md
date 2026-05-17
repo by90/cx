@@ -7,24 +7,25 @@ BDD defines the behavior and shared language. TDD proves the behavior with execu
 The cx workflow uses this order:
 
 1. Intake the user request.
-2. Update `docs/CHANGELOG.md` with a `CHANGE-*` entry.
-3. Update `docs/ENGINEERING_SPEC.md` with behavior, BDD scenarios, architecture notes, task queue, and test matrix.
-4. Write the expected failing test.
-5. Run the narrow test and record the red failure.
-6. Implement the smallest change.
-7. Run tests until green.
-8. Refactor only while keeping tests green.
-9. Record verification evidence.
-10. Consider whether duplicated logic should become a common module.
+2. Choose or create the target documentation set. Multi-feature projects use `docs/<feature-group>/ENGINEERING_SPEC.md` and the sibling `CHANGELOG.md`.
+3. Update the target `CHANGELOG.md` with a `CHANGE-*` entry.
+4. Update the target `ENGINEERING_SPEC.md` with behavior, main success scenarios, alternate scenarios, exception scenarios, architecture notes, task queue, and test matrix.
+5. Write the expected failing test.
+6. Run the narrow test and record the red failure.
+7. Implement the smallest change.
+8. Run tests until green.
+9. Refactor only while keeping tests green.
+10. Record verification evidence.
+11. Search existing implementation, related skills, and registries to decide whether duplicated logic should become a reusable component.
 
-## Why one engineering document
+## Why docs documentation sets
 
-Many AI workflows generate a new spec, plan, or task file for every request. That looks organized for one task but becomes unsearchable across a long-lived project. cx keeps a single engineering spec with stable sections so new work strengthens the existing document instead of creating document trash.
+Many AI workflows generate a new spec, plan, or task file for every request. That looks organized for one task but becomes unsearchable across a long-lived project. cx makes every new piece of work enter an explicit `docs/` documentation set: small projects can keep one set, while larger projects split by feature group and use `docs/INDEX.md` as the index.
 
 ## Recommended prompt
 
 ```text
-Use $cx-bdd-tdd. First update docs/ENGINEERING_SPEC.md and docs/CHANGELOG.md. Derive BDD scenarios and failing tests. Show the expected red failure, implement the smallest change, run validation, and record evidence. Do not create separate planning docs.
+Use $cx-bdd-tdd. First choose or create the target docs documentation set, then update its ENGINEERING_SPEC.md and CHANGELOG.md. Derive main success scenarios, alternate scenarios, exception scenarios, and failing tests. Show the expected red failure, implement the smallest change, run validation, and record evidence. Do not create separate planning docs.
 ```
 
 ## Specialized prompts

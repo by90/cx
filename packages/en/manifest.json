@@ -2,7 +2,7 @@
   "package": "cx",
   "language": "en",
   "version": "1.1.0",
-  "purpose": "Codex BDD/TDD single-source engineering workflow",
+  "purpose": "Codex BDD/TDD documentation-set engineering workflow",
   "skills": [
     {
       "name": "cx-workflow",

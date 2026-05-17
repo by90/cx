@@ -1,6 +1,6 @@
 # cx Codex BDD/TDD Pack
 
-This is the English cx package for AI-assisted BDD/TDD development with Codex App, Codex CLI, and ChatGPT-assisted planning. It keeps development anchored to one engineering specification, one changelog, executable tests, and reusable skills.
+This is the English cx package for AI-assisted BDD/TDD development with Codex App, Codex CLI, and ChatGPT-assisted planning. It keeps development anchored to docs documentation sets, executable tests, and reusable skills.
 
 Use the Chinese package instead when your team wants Chinese instructions in `AGENTS.md`, `SKILL.md`, templates, and guides. Do not install both language packs into the same target project, because the skill and agent names are intentionally identical.
 
@@ -13,6 +13,7 @@ AGENTS.md
 .codex/config.toml
 templates/ENGINEERING_SPEC.md
 templates/CHANGELOG.md
+templates/DOCS_INDEX.md
 tools/validate_single_source.py
 tools/validate_skill_pack.py
 tools/validate_cx_pack.py
@@ -50,7 +51,7 @@ Use stable cx names in your prompts. The names stay the same in both language pa
 ### Feature or bugfix request
 
 ```text
-Use $cx-workflow. Select the needed cx skills, update docs/ENGINEERING_SPEC.md and docs/CHANGELOG.md, derive BDD scenarios and failing tests, then implement. Do not create separate spec/plan/task documents.
+Use $cx-workflow. Select the needed cx skills, choose or create the target docs documentation set, update its ENGINEERING_SPEC.md and CHANGELOG.md, derive main success scenarios, alternate scenarios, exception scenarios, and failing tests, then implement. Do not create separate spec/plan/task documents.
 ```
 
 ### Python / PyTorch / Lightning request
@@ -68,7 +69,7 @@ Use $cx-bdd-tdd and $cx-rust-ui. Keep pure state and reducers separate from rend
 ### Reusable component request
 
 ```text
-Use $cx-common-module. Check the Common Module Registry in docs/ENGINEERING_SPEC.md. Design the API, add tests first, migrate duplicated code, and record the module in the registry.
+Use $cx-common-module. Search the current project, related skills, prior projects, and the target documentation set's Reusable Component Registry. Design the API, add tests first, migrate duplicated code, and record the component in the registry.
 ```
 
 ### Subagent workflow
@@ -76,37 +77,37 @@ Use $cx-common-module. Check the Common Module Registry in docs/ENGINEERING_SPEC
 Codex does not spawn custom subagents unless you explicitly ask. Use a prompt like:
 
 ```text
-Spawn cx-spec to update the single engineering spec, cx-tdd to design failing tests, and cx-review to check evidence. Wait for all results, then implement the smallest change.
+Spawn cx-spec to update the target docs documentation set, cx-tdd to design failing tests, and cx-review to check evidence. Wait for all results, then implement the smallest change.
 ```
 
 ### ChatGPT outside Codex
 
-ChatGPT will not automatically discover local Codex skills unless the relevant files are attached or pasted. For planning conversations, attach or paste `AGENTS.md`, the relevant `SKILL.md`, `docs/ENGINEERING_SPEC.md`, and `docs/CHANGELOG.md`, then ask ChatGPT to follow the cx workflow by name.
+ChatGPT will not automatically discover local Codex skills unless the relevant files are attached or pasted. For planning conversations, attach or paste `AGENTS.md`, the relevant `SKILL.md`, `docs/INDEX.md`, and the target documentation set's `ENGINEERING_SPEC.md` and `CHANGELOG.md`, then ask ChatGPT to follow the cx workflow by name.
 
 ## Skill map
 
 | Skill | Use for |
 | --- | --- |
 | `$cx-workflow` | Workflow handling, task routing, and cx skill orchestration |
-| `$cx-bdd-tdd` | Main BDD/TDD single-source workflow |
+| `$cx-bdd-tdd` | Main BDD/TDD documentation-set workflow |
 | `$cx-changelog` | `CHANGE-*` entries and changelog consistency |
 | `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensor, ML tests |
 | `$cx-ragged-tensor` | Variable-length tensors, masks, padding, collation |
 | `$cx-progress-ui` | Multi-task progress UI, ETA, cancellation, adapters |
 | `$cx-rust-ui` | Rust, GPUI, gpui-component desktop UI work |
-| `$cx-common-module` | Reusable module extraction and API design |
+| `$cx-common-module` | Reusable component extraction, common module extraction, and API design |
 | `$cx-evidence` | Final evidence review before delivery |
 
 ## Agent map
 
 | Agent | Use for |
 | --- | --- |
-| `cx-spec` | Maintaining `ENGINEERING_SPEC.md` and `CHANGELOG.md` |
+| `cx-spec` | Maintaining the target documentation set's `ENGINEERING_SPEC.md` and `CHANGELOG.md` |
 | `cx-bdd` | Expanding behavior into BDD scenarios |
 | `cx-tdd` | Designing failing tests and test matrix entries |
 | `cx-python-ml` | Python/PyTorch/Lightning implementation |
 | `cx-rust-ui` | Rust/GPUI implementation |
-| `cx-common` | Common module API and extraction |
+| `cx-common` | Reusable component API and extraction |
 | `cx-review` | Read-only evidence and compliance review |
 
 ## Multilingual publishing strategy
@@ -140,4 +141,4 @@ Target repositories do not need package validation tools copied into them.
 
 ## Important rule
 
-`docs/ENGINEERING_SPEC.md` is the only long-lived engineering specification. `docs/CHANGELOG.md` is only a historical index. Requirements, BDD scenarios, architecture decisions, task queues, test matrix entries, and verification evidence belong in the engineering spec, not in scattered feature documents.
+Single-feature projects may use `docs/ENGINEERING_SPEC.md` and `docs/CHANGELOG.md`. Multi-feature projects should use `docs/INDEX.md` as the root index and place concrete feature documentation in `docs/<feature-group>/ENGINEERING_SPEC.md` and the sibling `CHANGELOG.md`. Requirements, main success scenarios, alternate scenarios, exception scenarios, architecture decisions, task queues, test matrix entries, and verification evidence belong in the target documentation set, not in scattered feature documents.

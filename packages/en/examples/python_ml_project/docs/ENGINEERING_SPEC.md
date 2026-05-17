@@ -1,13 +1,13 @@
 # ENGINEERING_SPEC.md
 
-This is the single long-lived engineering specification for the project. Do not create separate per-feature planning documents unless a human explicitly approves them.
+This is the long-lived engineering specification for one feature group. Single-feature projects may place it at `docs/ENGINEERING_SPEC.md`; multi-feature projects should place it at `docs/<feature-group>/ENGINEERING_SPEC.md` and link it from `docs/INDEX.md`.
 
 ## 0. Document Rules
 
-- Requirements, BDD scenarios, architecture, task queue, test matrix, common module decisions, and verification evidence live here.
-- `docs/CHANGELOG.md` records history only.
-- Every `CHANGE-*` entry must appear here.
-- Every new or changed behavior should have a BDD scenario.
+- This feature group's requirements, BDD scenarios, architecture, task queue, test matrix, reusable component decisions, and verification evidence live here.
+- The sibling `CHANGELOG.md` records this feature group's history only.
+- Every `CHANGE-*` entry must appear in both the sibling `CHANGELOG.md` and this file.
+- Every new or changed behavior should have a main success scenario, necessary alternate scenarios, and exception scenarios.
 - Every BDD scenario should map to tests before implementation.
 
 ## 1. Product Intent
@@ -22,20 +22,32 @@ TODO: Describe the product, users, current goals, and non-goals.
 
 | Area | Behavior | BDD IDs | Notes |
 | --- | --- | --- | --- |
-| Workflow | Development starts from one engineering spec and one changelog | BDD-CX-001 | Initial policy |
+| Workflow | Development starts from the target documentation set and changelog | BDD-CX-001 | Initial policy |
 
 ## 4. BDD Scenarios
 
-### Scenario: BDD-CX-001 - Development uses the single-source BDD/TDD workflow
+### Scenario: BDD-CX-001 - Development uses the documentation-set BDD/TDD workflow
+
+Main success scenario:
 
 Given a developer asks for a feature or bugfix
 When the assistant plans and implements the work
-Then it updates this engineering spec and the changelog before implementation
+Then it updates the target engineering spec and changelog before implementation
 And it writes failing tests before production code
 And it records verification evidence after the tests pass
 
+Alternate scenarios:
+
+- Single-feature projects may use `docs/ENGINEERING_SPEC.md` and `docs/CHANGELOG.md` directly.
+- Multi-feature projects should use `docs/<feature-group>/ENGINEERING_SPEC.md` and the sibling `CHANGELOG.md`.
+
+Exception scenarios:
+
+- If the target documentation set is missing, create it first and register it in `docs/INDEX.md`.
+- If a `CHANGE-*` appears only in changelog and does not map back to the engineering spec, delivery validation must fail.
+
 - Related change: CHANGE-2026-001
-- Business rule: Work must remain searchable and auditable in one canonical engineering document.
+- Business rule: Work must remain searchable and auditable in the target documentation set.
 - Edge cases: urgent bugfixes, refactors, Python ML work, Rust UI work, reusable module extraction.
 - Related tests: `tools/validate_single_source.py`, `tools/validate_skill_pack.py`, `tools/validate_cx_pack.py`
 
@@ -55,14 +67,15 @@ TODO: Describe important modules, interfaces, data flow, error handling, and int
 | --- | --- | --- | --- |
 | Install cx package | CHANGE-2026-001 | done | Replace TODO sections with project-specific content. |
 
-## 8. Common Module Registry
+## 8. Reusable Component Registry
 
-| Module | Purpose | Public API | Tests | Owner |
-| --- | --- | --- | --- | --- |
-| progress_ui | Multi-task progress state and adapters | TODO | TODO | TODO |
-| ragged_tensors | Variable-length tensor utilities | TODO | TODO | TODO |
-| lightning_test_harness | Tiny deterministic Lightning test fixtures | TODO | TODO | TODO |
-| gpui_state_model | Pure Rust UI state and reducers | TODO | TODO | TODO |
+| Component | Purpose | Public API | Owners/Callers | Tests | Migration notes |
+| --- | --- | --- | --- | --- | --- |
+| indexed_series | Long-series wrapper indexed by entity, category, or window | TODO | TODO | TODO | TODO |
+| progress_ui | Multi-task progress state and adapters | TODO | TODO | TODO | TODO |
+| ragged_tensors | Variable-length tensor utilities | TODO | TODO | TODO | TODO |
+| lightning_test_harness | Tiny deterministic Lightning test fixtures | TODO | TODO | TODO | TODO |
+| gpui_state_model | Pure Rust UI state and reducers | TODO | TODO | TODO | TODO |
 
 ## 9. Verification Evidence
 
@@ -74,4 +87,4 @@ TODO: Describe important modules, interfaces, data flow, error handling, and int
 
 | Date | Decision | Reason | Consequences |
 | --- | --- | --- | --- |
-| 2026-05-13 | Use one engineering spec and one changelog | Prevent document sprawl and keep AI tasks searchable | Requires discipline and validation |
+| 2026-05-13 | Use a target engineering documentation set and changelog | Prevent document sprawl and keep AI tasks searchable | Requires discipline and validation |

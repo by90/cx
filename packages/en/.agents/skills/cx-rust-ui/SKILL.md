@@ -14,9 +14,10 @@ Use this for Rust desktop UI work with GPUI and gpui-component. Keep pure state 
 
 1. Read the engineering spec and related BDD scenarios.
 2. Extract pure state, reducers, validation, and command logic before UI rendering.
-3. Write Rust unit tests for state and event handling.
-4. Implement the smallest change.
-5. Run `cargo fmt`, `cargo test`, and `cargo clippy --all-targets --all-features` when practical.
+3. Use Rust's built-in test mechanism for state and event handling, such as `#[cfg(test)] mod tests` and `cargo test`.
+4. Before adding reusable UI state, component APIs, or reducers, add `$cx-common-module` and search existing components and registries.
+5. Implement the smallest change.
+6. Run `cargo fmt`, `cargo test`, and `cargo clippy --all-targets --all-features` when practical.
 
 ## GPUI/gpui-component rules
 
@@ -29,4 +30,4 @@ Use this for Rust desktop UI work with GPUI and gpui-component. Keep pure state 
 
 ## Testing strategy
 
-Unit test state transitions, reducers, validation, and command generation. Add integration tests only for flows that cannot be proven through pure state. Do not rely on screenshots as the only proof of correctness.
+Unit test state transitions, reducers, validation, and command generation. Add integration tests only for flows that cannot be proven through pure state. When persistence or data loading is involved, prefer real but reduced test data, such as a small SQLite fixture. Use mocks sparingly, only for external boundaries that cannot be controlled realistically. Do not rely on screenshots as the only proof of correctness.

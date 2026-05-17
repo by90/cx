@@ -1,6 +1,6 @@
 ---
 name: cx-pytorch-tdd
-description: Use for Python, PyTorch, Lightning, tensor utilities, model training, data modules, metrics, or ML tests. Enforces unittest-first, tiny tests, and current API verification.
+description: Use for Python, PyTorch, Lightning, tensor utilities, model training, data modules, metrics, ML tests, project-level uv environments, Python/PyTorch/CUDA stable-version checks, and test data strategy. Enforces unittest-first, tiny tests, sparse mocks, and current API verification.
 version: 1.0.0
 ---
 
@@ -12,12 +12,28 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 
 ## Required workflow
 
-1. Read the related BDD IDs and Common Module Registry entries in `docs/ENGINEERING_SPEC.md`.
-2. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
-3. Write Python `unittest` tests first unless the repository has an explicit exception.
-4. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
-5. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
-6. Use Black-compatible formatting and avoid changing unrelated user code.
+1. Read the related BDD IDs and Common Module Registry entries in the target documentation set's `ENGINEERING_SPEC.md`.
+2. Use the project-level `uv` virtual environment. Prefer `uv sync`, `uv run`, or the repository's existing `uv` workflow for dependency installation and test execution.
+3. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
+4. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
+5. Write Python `unittest` tests first. Do not introduce `pytest` unless the repository has an explicit exception.
+6. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
+7. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
+8. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable components.
+9. Use Black-compatible formatting and avoid changing unrelated user code.
+
+## Environment rules
+
+- Use the project-root `uv` environment, such as the environment defined by `.venv`, `uv.lock`, and `pyproject.toml`.
+- If a new environment is required, check https://www.python.org/downloads/ and https://pytorch.org/get-started/locally/ first.
+- Choose the PyTorch Stable build and select CPU or CUDA wheels from the official matrix. Treat the CUDA version supported by the PyTorch stable installer as authoritative.
+- Run Python unit tests with `uv run python -m unittest ...`.
+
+## Test data rules
+
+- Prefer real but reduced unit-test data.
+- For database behavior, prefer a small SQLite database or fixture instead of mocking the data-access layer.
+- Use mocks sparingly, only for boundaries such as external services, time, randomness, expensive hardware, or uncontrollable side effects.
 
 ## Tensor test checklist
 

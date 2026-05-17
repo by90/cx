@@ -2,17 +2,18 @@
 
 ## Repository working agreement
 
-This repository uses the cx single-source BDD/TDD workflow.
+This repository uses the cx documentation-set BDD/TDD workflow: the `docs/` root is for indexes and instructions, while feature groups may own their own documentation sets.
 
-1. Read `docs/ENGINEERING_SPEC.md` and `docs/CHANGELOG.md` before planning or editing code.
+1. Read `docs/INDEX.md` or `docs/README.md`, then read the target documentation set's `ENGINEERING_SPEC.md` and `CHANGELOG.md` before planning or editing code.
 2. Use `$cx-workflow` for workflow handling, task routing, and uncertainty about which cx skill applies.
 3. Use `$cx-bdd-tdd` for feature work, bug fixes, requirements, architecture updates, and implementation planning.
-4. Do not create per-feature `spec.md`, `plan.md`, `tasks.md`, or loose design notes unless the user explicitly asks for a separate artifact.
-5. Merge new requirements, BDD scenarios, architecture notes, task breakdowns, test mappings, and verification evidence into `docs/ENGINEERING_SPEC.md`.
-6. Use `docs/CHANGELOG.md` only as a historical log. Every `CHANGE-*` entry must link back to the engineering spec.
+4. Do not create orphan `spec.md`, `plan.md`, `tasks.md`, or loose design notes. Use `docs/<feature-group>/` documentation sets for multiple feature groups.
+5. Merge new requirements, BDD scenarios, architecture notes, task breakdowns, test mappings, and verification evidence into the target documentation set's `ENGINEERING_SPEC.md`.
+6. Use the target documentation set's `CHANGELOG.md` only as a historical log. Every `CHANGE-*` entry must link back to the same documentation set's engineering spec.
 7. Start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
-8. Prefer reusable common modules over duplicated logic. Check the Common Module Registry before adding utilities.
+8. Prefer reusable components and common modules over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Common Module Registry.
 9. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
+10. When adding or editing code, add beginner-friendly explanatory comments for code files, classes, functions, and important statements. Explain code intent line by line by default, except for pure formatting or repeated structural lines.
 
 ## Skill routing
 
@@ -23,35 +24,52 @@ This repository uses the cx single-source BDD/TDD workflow.
 - `$cx-ragged-tensor`: padding, masks, lengths, collation, and variable-length tensors.
 - `$cx-progress-ui`: multi-task progress state, cancellation, ETA, CLI adapters, or GPUI progress components.
 - `$cx-rust-ui`: Rust, GPUI, gpui-component, UI state, and component tests.
-- `$cx-common-module`: reusable module extraction and common API design.
+- `$cx-common-module`: reusable component extraction, common module extraction, and common API design.
 - `$cx-evidence`: final review before merge or delivery.
 
 ## Python rules
 
+- Use the project-level `uv` virtual environment. Install dependencies and run Python commands with `uv sync`, `uv run`, or the repository's existing `uv` workflow.
+- Before creating or rebuilding a Python / PyTorch environment, visit the official Python and PyTorch websites and choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
 - Use Python functions by default. Use classes only when they make the design clearer or when the user asks.
 - Format with Black defaults.
-- Tests must use Python's built-in `unittest` unless the repository already requires a different test framework.
+- Tests must use Python's built-in `unittest`; do not introduce `pytest` unless the repository already explicitly uses it.
 - For PyTorch and Lightning, verify current official docs when APIs or versions matter.
 - Test tensor shape, dtype, device, determinism, and edge cases.
 - Keep training tests tiny: CPU-first, tiny batches, tiny models, `fast_dev_run`, or limited batches.
+- Prefer real, small unit-test data. For database behavior, use a reduced SQLite database or fixture when practical, and use mocks sparingly only for boundaries such as external services, time, or randomness that cannot be controlled realistically.
 
 ## Rust / GPUI rules
 
+- Use Rust's built-in unit test mechanism and `cargo test`; do not introduce an extra test framework unless the repository already explicitly uses it.
 - Run `cargo fmt` and `cargo test` after Rust changes. Run `cargo clippy --all-targets --all-features` when practical.
 - Separate pure state and reducers from GPUI rendering code.
+- Before adding reusable UI state, component APIs, or reducers, search the Common Module Registry and existing implementations.
 - Prefer stateless gpui-component elements where possible; let views own state.
 - Keep UI component APIs small and reusable.
 
 ## Documentation policy
 
-Allowed long-lived documentation files in the target repository:
+Single-feature projects may use one root documentation set:
 
 ```text
 docs/ENGINEERING_SPEC.md
 docs/CHANGELOG.md
 ```
 
-Additional generated docs are temporary unless the user explicitly approves them. If you need a plan, write it into the Task Queue section of `docs/ENGINEERING_SPEC.md`.
+Multi-feature projects use multiple feature directories, with the `docs/` root reserved for indexes and instructions:
+
+```text
+docs/INDEX.md
+docs/<feature-group>/ENGINEERING_SPEC.md
+docs/<feature-group>/CHANGELOG.md
+```
+
+Additional generated docs are temporary unless the user explicitly approves them. If you need a plan, write it into the target documentation set's `ENGINEERING_SPEC.md` Task Queue section.
+
+When producing Chinese-language documentation, use Simplified Chinese. Long-lived documentation must live under the project's `docs/` directory.
+
+BDD scenarios, test matrices, implementation plans, and verification evidence must be written in the target documentation set under the project's `docs/` directory.
 
 ## Recommended validation commands
 
