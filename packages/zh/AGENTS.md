@@ -6,20 +6,22 @@
 
 1. 规划或修改代码前，先阅读 `docs/INDEX.md` 或 `docs/README.md`，再阅读目标文档集的 `ENGINEERING_SPEC.md` 和 `CHANGELOG.md`。
 2. 流程处理、任务分流和不确定应使用哪个 cx skill 时，优先使用 `$cx-workflow`。
-3. 功能、缺陷、需求、架构和实现规划任务使用 `$cx-bdd-tdd`。
+3. 编程相关的功能、缺陷、需求、架构和实现规划任务使用 `$cx-bdd-tdd`；非编程任务不要使用 TDD。
 4. 不要为每个需求新建孤立的 `spec.md`、`plan.md`、`tasks.md` 或零散设计文档；多组功能使用 `docs/<feature-group>/` 文档集。
-5. 新需求、BDD 场景、架构说明、任务拆解、测试映射和验证证据都回写到目标文档集的 `ENGINEERING_SPEC.md`。
-6. 目标文档集的 `CHANGELOG.md` 只做历史记录。每个 `CHANGE-*` 条目都必须能映射回同一文档集的研发主文档。
-7. 从 BDD 行为开始，先写失败测试，再实现最小改动，然后重构。
-8. 优先封装可复用组件和通用模块；新增工具、数据结构、测试夹具或 UI state 前，先搜索已有实现、相关 skills 和 Common Module Registry。
-9. 修改后先运行最窄的有效测试，再按需要运行更宽的验证，并记录命令和结果。
-10. 新增或修改代码时，代码文件、类、函数和关键语句都必须写面向初学者的相近说明注释；默认逐行解释代码意图，除非该行是纯格式或重复结构。
+5. 新需求、BDD 场景、架构说明、测试映射、复用组件决策和验证证据都回写到目标文档集的 `ENGINEERING_SPEC.md`。
+6. 目标文档集的 `CHANGELOG.md` 是唯一按顺序记录变更和变更任务的地方；具体 `CHANGE-*` 编号不要写进 `ENGINEERING_SPEC.md`。
+7. 编程任务从 BDD 行为开始，先写失败测试，再实现最小改动，然后重构；非编程任务用检查清单、审阅证据或交付确认验证。
+8. 理论上一个功能组或一次变更使用单独 git 分支，完成后合并到 `dev` 分支并删除工作分支。
+9. 完成一组功能并准备提交版本时，使用版本工具更新 `docs/VERSIONS.md`，例如 `v0.0.1 "创建项目模板"`。
+10. 优先封装可复用组件和通用模块；新增工具、数据结构、测试夹具或 UI state 前，先搜索已有实现、相关 skills、历史项目和 Common Module Registry。
+11. 修改后先运行最窄的有效测试或检查，再按需要运行更宽的验证，并记录命令和结果。
+12. 新增或修改代码时，代码文件、类、函数和关键语句都必须写面向初学者的相近说明注释；默认逐行解释代码意图，除非该行是纯格式或重复结构。
 
 ## Skill 路由
 
 - `$cx-workflow`：流程处理、任务分流和多个 cx skills 的编排入口。
-- `$cx-bdd-tdd`：功能、缺陷、规划和需求任务的 BDD/TDD 主流程。
-- `$cx-changelog`：变更记录、发布说明、`CHANGE-*` 一致性。
+- `$cx-bdd-tdd`：编程功能、缺陷、规划和需求任务的 BDD/TDD 主流程。
+- `$cx-changelog`：变更记录、变更任务顺序、发布说明、`CHANGE-*` 单一来源。
 - `$cx-pytorch-tdd`：Python、PyTorch、Lightning、tensor、训练与 ML 测试。
 - `$cx-ragged-tensor`：padding、mask、length、collate、变长 tensor。
 - `$cx-progress-ui`：多任务进度状态、取消、ETA、CLI 适配器、GPUI 进度组件。
@@ -55,21 +57,24 @@
 ```text
 docs/ENGINEERING_SPEC.md
 docs/CHANGELOG.md
+docs/GUIDE.md
 ```
 
 多功能组项目使用多个功能目录，`docs/` 根目录只保留索引和说明：
 
 ```text
 docs/INDEX.md
+docs/VERSIONS.md
 docs/<feature-group>/ENGINEERING_SPEC.md
 docs/<feature-group>/CHANGELOG.md
+docs/<feature-group>/GUIDE.md
 ```
 
-其他生成文档默认视为临时文件，除非用户明确批准。需要计划时，写入目标文档集 `ENGINEERING_SPEC.md` 的 Task Queue 章节。
+其他生成文档默认视为临时文件，除非用户明确批准。需要安排变更任务时，写入目标文档集 `CHANGELOG.md`，不要在 BDD 主文档中复制变更记录。
 
 中文版本或中文交付物中的所有文档必须使用简体中文，并且长期保留的文档必须放在项目的 `docs/` 文件夹下。
 
-BDD 场景、测试矩阵、实现计划和验证证据必须写入项目 `docs/` 文件夹中的目标研发文档集。
+BDD 场景、测试矩阵、实现说明和验证证据必须写入项目 `docs/` 文件夹中的目标研发文档集。非编程任务不使用 TDD。
 
 ## 推荐验证命令
 

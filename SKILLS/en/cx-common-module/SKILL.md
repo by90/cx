@@ -15,8 +15,8 @@ Turn repeated logic, stable data structures, test harnesses, and UI state models
 Before adding a new abstraction, search:
 
 1. The current project's `src/`, `tests/`, `docs/`, and the target documentation set's Common Module Registry.
-2. Enabled related skills such as `$cx-pytorch-tdd`, `$cx-ragged-tensor`, `$cx-rust-ui`, `$cx-progress-ui`, and this skill.
-3. Existing projects or prior implementations explicitly mentioned by the user, such as `IndexedSeries` in `rise202604`.
+2. Enabled and previously completed related skills such as `$cx-pytorch-tdd`, `$cx-ragged-tensor`, `$cx-rust-ui`, `$cx-progress-ui`, and this skill.
+3. Existing projects, prior projects, or historical implementations explicitly mentioned by the user, such as `IndexedSeries` in `rise202604`.
 4. Adjacent structures with the same shape, such as indexed series, packed tensor batches, ragged tensors, time-window datasets, or GPUI state reducers.
 
 Record candidates, accept/reject reasons, and migration impact. Do not add a reusable component without search evidence.

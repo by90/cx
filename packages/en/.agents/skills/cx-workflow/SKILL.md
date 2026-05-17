@@ -1,6 +1,6 @@
 ---
 name: cx-workflow
-description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, and deciding whether BDD/TDD, changelog, evidence review, specialist skills, or clarification is needed.
+description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, and deciding whether BDD/TDD, changelog, version records, evidence review, specialist skills, or clarification is needed; non-programming tasks do not use TDD.
 version: 1.0.0
 ---
 
@@ -12,16 +12,18 @@ Use this skill as the cx workflow entry point. It classifies the user's request,
 
 ## Entry Flow
 
-1. Classify the task: requirements discussion, feature implementation, bug fix, refactor, specialist technical work, documentation update, evidence review, or installation/use question.
+1. Classify the task: requirements discussion, feature implementation, bug fix, refactor, specialist technical work, documentation update, research, evidence review, or installation/use question.
 2. Check whether the project already has `docs/INDEX.md` or `docs/README.md`, one or more documentation sets, and `AGENTS.md`.
 3. Decide whether the request changes behavior, public APIs, data structures, user workflows, or release mechanics.
 4. Select the smallest necessary set of cx skills. Do not apply every skill by default.
 5. Select the target documentation set. Multi-feature work uses `docs/<feature-group>/`; single-feature work may keep using the root `docs/` documentation set.
-6. State the current step or execute directly. Ask first only when a missing requirement would likely cause the wrong implementation.
+6. Decide whether the task is programming work: non-programming documentation, research, installation, configuration, review, or planning-cleanup tasks do not start TDD.
+7. State the current step or execute directly. Ask first only when a missing requirement would likely cause the wrong implementation.
 
 ## Skill Selection
 
-- Behavior changes, bug fixes, architecture changes, or implementation planning: use `$cx-bdd-tdd`.
+- Programming behavior changes, bug fixes, architecture changes, or implementation planning: use `$cx-bdd-tdd`.
+- Non-programming documentation, research, installation, configuration, review, or planning cleanup: do not use TDD; use `$cx-changelog` or `$cx-evidence` when needed.
 - Changelog-only updates or change ID checks: use `$cx-changelog`.
 - Python, PyTorch, Lightning, tensor, or ML tests: add `$cx-pytorch-tdd`.
 - Variable-length tensors, masks, padding, or collation: add `$cx-ragged-tensor`.
@@ -32,12 +34,14 @@ Use this skill as the cx workflow entry point. It classifies the user's request,
 
 ## Execution Order
 
-1. For normal development tasks, start with `$cx-bdd-tdd`, choose or create the target documentation set, then add specialist skills.
+1. For programming development tasks, start with `$cx-bdd-tdd`, choose or create the target documentation set, then add specialist skills.
 2. For finishing work around an existing implementation, check docs and test evidence before using `$cx-evidence`.
-3. For installation, update, language switching, or shskills usage questions, answer with commands directly and do not start BDD/TDD.
+3. For installation, update, language switching, documentation cleanup, research notes, or shskills usage questions, answer directly or record check results and do not start BDD/TDD.
 4. For read-only analysis or code review, read the relevant files and list risks before making changes, unless the user asks for fixes.
-5. For broad changes across multiple feature groups, split the work into feature-group documentation sets and record order, dependencies, and status in `docs/INDEX.md`.
+5. For broad changes across multiple feature groups, split the work into feature-group documentation sets and record dependencies and status in `docs/INDEX.md`; each feature-group folder may include `GUIDE.md`.
 6. For potentially reusable components, data structures, test harnesses, or UI state models, use `$cx-common-module` first to search existing implementations and registries before adding a new abstraction.
+7. In principle, each feature group or change is completed on a separate work branch, then merged into `dev` and followed by deleting the work branch.
+8. When a feature group is complete and ready for a version, use the version tool to update `docs/VERSIONS.md`, for example `v0.0.1 "Create project template"`.
 
 ## Stop Conditions
 

@@ -23,8 +23,6 @@ class TestValidateSingleSource(unittest.TestCase):
 ## 4. BDD Scenarios
 
 BDD-TRAIN-001
-CHANGE-2026-001
-
 ## 6. Test Matrix
 """,
                 encoding="utf-8",
@@ -45,7 +43,7 @@ CHANGE-2026-001
             feature.mkdir(parents=True)  # Create docs and the feature folder.
             (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # Write the root index.
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.
@@ -54,21 +52,24 @@ CHANGE-2026-001
 
         self.assertTrue(report.ok, report.errors)  # The multi-set layout should pass.
 
-    def test_change_in_changelog_must_appear_in_spec(self) -> None:
-        """A CHANGE in changelog must also appear in the same set's spec."""
+    def test_change_id_in_spec_is_error(self) -> None:
+        """A CHANGE belongs only in changelog, not in the BDD spec."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
             docs = root / "docs"  # Point to the docs directory.
             docs.mkdir()  # Create docs.
-            (docs / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Spec intentionally lacks CHANGE.
+            (docs / "ENGINEERING_SPEC.md").write_text(  # Spec intentionally includes an invalid CHANGE.
+                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                encoding="utf-8",
+            )
             (docs / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Changelog includes CHANGE.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertFalse(report.ok)  # Missing mapping should fail.
+        self.assertFalse(report.ok)  # CHANGE in spec should fail.
         self.assertIn(  # Error should point to the same documentation set.
-            "CHANGE-2026-001 appears in docs/CHANGELOG.md but not docs/ENGINEERING_SPEC.md",
+            "CHANGE-2026-001 must be recorded in docs/CHANGELOG.md, not docs/ENGINEERING_SPEC.md",
             report.errors,
         )
 
@@ -96,7 +97,7 @@ CHANGE-2026-001
             feature = root / "docs" / "training"  # Point to one feature docs folder.
             feature.mkdir(parents=True)  # Create the feature folder.
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.

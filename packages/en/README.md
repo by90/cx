@@ -14,10 +14,13 @@ AGENTS.md
 templates/ENGINEERING_SPEC.md
 templates/CHANGELOG.md
 templates/DOCS_INDEX.md
+templates/GUIDE.md
+templates/VERSIONS.md
 tools/validate_single_source.py
 tools/validate_skill_pack.py
 tools/validate_cx_pack.py
 tools/new_change.py
+tools/new_version.py
 ```
 
 The repository root `SKILLS/en` directory is the shskills installation source for users. This package directory keeps the complete English package source, templates, guides, and validation tools for development and release checks.
@@ -51,7 +54,7 @@ Use stable cx names in your prompts. The names stay the same in both language pa
 ### Feature or bugfix request
 
 ```text
-Use $cx-workflow. Select the needed cx skills, choose or create the target docs documentation set, update its ENGINEERING_SPEC.md and CHANGELOG.md, derive main success scenarios, alternate scenarios, exception scenarios, and failing tests, then implement. Do not create separate spec/plan/task documents.
+Use $cx-workflow. Select the needed cx skills, choose or create the target docs documentation set, update its ENGINEERING_SPEC.md and CHANGELOG.md, and derive main success scenarios, alternate scenarios, and exception scenarios. For programming tasks, write failing tests before implementation; for non-programming tasks, do not use TDD. Keep ordered change tasks only in CHANGELOG.md. Do not create separate spec/plan/task documents.
 ```
 
 ### Python / PyTorch / Lightning request
@@ -89,8 +92,8 @@ ChatGPT will not automatically discover local Codex skills unless the relevant f
 | Skill | Use for |
 | --- | --- |
 | `$cx-workflow` | Workflow handling, task routing, and cx skill orchestration |
-| `$cx-bdd-tdd` | Main BDD/TDD documentation-set workflow |
-| `$cx-changelog` | `CHANGE-*` entries and changelog consistency |
+| `$cx-bdd-tdd` | Main BDD/TDD documentation-set workflow for programming tasks |
+| `$cx-changelog` | `CHANGE-*` entries, ordered change tasks, and single source |
 | `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensor, ML tests |
 | `$cx-ragged-tensor` | Variable-length tensors, masks, padding, collation |
 | `$cx-progress-ui` | Multi-task progress UI, ETA, cancellation, adapters |
@@ -102,7 +105,7 @@ ChatGPT will not automatically discover local Codex skills unless the relevant f
 
 | Agent | Use for |
 | --- | --- |
-| `cx-spec` | Maintaining the target documentation set's `ENGINEERING_SPEC.md` and `CHANGELOG.md` |
+| `cx-spec` | Maintaining the target documentation set's behavior spec and changelog |
 | `cx-bdd` | Expanding behavior into BDD scenarios |
 | `cx-tdd` | Designing failing tests and test matrix entries |
 | `cx-python-ml` | Python/PyTorch/Lightning implementation |
@@ -141,4 +144,4 @@ Target repositories do not need package validation tools copied into them.
 
 ## Important rule
 
-Single-feature projects may use `docs/ENGINEERING_SPEC.md` and `docs/CHANGELOG.md`. Multi-feature projects should use `docs/INDEX.md` as the root index and place concrete feature documentation in `docs/<feature-group>/ENGINEERING_SPEC.md` and the sibling `CHANGELOG.md`. Requirements, main success scenarios, alternate scenarios, exception scenarios, architecture decisions, task queues, test matrix entries, and verification evidence belong in the target documentation set, not in scattered feature documents.
+Single-feature projects may use `docs/ENGINEERING_SPEC.md`, `docs/CHANGELOG.md`, and optional `docs/GUIDE.md`. Multi-feature projects should use `docs/INDEX.md` as the root index, `docs/VERSIONS.md` as the version index, and place concrete feature documentation in `docs/<feature-group>/ENGINEERING_SPEC.md`, the sibling `CHANGELOG.md`, and optional `GUIDE.md`. Requirements, main success scenarios, alternate scenarios, exception scenarios, architecture decisions, test matrix entries, and verification evidence belong in the target documentation set; concrete change IDs and ordered change tasks belong only in the sibling `CHANGELOG.md`. Non-programming tasks do not use TDD. In principle, each feature group or change is completed on its own branch, merged into `dev`, and followed by deleting the work branch.

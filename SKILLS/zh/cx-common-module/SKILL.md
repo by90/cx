@@ -15,8 +15,8 @@ version: 1.0.0
 新增抽象前必须先搜索：
 
 1. 当前项目的 `src/`、`tests/`、`docs/` 和目标文档集 Common Module Registry。
-2. 已启用的相关 skills，例如 `$cx-pytorch-tdd`、`$cx-ragged-tensor`、`$cx-rust-ui`、`$cx-progress-ui` 和本 skill。
-3. 用户明确提到的既有项目或历史实现，例如 `rise202604` 中的 `IndexedSeries`。
+2. 已启用和之前完成的相关 skills，例如 `$cx-pytorch-tdd`、`$cx-ragged-tensor`、`$cx-rust-ui`、`$cx-progress-ui` 和本 skill。
+3. 用户明确提到的既有项目、历史项目或历史实现，例如 `rise202604` 中的 `IndexedSeries`。
 4. 相邻领域是否已有同构结构，例如 indexed series、packed tensor batch、ragged tensor、time-window dataset、GPUI state reducer。
 
 搜索后必须记录候选、采用/拒绝理由和迁移影响；没有搜索证据时，不要新增复用组件。

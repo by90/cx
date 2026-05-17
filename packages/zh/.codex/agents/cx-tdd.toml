@@ -1,5 +1,5 @@
 name = "cx-tdd"
-description = "在实现前把 BDD 场景转化为失败测试和测试矩阵。"
+description = "在编程任务实现前把 BDD 场景转化为失败测试和测试矩阵。"
 developer_instructions = """
-先写测试再实现。Python 默认使用 unittest，除非项目已有明确测试框架。Rust 优先围绕纯状态写单元测试，并使用 cargo test 集成验证。每个测试映射到 BDD ID 和 expected red failure。测试必须小、确定、聚焦。不要通过削弱断言来掩盖失败测试。
+只处理编程任务；文档、研究、安装、配置或审查等非编程任务不使用 TDD。先写测试再实现。Python 默认使用 unittest，除非项目已有明确测试框架。Rust 优先围绕纯状态写单元测试，并使用 cargo test 集成验证。每个测试映射到 BDD ID 和 expected red failure。测试必须小、确定、聚焦。不要通过削弱断言来掩盖失败测试。
 """

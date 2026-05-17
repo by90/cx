@@ -11,9 +11,9 @@ from pathlib import Path  # Path 用面向对象方式处理文件路径。
 
 CHANGE_ID_RE = re.compile(r"CHANGE-\d{4}-\d{3}")  # 匹配稳定变更编号。
 BDD_ID_RE = re.compile(r"BDD-[A-Z0-9]+-\d{3}")  # 匹配稳定行为场景编号。
-ROOT_INDEX_DOCS = {"INDEX.md", "README.md"}  # 多文档集模式下 docs 根目录允许的索引文件。
+ROOT_INDEX_DOCS = {"INDEX.md", "README.md", "VERSIONS.md"}  # docs 根目录允许索引、说明和版本索引。
 DOC_SET_FILES = {"ENGINEERING_SPEC.md", "CHANGELOG.md"}  # 一个研发文档集必须包含的核心文件。
-OPTIONAL_DOC_SET_FILES = {"INDEX.md", "README.md"}  # 文档集目录内允许存在的说明文件。
+OPTIONAL_DOC_SET_FILES = {"GUIDE.md", "INDEX.md", "README.md"}  # 文档集目录内允许存在的说明和使用指南。
 
 
 @dataclass(frozen=True)
@@ -98,13 +98,11 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
         errors.append(f"unexpected long-lived docs file: {doc_set.root_relative}/{doc_name}")  # 阻止孤立文档。
 
     spec_text = read_text(doc_set.spec_path)  # 读取主文档文本。
-    changelog_text = read_text(doc_set.changelog_path)  # 读取变更记录文本。
-    change_ids_in_changelog = set(CHANGE_ID_RE.findall(changelog_text))  # 提取 changelog 中的变更编号。
     change_ids_in_spec = set(CHANGE_ID_RE.findall(spec_text))  # 提取主文档中的变更编号。
-    for change_id in sorted(change_ids_in_changelog - change_ids_in_spec):  # 每个 changelog 变更都必须回指主文档。
-        errors.append(  # 把缺失映射写成清楚的错误。
-            f"{change_id} appears in {doc_set.root_relative}/CHANGELOG.md but not "
-            f"{doc_set.root_relative}/ENGINEERING_SPEC.md"
+    for change_id in sorted(change_ids_in_spec):  # 逐个检查错误写入主文档的变更编号。
+        errors.append(  # CHANGE 只能存在 changelog，这里给出直接修复方向。
+            f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, "
+            f"not {doc_set.root_relative}/ENGINEERING_SPEC.md"
         )
 
     bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text)))  # 提取主文档中的 BDD 场景编号。
@@ -139,8 +137,8 @@ def validate_single_source(root: Path, allowed_docs: set[str] | None = None) -> 
         errors.append("multi-doc-set mode requires docs/INDEX.md or docs/README.md")  # 报告缺失索引。
 
     root_allowed = ROOT_INDEX_DOCS | extra_allowed_docs  # 根目录默认只允许索引和用户额外白名单。
-    if has_root_set and not has_child_sets:  # 单文档集模式允许根目录放核心文件。
-        root_allowed = root_allowed | DOC_SET_FILES  # 加入 ENGINEERING_SPEC.md 和 CHANGELOG.md。
+    if has_root_set and not has_child_sets:  # 单文档集模式允许根目录放核心文件和同级使用指南。
+        root_allowed = root_allowed | DOC_SET_FILES | OPTIONAL_DOC_SET_FILES  # 加入文档集核心文件和 GUIDE.md。
     for doc_name in sorted(markdown_files(docs_dir) - root_allowed):  # 检查根目录多余 Markdown 文件。
         errors.append(f"unexpected long-lived docs file: docs/{doc_name}")  # 报告孤立根文档。
 
