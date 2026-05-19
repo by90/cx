@@ -1,6 +1,6 @@
 # CHANGELOG.md
 
-This file is the current documentation set's only ordered record of changes and change tasks. Full requirements, BDD scenarios, architecture, test matrix entries, and verification evidence belong in the sibling `ENGINEERING_SPEC.md`; do not duplicate long behavior descriptions here.
+This file records history for the current documentation set only. Full requirements, BDD scenarios, architecture, test matrix entries, and verification evidence belong in the sibling `ENGINEERING_SPEC.md`.
 
 ## Unreleased
 
@@ -8,12 +8,8 @@ This file is the current documentation set's only ordered record of changes and 
 
 - Date: 2026-05-13
 - Type: docs
-- Status: done
-- Branch: codex/install-cx-workflow
-- Base branch: dev
-- Feature group: root
-- Task order: 1
 - Summary: Install the cx documentation-set BDD/TDD workflow package.
-- Related scenarios: BDD-CX-001
+- Engineering spec sections: 0, 2, 4, 6, 8, 9, 10
+- Related BDD scenarios: BDD-CX-001
 - Related tests: `tools/validate_single_source.py`, `tools/validate_skill_pack.py`, `tools/validate_cx_pack.py`
-- Verification evidence: Recorded in the sibling `ENGINEERING_SPEC.md` Verification Evidence section.
+- Verification evidence: Recorded in the sibling `ENGINEERING_SPEC.md` section 9.

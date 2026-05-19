@@ -1,7 +1,7 @@
 ---
 name: cx-pytorch-tdd
 description: 用于 Python、PyTorch、Lightning、tensor utilities、model training、data modules、metrics、ML tests、uv 项目环境、Python/PyTorch/CUDA 稳定版本核对和测试数据策略；强制 unittest-first、小测试、少 mock 和当前 API 验证。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Python / PyTorch / Lightning TDD
@@ -21,6 +21,17 @@ version: 1.0.0
 7. tensor 变换优先写成纯函数，Lightning orchestration 尽量保持很薄。
 8. 新增 dataset、tensor 容器、indexed series 或 test harness 前，先叠加 `$cx-common-module` 搜索已有复用组件。
 9. 代码遵循 Black 默认规范，不修改无关用户代码。
+
+## Python 设计规则
+
+- model state、dataset state、配置、生命周期和领域不变量必须使用面向对象设计。
+- 优先使用显式类、dataclass、protocol、带类型的构造参数和有名字的方法，而不是动态属性访问。
+- 默认禁止 `getattr`、`setattr`、`delattr`、monkey patch 或动态注入方法。
+- 如果反射不可避免，必须先记录为什么显式方法、mapping、protocol 或 dispatch table 不适用；把反射隔离在极小 adapter 中，并直接测试它。
+- 不要构造字符串驱动的训练流水线。使用带类型的配置对象和显式 factory。
+- tensor 变换尽量小而纯，但不要把无关逻辑乱塞进 utility 文件。
+- Lightning orchestration 必须保持薄；领域逻辑放入经过测试的对象或纯函数。
+- 避免过度 mock、全局可变状态、兜底式异常吞噬和隐藏文件系统副作用。
 
 ## 环境规则
 

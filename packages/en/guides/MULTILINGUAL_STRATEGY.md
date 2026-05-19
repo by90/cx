@@ -19,17 +19,18 @@ Codex discovers skills by scanning `.agents/skills` from the current working dir
 
 Put a short `README.md` in the repository root and link to `README.zh-CN.md`. GitHub renders the root README as the primary visitor page and relative links keep the repository usable after cloning.
 
-## Stable naming
+## Naming stability
 
-Keep names stable forever unless you create a major release:
+Keep names stable across language packages. During pre-1.0 development, interface and workflow changes use minor versions while the major version stays `0`; after `1.0.0`, incompatible renames require a major release:
 
-- `$cx-bdd-tdd`
+- `$cx-bdd`
+- `$cx-tdd`
 - `$cx-changelog`
+- `$cx-version`
+- `$cx-research`
 - `$cx-pytorch-tdd`
-- `$cx-ragged-tensor`
-- `$cx-progress-ui`
-- `$cx-rust-ui`
+- `$cx-rust-tdd`
 - `$cx-common-module`
 - `$cx-evidence`
 
-Stable names let users write prompts, tutorials, and automation once, then choose the language package separately.
+Consistent names let users write prompts, tutorials, and automation once, then choose the language package separately.

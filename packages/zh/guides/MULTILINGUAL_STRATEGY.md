@@ -19,17 +19,18 @@ Codex 会从当前工作目录向仓库根目录扫描 `.agents/skills`。如果
 
 仓库根目录放简洁的 `README.md`，并链接到 `README.zh-CN.md`。GitHub 会把根目录 README 作为主要访问页展示；使用相对链接可以保证仓库 clone 后仍然可用。
 
-## 稳定命名
+## 命名稳定性
 
-除非发布大版本，否则保持这些名称不变：
+中英文包必须保持名称一致。pre-1.0 阶段接口和工作流变化使用 minor，主版本号保持 `0`；`1.0.0` 之后，不兼容重命名才需要 major：
 
-- `$cx-bdd-tdd`
+- `$cx-bdd`
+- `$cx-tdd`
 - `$cx-changelog`
+- `$cx-version`
+- `$cx-research`
 - `$cx-pytorch-tdd`
-- `$cx-ragged-tensor`
-- `$cx-progress-ui`
-- `$cx-rust-ui`
+- `$cx-rust-tdd`
 - `$cx-common-module`
 - `$cx-evidence`
 
-稳定名称让用户只写一次提示词、教程和自动化脚本，然后单独选择语言包。
+一致名称让用户只写一次提示词、教程和自动化脚本，然后单独选择语言包。

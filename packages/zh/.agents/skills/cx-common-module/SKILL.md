@@ -1,7 +1,7 @@
 ---
 name: cx-common-module
-description: 用于 code duplication、shared utilities、reusable components、component extraction、API design、indexed-series-like data structures，以及判断 progress UI、ragged tensor handling、test harnesses 或 GPUI state 是否应该成为 common modules。
-version: 1.0.0
+description: 用于 code duplication、shared utilities、reusable components、component extraction、API design、indexed-series-like data structures，以及判断重复实现逻辑是否应该成为 common modules。
+version: 0.0.1
 ---
 
 # cx 复用组件与通用模块抽取
@@ -15,8 +15,8 @@ version: 1.0.0
 新增抽象前必须先搜索：
 
 1. 当前项目的 `src/`、`tests/`、`docs/` 和目标文档集 Common Module Registry。
-2. 已启用和之前完成的相关 skills，例如 `$cx-pytorch-tdd`、`$cx-ragged-tensor`、`$cx-rust-ui`、`$cx-progress-ui` 和本 skill。
-3. 用户明确提到的既有项目、历史项目或历史实现，例如 `rise202604` 中的 `IndexedSeries`。
+2. 已启用的相关 workflow skills，例如 `$cx-pytorch-tdd`、`$cx-rust-tdd`、`$cx-tdd` 和本 skill。
+3. 用户明确提到的既有项目或历史实现，例如 `rise202604` 中的 `IndexedSeries`。
 4. 相邻领域是否已有同构结构，例如 indexed series、packed tensor batch、ragged tensor、time-window dataset、GPUI state reducer。
 
 搜索后必须记录候选、采用/拒绝理由和迁移影响；没有搜索证据时，不要新增复用组件。
@@ -51,7 +51,5 @@ Component | Purpose | Public API | Owners/Callers | Tests | Migration notes
 ## 初始模块优先级
 
 1. `indexed_series` 或 `indexed_tensor_series`：按分类、实体或时间窗口索引的长序列封装。
-2. `progress_ui`。
-3. `ragged_tensors`。
-4. `lightning_test_harness`。
-5. `gpui_state_model`。
+2. `lightning_test_harness`。
+3. 已有 README 和测试的项目专属组件库。

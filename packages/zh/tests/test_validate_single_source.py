@@ -23,6 +23,8 @@ class TestValidateSingleSource(unittest.TestCase):
 ## 4. BDD Scenarios
 
 BDD-TRAIN-001
+CHANGE-2026-001
+
 ## 6. Test Matrix
 """,
                 encoding="utf-8",
@@ -39,11 +41,15 @@ BDD-TRAIN-001
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
             root = Path(tmpdir)  # 把临时目录转成 Path。
             docs = root / "docs"  # 指向 docs 根目录。
-            feature = docs / "training"  # 指向功能组文档目录。
+            feature = docs / "1.训练"  # 指向编号功能组文档目录。
             feature.mkdir(parents=True)  # 创建 docs 和功能组目录。
             (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # 写入根索引。
+            (feature / "BDD.md").write_text(  # 写入功能组 BDD 文档。
+                "# BDD: 1.训练\n\nFeature: 1.训练\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # 写入功能组主文档。
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # 写入功能组变更记录。
@@ -52,24 +58,21 @@ BDD-TRAIN-001
 
         self.assertTrue(report.ok, report.errors)  # 多文档集布局应通过。
 
-    def test_change_id_in_spec_is_error(self) -> None:
-        """CHANGE 只能在 changelog 中记录，不能写进 BDD 主文档。"""
+    def test_change_in_changelog_must_appear_in_spec(self) -> None:
+        """CHANGE 出现在 changelog 时，也必须出现在同一文档集主文档。"""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
             root = Path(tmpdir)  # 把临时目录转成 Path。
             docs = root / "docs"  # 指向 docs 目录。
             docs.mkdir()  # 创建 docs 目录。
-            (docs / "ENGINEERING_SPEC.md").write_text(  # 主文档故意错误地写入 CHANGE。
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
+            (docs / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # 主文档故意缺少 CHANGE。
             (docs / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # 变更记录包含 CHANGE。
 
             report = validate_single_source(root)  # 执行校验。
 
-        self.assertFalse(report.ok)  # 主文档出现 CHANGE 必须失败。
+        self.assertFalse(report.ok)  # 缺少映射必须失败。
         self.assertIn(  # 错误信息要指向同一文档集。
-            "CHANGE-2026-001 must be recorded in docs/CHANGELOG.md, not docs/ENGINEERING_SPEC.md",
+            "CHANGE-2026-001 appears in docs/CHANGELOG.md but not docs/ENGINEERING_SPEC.md",
             report.errors,
         )
 
@@ -94,10 +97,14 @@ BDD-TRAIN-001
 
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
             root = Path(tmpdir)  # 把临时目录转成 Path。
-            feature = root / "docs" / "training"  # 指向功能组文档目录。
+            feature = root / "docs" / "1.训练"  # 指向编号功能组文档目录。
             feature.mkdir(parents=True)  # 创建功能组目录。
+            (feature / "BDD.md").write_text(  # 写入必需的 BDD 文档。
+                "# BDD: 1.训练\n\nFeature: 1.训练\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # 写入功能组主文档。
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # 写入功能组变更记录。

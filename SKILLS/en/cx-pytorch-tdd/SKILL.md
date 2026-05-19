@@ -1,7 +1,7 @@
 ---
 name: cx-pytorch-tdd
 description: Use for Python, PyTorch, Lightning, tensor utilities, model training, data modules, metrics, ML tests, project-level uv environments, Python/PyTorch/CUDA stable-version checks, and test data strategy. Enforces unittest-first, tiny tests, sparse mocks, and current API verification.
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Python / PyTorch / Lightning TDD
@@ -21,6 +21,17 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 7. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
 8. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable components.
 9. Use Black-compatible formatting and avoid changing unrelated user code.
+
+## Python Design Rules
+
+- Use object-oriented design for model state, dataset state, configuration, lifecycle, and domain invariants.
+- Prefer explicit classes, dataclasses, protocols, typed constructor arguments, and named methods over dynamic attribute access.
+- Do not use `getattr`, `setattr`, `delattr`, monkey-patching, or dynamic method injection by default.
+- If reflection is unavoidable, first document why explicit methods, mappings, protocols, or dispatch tables do not work; isolate the reflection behind a tiny adapter and test it directly.
+- Do not build stringly typed training pipelines. Use typed config objects and explicit factories.
+- Keep tensor transformations small and pure where possible, but avoid dumping unrelated logic into utility files.
+- Keep Lightning orchestration thin; put domain logic in tested objects or pure functions.
+- Avoid broad mocks, global mutable state, catch-all exception handling, and hidden filesystem side effects.
 
 ## Environment rules
 

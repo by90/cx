@@ -28,7 +28,7 @@ class TestValidateCxPack(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             (root / "manifest.json").write_text(
-                '{"package":"cx","version":"1.0.0","skills":[{"name":"cx-missing","path":"missing/SKILL.md"}],"agents":[]}',
+                '{"package":"cx","version":"0.0.1","skills":[{"name":"cx-missing","path":"missing/SKILL.md"}],"agents":[]}',
                 encoding="utf-8",
             )
 

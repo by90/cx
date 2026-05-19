@@ -23,6 +23,8 @@ class TestValidateSingleSource(unittest.TestCase):
 ## 4. BDD Scenarios
 
 BDD-TRAIN-001
+CHANGE-2026-001
+
 ## 6. Test Matrix
 """,
                 encoding="utf-8",
@@ -39,11 +41,15 @@ BDD-TRAIN-001
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
             docs = root / "docs"  # Point to the docs root.
-            feature = docs / "training"  # Point to one feature-group docs folder.
+            feature = docs / "1.Training"  # Point to one ordered feature-group docs folder.
             feature.mkdir(parents=True)  # Create docs and the feature folder.
             (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # Write the root index.
+            (feature / "BDD.md").write_text(  # Write the feature BDD document.
+                "# BDD: 1.Training\n\nFeature: 1.Training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.
@@ -52,24 +58,21 @@ BDD-TRAIN-001
 
         self.assertTrue(report.ok, report.errors)  # The multi-set layout should pass.
 
-    def test_change_id_in_spec_is_error(self) -> None:
-        """A CHANGE belongs only in changelog, not in the BDD spec."""
+    def test_change_in_changelog_must_appear_in_spec(self) -> None:
+        """A CHANGE in changelog must also appear in the same set's spec."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
             docs = root / "docs"  # Point to the docs directory.
             docs.mkdir()  # Create docs.
-            (docs / "ENGINEERING_SPEC.md").write_text(  # Spec intentionally includes an invalid CHANGE.
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
+            (docs / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Spec intentionally lacks CHANGE.
             (docs / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Changelog includes CHANGE.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertFalse(report.ok)  # CHANGE in spec should fail.
+        self.assertFalse(report.ok)  # Missing mapping should fail.
         self.assertIn(  # Error should point to the same documentation set.
-            "CHANGE-2026-001 must be recorded in docs/CHANGELOG.md, not docs/ENGINEERING_SPEC.md",
+            "CHANGE-2026-001 appears in docs/CHANGELOG.md but not docs/ENGINEERING_SPEC.md",
             report.errors,
         )
 
@@ -94,10 +97,14 @@ BDD-TRAIN-001
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
-            feature = root / "docs" / "training"  # Point to one feature docs folder.
+            feature = root / "docs" / "1.Training"  # Point to one feature docs folder.
             feature.mkdir(parents=True)  # Create the feature folder.
+            (feature / "BDD.md").write_text(  # Write the required BDD document.
+                "# BDD: 1.Training\n\nFeature: 1.Training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.

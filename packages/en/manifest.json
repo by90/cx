@@ -1,7 +1,7 @@
 {
   "package": "cx",
   "language": "en",
-  "version": "1.1.0",
+  "version": "0.0.1",
   "purpose": "Codex BDD/TDD documentation-set engineering workflow",
   "skills": [
     {
@@ -9,28 +9,32 @@
       "path": ".agents/skills/cx-workflow/SKILL.md"
     },
     {
-      "name": "cx-bdd-tdd",
-      "path": ".agents/skills/cx-bdd-tdd/SKILL.md"
+      "name": "cx-bdd",
+      "path": ".agents/skills/cx-bdd/SKILL.md"
+    },
+    {
+      "name": "cx-tdd",
+      "path": ".agents/skills/cx-tdd/SKILL.md"
     },
     {
       "name": "cx-changelog",
       "path": ".agents/skills/cx-changelog/SKILL.md"
     },
     {
+      "name": "cx-version",
+      "path": ".agents/skills/cx-version/SKILL.md"
+    },
+    {
+      "name": "cx-research",
+      "path": ".agents/skills/cx-research/SKILL.md"
+    },
+    {
       "name": "cx-pytorch-tdd",
       "path": ".agents/skills/cx-pytorch-tdd/SKILL.md"
     },
     {
-      "name": "cx-ragged-tensor",
-      "path": ".agents/skills/cx-ragged-tensor/SKILL.md"
-    },
-    {
-      "name": "cx-progress-ui",
-      "path": ".agents/skills/cx-progress-ui/SKILL.md"
-    },
-    {
-      "name": "cx-rust-ui",
-      "path": ".agents/skills/cx-rust-ui/SKILL.md"
+      "name": "cx-rust-tdd",
+      "path": ".agents/skills/cx-rust-tdd/SKILL.md"
     },
     {
       "name": "cx-common-module",
@@ -57,10 +61,6 @@
     {
       "name": "cx-python-ml",
       "path": ".codex/agents/cx-python-ml.toml"
-    },
-    {
-      "name": "cx-rust-ui",
-      "path": ".codex/agents/cx-rust-ui.toml"
     },
     {
       "name": "cx-common",

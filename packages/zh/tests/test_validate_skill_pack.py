@@ -12,7 +12,7 @@ class TestValidateSkillPack(unittest.TestCase):
         text = """---
 name: cx-example
 description: Use this skill for a sufficiently clear and repeatable task.
-version: 1.0.0
+version: 0.0.1
 ---
 
 Body text.
@@ -22,7 +22,7 @@ Body text.
             {
                 "name": "cx-example",
                 "description": "Use this skill for a sufficiently clear and repeatable task.",
-                "version": "1.0.0",
+                "version": "0.0.1",
             },
         )
 
@@ -32,7 +32,7 @@ Body text.
             skill_dir.mkdir()
             path = skill_dir / "SKILL.md"
             path.write_text(
-                "---\nname: example\ndescription: This description is long enough but lacks the required prefix.\nversion: 1.0.0\n---\n\n"
+                "---\nname: example\ndescription: This description is long enough but lacks the required prefix.\nversion: 0.0.1\n---\n\n"
                 + "Word " * 100,
                 encoding="utf-8",
             )
