@@ -23,6 +23,8 @@ Review whether the work is actually supported by tests and the target documentat
 9. Were reusable components searched across existing implementation, related skills, and the Common Module Registry before extraction or explicit non-extraction?
 10. Are Python tests `unittest` unless a project exception exists?
 11. Were Rust commands run when Rust code changed?
+12. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
+13. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
 
 ## Output format
 

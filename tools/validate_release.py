@@ -9,7 +9,14 @@ from pathlib import Path
 import re
 
 
-SEMVER_RE = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+\Z")
+SEMVER_RE = re.compile(
+    r"^(0|[1-9]\d*)\."
+    r"(0|[1-9]\d*)\."
+    r"(0|[1-9]\d*)"
+    r"(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+    r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+    r"(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?\Z"
+)
 
 
 def load_manifest(path: Path) -> dict[str, object]:
@@ -41,17 +48,35 @@ def main() -> int:
         errors.append("missing packages/zh")
     if not (root / "SKILLS").exists():
         errors.append("missing public SKILLS directory for shskills")
+    if not (root / "VERSION").exists():
+        errors.append("missing root VERSION")
+    if not (root / "CHANGELOG.md").exists():
+        errors.append("missing root CHANGELOG.md")
     if errors:
         for error in errors:
             print(f"ERROR {error}")
         return 1
 
+    root_version = (root / "VERSION").read_text(encoding="utf-8").strip()
+    if not SEMVER_RE.fullmatch(root_version):
+        errors.append("root VERSION must use SemVer 2.0.0 format")
+
     en_manifest = load_manifest(en / "manifest.json")
     zh_manifest = load_manifest(zh / "manifest.json")
     if en_manifest.get("version") != zh_manifest.get("version"):
         errors.append("package version mismatch between English and Chinese packages")
+    if en_manifest.get("version") != root_version or zh_manifest.get("version") != root_version:
+        errors.append("package manifests must match root VERSION")
     if not SEMVER_RE.fullmatch(str(en_manifest.get("version", ""))):
-        errors.append("package version must use semantic version format")
+        errors.append("package version must use SemVer 2.0.0 format")
+
+    changelog_text = (root / "CHANGELOG.md").read_text(encoding="utf-8")
+    if "## [Unreleased]" not in changelog_text:
+        errors.append("root CHANGELOG.md must contain ## [Unreleased]")
+    release_heading = re.compile(rf"^## \[{re.escape(root_version)}\] - \d{{4}}-\d{{2}}-\d{{2}}$", re.MULTILINE)
+    if not release_heading.search(changelog_text):
+        errors.append("root CHANGELOG.md must contain a dated section for root VERSION")
+
     for key in ("skills", "agents"):
         if names(en_manifest, key) != names(zh_manifest, key):
             errors.append(f"{key} mismatch between English and Chinese packages")

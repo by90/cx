@@ -1,13 +1,14 @@
 # ENGINEERING_SPEC.md
 
-这是某个功能组的长期研发主文档。单功能项目可以把它放在 `docs/ENGINEERING_SPEC.md`；多功能组项目应放在 `docs/<feature-group>/ENGINEERING_SPEC.md`，并从 `docs/INDEX.md` 链接到这里。
+这是某个编号功能组的长期研发主文档。单功能项目可以把它放在 `docs/ENGINEERING_SPEC.md`；多功能组项目应放在 `docs/1.配置系统/ENGINEERING_SPEC.md`，并从 `docs/INDEX.md` 链接到这里。
 
 ## 0. Document Rules
 
-- 本功能组的需求、BDD 场景、架构、任务队列、测试矩阵、复用组件决策和验证证据都放在这里。
+- 本功能组的架构、任务队列、测试矩阵、复用组件决策和验证证据都放在这里。
+- BDD 场景放在同目录 `BDD.md`，其标题和 `Feature:` 名称必须与文件夹名一致。
 - 同一目录下的 `CHANGELOG.md` 只记录本功能组历史。
 - 每个 `CHANGE-*` 条目都必须出现在同一文档集的 `CHANGELOG.md` 和这里。
-- 每个新增或变化的行为都应该有主成功场景、必要分支场景和异常场景。
+- 每个新增或变化的行为都应该在 `BDD.md` 中有主成功场景、必要分支场景和异常场景。
 - 每个 BDD 场景都应该在实现前映射到测试。
 
 ## 1. Product Intent

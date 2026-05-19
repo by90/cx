@@ -12,7 +12,7 @@ from pathlib import Path  # Path handles filesystem paths in an object-oriented 
 CHANGE_ID_RE = re.compile(r"CHANGE-\d{4}-\d{3}")  # Match stable change IDs.
 BDD_ID_RE = re.compile(r"BDD-[A-Z0-9]+-\d{3}")  # Match stable behavior scenario IDs.
 ROOT_INDEX_DOCS = {"INDEX.md", "README.md"}  # Root docs may keep index/instruction files.
-DOC_SET_FILES = {"ENGINEERING_SPEC.md", "CHANGELOG.md"}  # Each documentation set needs these files.
+DOC_SET_FILES = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md"}  # Each documentation set needs these files.
 OPTIONAL_DOC_SET_FILES = {"INDEX.md", "README.md"}  # A doc-set folder may also include local notes.
 
 
@@ -88,6 +88,11 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
     errors: list[str] = []  # Collect this set's errors.
     warnings: list[str] = []  # Collect this set's warnings.
+    if doc_set.root_relative != "docs" and not re.fullmatch(r"\d+\..+", doc_set.directory.name):  # Feature folders are ordered.
+        errors.append(f"feature documentation folder must be named like docs/1.Configuration System: {doc_set.root_relative}")  # Report bad naming.
+    bdd_path = doc_set.directory / "BDD.md"  # BDD lives beside the engineering spec.
+    if doc_set.root_relative != "docs" and not bdd_path.exists():  # Multi-feature sets must carry their BDD document.
+        errors.append(f"missing {doc_set.root_relative}/BDD.md")  # Report missing BDD doc.
     if not doc_set.spec_path.exists():  # Every set needs an engineering spec.
         errors.append(f"missing {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Report the missing spec.
     if not doc_set.changelog_path.exists():  # Every set needs a changelog.
@@ -98,6 +103,7 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
         errors.append(f"unexpected long-lived docs file: {doc_set.root_relative}/{doc_name}")  # Block orphan docs.
 
     spec_text = read_text(doc_set.spec_path)  # Read the engineering spec text.
+    bdd_text = read_text(bdd_path)  # Read the BDD document text.
     changelog_text = read_text(doc_set.changelog_path)  # Read the changelog text.
     change_ids_in_changelog = set(CHANGE_ID_RE.findall(changelog_text))  # Extract change IDs from changelog.
     change_ids_in_spec = set(CHANGE_ID_RE.findall(spec_text))  # Extract change IDs from spec.
@@ -107,7 +113,12 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
             f"{doc_set.root_relative}/ENGINEERING_SPEC.md"
         )
 
-    bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text)))  # Extract BDD scenario IDs from the spec.
+    if bdd_text and doc_set.root_relative != "docs":  # Check feature-name alignment when BDD exists.
+        expected = doc_set.directory.name  # BDD title and Feature name should match this folder.
+        if f"# BDD: {expected}" not in bdd_text and f"Feature: {expected}" not in bdd_text:  # Require at least one exact marker.
+            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD or Feature name as its folder")  # Report drift.
+
+    bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text + "\n" + bdd_text)))  # Extract BDD scenario IDs from docs.
     if doc_set.spec_path.exists() and not bdd_ids:  # A spec without BDD IDs is suspicious but not fatal.
         warnings.append(f"no BDD-* scenario IDs found in {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Ask for behavior IDs.
     if bdd_ids and "## 6. Test Matrix" not in spec_text:  # BDD scenarios need test mappings.

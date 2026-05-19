@@ -23,12 +23,13 @@ Put a short `README.md` in the repository root and link to `README.zh-CN.md`. Gi
 
 Keep names stable forever unless you create a major release:
 
-- `$cx-bdd-tdd`
+- `$cx-bdd`
+- `$cx-tdd`
 - `$cx-changelog`
+- `$cx-version`
+- `$cx-research`
 - `$cx-pytorch-tdd`
-- `$cx-ragged-tensor`
-- `$cx-progress-ui`
-- `$cx-rust-ui`
+- `$cx-rust-tdd`
 - `$cx-common-module`
 - `$cx-evidence`
 

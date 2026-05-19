@@ -7,16 +7,17 @@ BDD 定义行为和共同语言。TDD 用可执行测试证明行为。AI 编程
 cx 工作流采用这个顺序：
 
 1. 接收用户需求。
-2. 选择或创建目标文档集；多功能组项目使用 `docs/<feature-group>/ENGINEERING_SPEC.md` 和同目录 `CHANGELOG.md`。
-3. 在目标 `CHANGELOG.md` 中更新 `CHANGE-*` 条目。
-4. 在目标 `ENGINEERING_SPEC.md` 中更新行为、主成功场景、分支场景、异常场景、架构说明、任务队列和测试矩阵。
-5. 编写预期失败的测试。
-6. 运行最窄测试并记录 red failure。
-7. 实现最小改动。
-8. 运行测试直到 green。
-9. 只在测试保持 green 的情况下重构。
-10. 记录验证证据。
-11. 搜索已有实现、相关 skills 和 registry，判断重复逻辑是否应该成为复用组件。
+2. 选择或创建目标编号功能文件夹，例如 `docs/1.配置系统/`。
+3. 在目标 `BDD.md` 中更新业务规则、主成功场景、分支场景和异常场景。
+4. 在目标 `CHANGELOG.md` 中更新 `CHANGE-*` 条目。
+5. 在目标 `ENGINEERING_SPEC.md` 中更新架构说明、任务队列和回链 BDD ID 的测试矩阵。
+6. 编写预期失败的测试。
+7. 运行最窄测试并记录 red failure。
+8. 实现最小改动。
+9. 运行测试直到 green。
+10. 只在测试保持 green 的情况下重构。
+11. 记录验证证据。
+12. 搜索已有实现、相关 skills 和 registry，判断重复逻辑是否应该成为复用组件。
 
 ## 为什么坚持 docs 文档集
 
@@ -25,13 +26,13 @@ cx 工作流采用这个顺序：
 ## 推荐提示词
 
 ```text
-请使用 $cx-bdd-tdd。先选择或创建目标 docs 文档集，更新其中的 ENGINEERING_SPEC.md 和 CHANGELOG.md。推导主成功场景、分支场景、异常场景和失败测试，展示预期 red failure，实现最小改动，运行验证并记录证据。不要创建单独规划文档。
+请使用 $cx-bdd 和 $cx-tdd。先选择或创建目标编号功能文件夹，更新其中的 BDD.md、ENGINEERING_SPEC.md 和 CHANGELOG.md。推导主成功场景、分支场景、异常场景和失败测试，展示预期 red failure，实现最小改动，运行验证并记录证据。不要创建单独规划文档。
 ```
 
 ## 专项提示词
 
-Python ML 工作组合 `$cx-bdd-tdd`、`$cx-pytorch-tdd`，涉及变长 tensor 时再加 `$cx-ragged-tensor`。
+Python ML 工作组合 `$cx-bdd`、`$cx-tdd`、`$cx-pytorch-tdd`。
 
-Rust 桌面 UI 工作组合 `$cx-bdd-tdd`、`$cx-rust-ui`，涉及进度状态或任务监控时再加 `$cx-progress-ui`。
+Rust 工作组合 `$cx-bdd`、`$cx-tdd`、`$cx-rust-tdd`。
 
 最终审查使用 `$cx-evidence`，或明确启动只读 subagent `cx-review`。

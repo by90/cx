@@ -23,12 +23,13 @@ Codex 会从当前工作目录向仓库根目录扫描 `.agents/skills`。如果
 
 除非发布大版本，否则保持这些名称不变：
 
-- `$cx-bdd-tdd`
+- `$cx-bdd`
+- `$cx-tdd`
 - `$cx-changelog`
+- `$cx-version`
+- `$cx-research`
 - `$cx-pytorch-tdd`
-- `$cx-ragged-tensor`
-- `$cx-progress-ui`
-- `$cx-rust-ui`
+- `$cx-rust-tdd`
 - `$cx-common-module`
 - `$cx-evidence`
 

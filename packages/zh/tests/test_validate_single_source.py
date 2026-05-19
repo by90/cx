@@ -41,9 +41,13 @@ CHANGE-2026-001
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
             root = Path(tmpdir)  # 把临时目录转成 Path。
             docs = root / "docs"  # 指向 docs 根目录。
-            feature = docs / "training"  # 指向功能组文档目录。
+            feature = docs / "1.训练"  # 指向编号功能组文档目录。
             feature.mkdir(parents=True)  # 创建 docs 和功能组目录。
             (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # 写入根索引。
+            (feature / "BDD.md").write_text(  # 写入功能组 BDD 文档。
+                "# BDD: 1.训练\n\nFeature: 1.训练\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # 写入功能组主文档。
                 "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
@@ -93,8 +97,12 @@ CHANGE-2026-001
 
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
             root = Path(tmpdir)  # 把临时目录转成 Path。
-            feature = root / "docs" / "training"  # 指向功能组文档目录。
+            feature = root / "docs" / "1.训练"  # 指向编号功能组文档目录。
             feature.mkdir(parents=True)  # 创建功能组目录。
+            (feature / "BDD.md").write_text(  # 写入必需的 BDD 文档。
+                "# BDD: 1.训练\n\nFeature: 1.训练\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # 写入功能组主文档。
                 "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",

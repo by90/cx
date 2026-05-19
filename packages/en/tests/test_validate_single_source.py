@@ -41,9 +41,13 @@ CHANGE-2026-001
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
             docs = root / "docs"  # Point to the docs root.
-            feature = docs / "training"  # Point to one feature-group docs folder.
+            feature = docs / "1.Training"  # Point to one ordered feature-group docs folder.
             feature.mkdir(parents=True)  # Create docs and the feature folder.
             (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # Write the root index.
+            (feature / "BDD.md").write_text(  # Write the feature BDD document.
+                "# BDD: 1.Training\n\nFeature: 1.Training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
                 "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
@@ -93,8 +97,12 @@ CHANGE-2026-001
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
-            feature = root / "docs" / "training"  # Point to one feature docs folder.
+            feature = root / "docs" / "1.Training"  # Point to one feature docs folder.
             feature.mkdir(parents=True)  # Create the feature folder.
+            (feature / "BDD.md").write_text(  # Write the required BDD document.
+                "# BDD: 1.Training\n\nFeature: 1.Training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                encoding="utf-8",
+            )
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
                 "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",

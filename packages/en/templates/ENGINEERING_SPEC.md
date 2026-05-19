@@ -1,13 +1,14 @@
 # ENGINEERING_SPEC.md
 
-This is the long-lived engineering specification for one feature group. Single-feature projects may place it at `docs/ENGINEERING_SPEC.md`; multi-feature projects should place it at `docs/<feature-group>/ENGINEERING_SPEC.md` and link it from `docs/INDEX.md`.
+This is the long-lived engineering specification for one ordered feature group. Single-feature projects may place it at `docs/ENGINEERING_SPEC.md`; multi-feature projects should place it at `docs/1.Configuration System/ENGINEERING_SPEC.md` and link it from `docs/INDEX.md`.
 
 ## 0. Document Rules
 
-- This feature group's requirements, BDD scenarios, architecture, task queue, test matrix, reusable component decisions, and verification evidence live here.
+- This feature group's architecture, task queue, test matrix, reusable component decisions, and verification evidence live here.
+- BDD scenarios live in the sibling `BDD.md`, whose heading and `Feature:` name must match the folder name.
 - The sibling `CHANGELOG.md` records this feature group's history only.
 - Every `CHANGE-*` entry must appear in both the sibling `CHANGELOG.md` and this file.
-- Every new or changed behavior should have a main success scenario, necessary alternate scenarios, and exception scenarios.
+- Every new or changed behavior should have a main success scenario, necessary alternate scenarios, and exception scenarios in `BDD.md`.
 - Every BDD scenario should map to tests before implementation.
 
 ## 1. Product Intent

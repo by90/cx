@@ -12,7 +12,7 @@ from pathlib import Path  # Path 用面向对象方式处理文件路径。
 CHANGE_ID_RE = re.compile(r"CHANGE-\d{4}-\d{3}")  # 匹配稳定变更编号。
 BDD_ID_RE = re.compile(r"BDD-[A-Z0-9]+-\d{3}")  # 匹配稳定行为场景编号。
 ROOT_INDEX_DOCS = {"INDEX.md", "README.md"}  # 多文档集模式下 docs 根目录允许的索引文件。
-DOC_SET_FILES = {"ENGINEERING_SPEC.md", "CHANGELOG.md"}  # 一个研发文档集必须包含的核心文件。
+DOC_SET_FILES = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md"}  # 一个研发文档集必须包含的核心文件。
 OPTIONAL_DOC_SET_FILES = {"INDEX.md", "README.md"}  # 文档集目录内允许存在的说明文件。
 
 
@@ -88,6 +88,11 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
     errors: list[str] = []  # 收集当前文档集的错误。
     warnings: list[str] = []  # 收集当前文档集的警告。
+    if doc_set.root_relative != "docs" and not re.fullmatch(r"\d+\..+", doc_set.directory.name):
+        errors.append(f"feature documentation folder must be named like docs/1.配置系统: {doc_set.root_relative}")
+    bdd_path = doc_set.directory / "BDD.md"
+    if doc_set.root_relative != "docs" and not bdd_path.exists():
+        errors.append(f"missing {doc_set.root_relative}/BDD.md")
     if not doc_set.spec_path.exists():  # 每个文档集必须有研发主文档。
         errors.append(f"missing {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 报告缺失主文档。
     if not doc_set.changelog_path.exists():  # 每个文档集必须有变更记录。
@@ -98,6 +103,7 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
         errors.append(f"unexpected long-lived docs file: {doc_set.root_relative}/{doc_name}")  # 阻止孤立文档。
 
     spec_text = read_text(doc_set.spec_path)  # 读取主文档文本。
+    bdd_text = read_text(bdd_path)
     changelog_text = read_text(doc_set.changelog_path)  # 读取变更记录文本。
     change_ids_in_changelog = set(CHANGE_ID_RE.findall(changelog_text))  # 提取 changelog 中的变更编号。
     change_ids_in_spec = set(CHANGE_ID_RE.findall(spec_text))  # 提取主文档中的变更编号。
@@ -107,7 +113,12 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
             f"{doc_set.root_relative}/ENGINEERING_SPEC.md"
         )
 
-    bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text)))  # 提取主文档中的 BDD 场景编号。
+    if bdd_text and doc_set.root_relative != "docs":
+        expected = doc_set.directory.name
+        if f"# BDD: {expected}" not in bdd_text and f"Feature: {expected}" not in bdd_text:
+            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD or Feature name as its folder")
+
+    bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text + "\n" + bdd_text)))  # 提取 BDD 场景编号。
     if doc_set.spec_path.exists() and not bdd_ids:  # 主文档存在但没有 BDD ID 时给警告。
         warnings.append(f"no BDD-* scenario IDs found in {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 提醒补行为场景。
     if bdd_ids and "## 6. Test Matrix" not in spec_text:  # 有 BDD ID 就必须有测试矩阵。
