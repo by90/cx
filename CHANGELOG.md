@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-05-19
+
 ### Changed
 
 - Documented mandatory feature-group branching: feature work must happen on its own branch, completed feature branches merge to `dev`, and only user-confirmed releases flow from `dev` to `main`.

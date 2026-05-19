@@ -1,7 +1,7 @@
 ---
 name: cx-evidence
 description: 用于任务、分支或 PR 交付前检查 BDD/TDD compliance、test output、changelog/spec consistency 和 document-sprawl problems。
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx 证据审查

@@ -1,7 +1,7 @@
 ---
 name: cx-rust-tdd
 description: Use for Rust code implementation and TDD, including ownership-aware design, structs/enums/traits, Result-based errors, cargo test, rustfmt, clippy, and high-quality non-UI Rust code.
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx Rust Code And TDD

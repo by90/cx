@@ -1,7 +1,7 @@
 ---
 name: cx-tdd
 description: Use for test-driven development after BDD is defined: red-green-refactor, narrow failing tests, test matrices, code quality gates, and verification evidence.
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx TDD Implementation Discipline

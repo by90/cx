@@ -4,7 +4,7 @@ cx is a Codex skill package for disciplined human-AI software development. Its c
 
 cx is not a component library. Implementation domains such as progress UI widgets, ragged tensor utilities, or Rust UI components should live in their own project/component directories with their own README, API docs, and tests. They are not core cx skills.
 
-Current package version: `0.0.1`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
+Current package version: `0.1.0`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
 
 For Chinese documentation, see [README.zh-CN.md](README.zh-CN.md).
 
@@ -147,7 +147,7 @@ Version numbers use `MAJOR.MINOR.PATCH`:
 - `1.0.0` means the first stable public workflow/API contract after the project is complete and explicitly declared stable.
 - After `1.0.0`, compatible public additions use minor versions such as `1.1.0`, and incompatible public contract changes use major versions such as `2.0.0`.
 
-For cx specifically, the current split from `$cx-bdd-tdd` into `$cx-bdd` and `$cx-tdd` still belongs to the pre-1.0 experimental line, so the package is `0.0.1` rather than `2.0.0`.
+For cx specifically, the split from `$cx-bdd-tdd` into `$cx-bdd` and `$cx-tdd` remains in the pre-1.0 experimental line. The branch/release-gate feature group is released as `0.1.0`; it is not a `1.0.0` stability declaration or a `2.0.0` breaking release.
 
 Useful commands:
 
