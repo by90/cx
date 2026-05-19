@@ -12,8 +12,10 @@ This repository uses the cx documentation-set BDD/TDD workflow: the `docs/` root
 6. Use the target documentation set's `CHANGELOG.md` only as a historical log. Every `CHANGE-*` entry must link back to the same documentation set's engineering spec.
 7. Start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
 8. Prefer reusable components and common modules over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Common Module Registry.
-9. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
-10. When adding or editing code, add beginner-friendly explanatory comments for code files, classes, functions, and important statements. Explain code intent line by line by default, except for pure formatting or repeated structural lines.
+9. Every feature group must use its own branch. Merge completed feature-group branches into `dev`; do not merge them directly into `main`.
+10. Only after the user confirms the version is complete may `dev` be merged into `main`; only `main` may be used for version commits, release tags, and release-tag pushes. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.
+11. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
+12. When adding or editing code, add beginner-friendly explanatory comments for code files, classes, functions, and important statements. Explain code intent line by line by default, except for pure formatting or repeated structural lines.
 
 ## Prompt contract
 
@@ -25,6 +27,7 @@ Coding-agent prompts should specify:
 - Required workflow: cx skills to use and whether BDD, TDD, research, versioning, or evidence review is required.
 - Verification: exact commands, tests, screenshots, or checks expected.
 - Deliverables: code, docs, changelog entries, evidence, or final summary.
+- Branching: feature-group branch name, merge target `dev`, and whether a release handoff to `main` is requested.
 
 If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rule source and have `CLAUDE.md` import or reference it instead of duplicating the rules.
 

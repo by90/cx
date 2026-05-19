@@ -55,6 +55,21 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CO
 4. `$cx-pytorch-tdd`、`$cx-rust-tdd`、`$cx-common-module` 等专项 skills 补充语言和设计约束。
 5. `$cx-changelog`、`$cx-version`、`$cx-evidence` 保证交付或发布前可审计。
 
+## 分支与发布门禁
+
+任何功能组都必须在独立分支上开发。功能组完成后，先合并到 `dev`；不要把功能分支直接合并到 `main`。
+
+pre-1.0 阶段完成一个功能组后，版本从 `0.0.x` 进入下一个 minor，例如 `0.1.0`。创建发布前必须先和用户确认该版本已经完成。
+
+发布顺序是强制的：
+
+1. 完成功能组分支，并合并到 `dev`。
+2. 用户确认版本完成后，将 `dev` 合并到 `main`。
+3. 只有在 `main` 上，才允许创建版本提交、创建带注释的 `vX.Y.Z` tag，然后 push `main` 和发布 tag。
+
+禁止在功能分支或 `dev` 上创建 release commit 或 tag。
+这条门禁不禁止为了协作、备份或 CI push 功能分支或 `dev`；它只限制版本发布动作必须发生在 `main`。
+
 ## 提示词契约
 
 cx 最适合配合小而明确的任务契约，而不是含混的一句话需求。无论使用 Codex、Claude Code 还是其他 coding agent，都建议按这个结构写：
@@ -139,7 +154,7 @@ cx 使用标准发布机制：
 ```bash
 python tools/cx_version.py show .
 python tools/cx_version.py check .
-python tools/validate_release.py .
+python tools/validate_release.py .  # release commit/tag 前必须在 main 上运行
 ```
 
 ## 调研依据

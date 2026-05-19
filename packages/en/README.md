@@ -70,7 +70,7 @@ Use $cx-research. Define the research question, search window, inclusion/exclusi
 Release:
 
 ```text
-Use $cx-version. For new or unproven projects, start at 0.0.1 and keep major version 0 until the project is explicitly stable. Decide the SemVer bump, update VERSION and manifests, update CHANGELOG.md, validate, then create an annotated vX.Y.Z tag.
+Use $cx-version. Feature-group work must happen on its own branch and merge to dev. Feature branches and dev may still be pushed for collaboration or CI. After the user confirms the version is complete, merge dev to main; only on main update VERSION/manifests/CHANGELOG, validate, create the annotated vX.Y.Z tag, then push main and the release tag.
 ```
 
 ## Skill Map

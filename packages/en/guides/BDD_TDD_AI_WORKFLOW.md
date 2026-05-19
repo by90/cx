@@ -7,17 +7,19 @@ BDD defines the behavior and shared language. TDD proves the behavior with execu
 The cx workflow uses this order:
 
 1. Intake the user request.
-2. Choose or create the target ordered feature folder, such as `docs/1.Configuration System/`.
-3. Update the target `BDD.md` with business rules, main success scenarios, alternate scenarios, and exception scenarios.
-4. Update the target `CHANGELOG.md` with a `CHANGE-*` entry.
-5. Update the target `ENGINEERING_SPEC.md` with architecture notes, task queue, and test matrix links back to BDD IDs.
-6. Write the expected failing test.
-7. Run the narrow test and record the red failure.
-8. Implement the smallest change.
-9. Run tests until green.
-10. Refactor only while keeping tests green.
-11. Record verification evidence.
-12. Search existing implementation, related skills, and registries to decide whether duplicated logic should become a reusable component.
+2. Create or switch to a dedicated branch for this feature group before changing project files.
+3. Choose or create the target ordered feature folder, such as `docs/1.Configuration System/`.
+4. Update the target `BDD.md` with business rules, main success scenarios, alternate scenarios, and exception scenarios.
+5. Update the target `CHANGELOG.md` with a `CHANGE-*` entry.
+6. Update the target `ENGINEERING_SPEC.md` with architecture notes, task queue, and test matrix links back to BDD IDs.
+7. Write the expected failing test.
+8. Run the narrow test and record the red failure.
+9. Implement the smallest change.
+10. Run tests until green.
+11. Refactor only while keeping tests green.
+12. Record verification evidence.
+13. Search existing implementation, related skills, and registries to decide whether duplicated logic should become a reusable component.
+14. Merge the completed feature-group branch into `dev`; release handoff from `dev` to `main` happens only after user version confirmation.
 
 ## Why docs documentation sets
 
@@ -26,7 +28,7 @@ Many AI workflows generate a new spec, plan, or task file for every request. Tha
 ## Recommended prompt
 
 ```text
-Use $cx-bdd and $cx-tdd. First choose or create the ordered feature folder, then update its BDD.md, ENGINEERING_SPEC.md, and CHANGELOG.md. Derive main success scenarios, alternate scenarios, exception scenarios, and failing tests. Show the expected red failure, implement the smallest change, run validation, and record evidence. Do not create separate planning docs.
+Use $cx-bdd and $cx-tdd. First create or switch to the feature-group branch, then choose or create the ordered feature folder and update its BDD.md, ENGINEERING_SPEC.md, and CHANGELOG.md. Derive main success scenarios, alternate scenarios, exception scenarios, and failing tests. Show the expected red failure, implement the smallest change, run validation, record evidence, and merge the completed feature branch to dev. Do not create separate planning docs.
 ```
 
 ## Specialized prompts

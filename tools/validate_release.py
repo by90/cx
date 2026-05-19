@@ -33,6 +33,18 @@ def run(command: list[str], cwd: Path) -> int:
     return completed.returncode
 
 
+def current_branch(root: Path) -> str | None:
+    completed = subprocess.run(
+        ["git", "branch", "--show-current"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+    )
+    if completed.returncode != 0:
+        return None
+    return completed.stdout.strip() or None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate cx multilingual release repository.")
     parser.add_argument("root", nargs="?", default=".")
@@ -56,6 +68,10 @@ def main() -> int:
         for error in errors:
             print(f"ERROR {error}")
         return 1
+
+    branch = current_branch(root)
+    if branch != "main":
+        errors.append("release validation must run on main before version commits or release tags")
 
     root_version = (root / "VERSION").read_text(encoding="utf-8").strip()
     if not SEMVER_RE.fullmatch(root_version):

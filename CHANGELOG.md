@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Documented mandatory feature-group branching: feature work must happen on its own branch, completed feature branches merge to `dev`, and only user-confirmed releases flow from `dev` to `main`.
+- Clarified that completed pre-1.0 feature groups move the package from the `0.0.x` line to the next minor line such as `0.1.0`, while release commits and annotated tags are allowed only on `main`; normal pushes of feature branches and `dev` remain allowed.
+
 ## [0.0.1] - 2026-05-19
 
 ### Added

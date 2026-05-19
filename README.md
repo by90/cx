@@ -55,6 +55,21 @@ For Chinese, change `--subpath en` to `--subpath zh`.
 4. Specialist skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, or `$cx-common-module` add language or design constraints.
 5. `$cx-changelog`, `$cx-version`, and `$cx-evidence` keep the work auditable before release or delivery.
 
+## Branch And Release Gates
+
+Every feature group must be developed on its own branch. When the feature group is complete, merge that branch into `dev`; do not merge feature branches directly into `main`.
+
+When one feature group is complete during pre-1.0 development, the version moves from `0.0.x` to the next minor line such as `0.1.0`. Confirm the completed version with the user before creating a release.
+
+Release order is strict:
+
+1. Finish the feature group branch and merge it into `dev`.
+2. After the user confirms the version is complete, merge `dev` into `main`.
+3. Only on `main`, create the version commit, create the annotated `vX.Y.Z` tag, then push `main` and the release tag.
+
+Do not create release commits or tags on feature branches or `dev`.
+This gate does not forbid pushing feature branches or `dev` for collaboration, backup, or CI; it only restricts release-version actions to `main`.
+
 ## Prompt Contract
 
 cx works best when the human prompt gives the agent a small, explicit contract instead of a vague task. Use this structure for Codex, Claude Code, or any coding agent:
@@ -139,7 +154,7 @@ Useful commands:
 ```bash
 python tools/cx_version.py show .
 python tools/cx_version.py check .
-python tools/validate_release.py .
+python tools/validate_release.py .  # must run on main for release commits/tags
 ```
 
 ## Research Basis

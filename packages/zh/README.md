@@ -70,7 +70,7 @@ Rust：
 发布：
 
 ```text
-请使用 $cx-version。新项目或未经验证的项目从 0.0.1 开始，主版本号保持 0，直到项目被明确声明稳定。判断 SemVer 升级，更新 VERSION 和 manifests，更新 CHANGELOG.md，验证后创建带注释 vX.Y.Z tag。
+请使用 $cx-version。功能组工作必须在独立分支完成并合并到 dev。功能分支和 dev 仍可为了协作或 CI 正常 push。用户确认版本完成后，再将 dev 合并到 main；只有在 main 上才更新 VERSION/manifests/CHANGELOG、验证、创建带注释 vX.Y.Z tag，然后 push main 和发布 tag。
 ```
 
 ## Skill 对照表
