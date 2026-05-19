@@ -70,7 +70,7 @@ Rust：
 发布：
 
 ```text
-请使用 $cx-version。判断 SemVer 升级，更新 VERSION 和 manifests，更新 CHANGELOG.md，验证后创建带注释 vX.Y.Z tag。
+请使用 $cx-version。新项目或未经验证的项目从 0.0.1 开始，主版本号保持 0，直到项目被明确声明稳定。判断 SemVer 升级，更新 VERSION 和 manifests，更新 CHANGELOG.md，验证后创建带注释 vX.Y.Z tag。
 ```
 
 ## Skill 对照表

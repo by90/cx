@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-05-19
+## [0.0.1] - 2026-05-19
 
 ### Added
 
@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refocused the package description on the core cx goal: a BDD/TDD human-AI collaboration workflow anchored in durable docs, test evidence, changelog entries, and release evidence.
 - Rewrote the English and Chinese root READMEs with detailed explanations for each installable workflow skill.
 - Added a coding-agent prompt contract for goal, context, constraints, workflow, verification, and deliverables, aligned with Codex and Claude Code instruction-file practices.
+- Rebased cx as an experimental pre-1.0 package starting at `0.0.1`; while major version is `0`, interface and workflow contract changes use minor bumps.
 - Strengthened Python/PyTorch guidance with explicit OOP design and dynamic-reflection restrictions.
 - Added ordered feature-folder naming such as `docs/1.配置系统/`, with matching `BDD.md` heading and `Feature:` name.
 

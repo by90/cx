@@ -1,7 +1,7 @@
 ---
 name: cx-workflow
 description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, and deciding whether BDD, TDD, changelog, release versioning, research, evidence review, or clarification is needed.
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Workflow Handling

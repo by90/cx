@@ -70,7 +70,7 @@ Use $cx-research. Define the research question, search window, inclusion/exclusi
 Release:
 
 ```text
-Use $cx-version. Decide the SemVer bump, update VERSION and manifests, update CHANGELOG.md, validate, then create an annotated vX.Y.Z tag.
+Use $cx-version. For new or unproven projects, start at 0.0.1 and keep major version 0 until the project is explicitly stable. Decide the SemVer bump, update VERSION and manifests, update CHANGELOG.md, validate, then create an annotated vX.Y.Z tag.
 ```
 
 ## Skill Map

@@ -1,7 +1,7 @@
 ---
 name: cx-changelog
 description: 用于 changelog、release notes、change IDs、audit trails，以及确保 CHANGE 条目映射回目标文档集的 ENGINEERING_SPEC 研发主文档。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx 变更记录维护

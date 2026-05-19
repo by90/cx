@@ -59,7 +59,7 @@ def main() -> int:
 
     root_version = (root / "VERSION").read_text(encoding="utf-8").strip()
     if not SEMVER_RE.fullmatch(root_version):
-        errors.append("root VERSION must use SemVer 2.0.0 format")
+        errors.append("root VERSION must use SemVer format")
 
     en_manifest = load_manifest(en / "manifest.json")
     zh_manifest = load_manifest(zh / "manifest.json")
@@ -68,7 +68,7 @@ def main() -> int:
     if en_manifest.get("version") != root_version or zh_manifest.get("version") != root_version:
         errors.append("package manifests must match root VERSION")
     if not SEMVER_RE.fullmatch(str(en_manifest.get("version", ""))):
-        errors.append("package version must use SemVer 2.0.0 format")
+        errors.append("package version must use SemVer format")
 
     changelog_text = (root / "CHANGELOG.md").read_text(encoding="utf-8")
     if "## [Unreleased]" not in changelog_text:

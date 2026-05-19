@@ -4,7 +4,7 @@ cx is a Codex skill package for disciplined human-AI software development. Its c
 
 cx is not a component library. Implementation domains such as progress UI widgets, ragged tensor utilities, or Rust UI components should live in their own project/component directories with their own README, API docs, and tests. They are not core cx skills.
 
-Current package version: `2.0.0`. Version `2.x` splits the old combined BDD/TDD concept into separate `$cx-bdd` and `$cx-tdd` skills.
+Current package version: `0.0.1`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
 
 For Chinese documentation, see [README.zh-CN.md](README.zh-CN.md).
 
@@ -125,12 +125,14 @@ cx uses standard release mechanics:
 
 Version numbers use `MAJOR.MINOR.PATCH`:
 
-- `1.0.0` means the first stable public workflow/API contract.
-- `1.1.0` means a backward-compatible public interface or workflow capability was added.
-- `1.0.1` means a bugfix, wording fix, example fix, translation fix, or validation fix that does not change the public contract.
-- `2.0.0` means an incompatible public contract change, such as removing or renaming a public skill, agent, install path, CLI command, document-set rule, or prompt/workflow API.
+- New or unproven projects start at `0.0.1` unless the user explicitly says the project has reached `1.0.0`.
+- Major version `0` means the project is not formally released. Interface and workflow contract changes are expected during this phase.
+- While major version is `0`, minor bumps such as `0.1.0` represent interface or workflow contract changes.
+- While major version is `0`, patch bumps such as `0.0.2` represent bugfixes, wording fixes, examples, translations, or validation fixes that do not change the public contract.
+- `1.0.0` means the first stable public workflow/API contract after the project is complete and explicitly declared stable.
+- After `1.0.0`, compatible public additions use minor versions such as `1.1.0`, and incompatible public contract changes use major versions such as `2.0.0`.
 
-So "the interface changed" maps to `1.1.0` only when the change is backward-compatible. Breaking interface changes require a major version bump.
+For cx specifically, the current split from `$cx-bdd-tdd` into `$cx-bdd` and `$cx-tdd` still belongs to the pre-1.0 experimental line, so the package is `0.0.1` rather than `2.0.0`.
 
 Useful commands:
 

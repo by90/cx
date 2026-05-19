@@ -1,7 +1,7 @@
 ---
 name: cx-common-module
 description: 用于 code duplication、shared utilities、reusable components、component extraction、API design、indexed-series-like data structures，以及判断重复实现逻辑是否应该成为 common modules。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx 复用组件与通用模块抽取

@@ -1,7 +1,7 @@
 ---
 name: cx-evidence
 description: Use before finalizing a task, branch, or pull request to check BDD/TDD compliance, test output, changelog/spec consistency, and document-sprawl problems.
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Evidence Review

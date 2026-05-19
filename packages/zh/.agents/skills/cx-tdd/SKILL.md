@@ -1,7 +1,7 @@
 ---
 name: cx-tdd
 description: 用于 BDD 明确后的测试驱动开发：red-green-refactor、最窄失败测试、测试矩阵、代码质量门槛和验证证据。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx TDD 实现纪律

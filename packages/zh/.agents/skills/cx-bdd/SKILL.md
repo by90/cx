@@ -1,7 +1,7 @@
 ---
 name: cx-bdd
 description: 用于 BDD 发现、功能文件夹命名、业务规则、Gherkin 风格示例、验收标准、主成功/分支/异常场景，以及把行为映射到后续测试。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx BDD 发现与场景文档

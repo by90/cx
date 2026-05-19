@@ -1,7 +1,7 @@
 ---
 name: cx-common-module
 description: Use for code duplication, shared utilities, reusable components, component extraction, API design, indexed-series-like data structures, and deciding whether repeated implementation logic should become common modules.
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Reusable Component And Common Module Extraction

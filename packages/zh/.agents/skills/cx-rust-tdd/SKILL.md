@@ -1,7 +1,7 @@
 ---
 name: cx-rust-tdd
 description: 用于 Rust 代码实现和 TDD，包括 ownership-aware design、struct/enum/trait、Result 错误、cargo test、rustfmt、clippy 和高质量非 UI Rust 代码。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Rust 编码与 TDD

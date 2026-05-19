@@ -36,7 +36,7 @@ def validate(root: Path) -> list[str]:
 
     version = read_version(root)
     if not SEMVER_RE.fullmatch(version):
-        errors.append(f"VERSION must be a SemVer 2.0.0 value without a leading v: {version!r}")
+        errors.append(f"VERSION must be a SemVer value without a leading v: {version!r}")
 
     for path in manifest_paths(root):
         if not path.exists():
@@ -61,7 +61,7 @@ def validate(root: Path) -> list[str]:
 
 def write_version(root: Path, version: str) -> None:
     if not SEMVER_RE.fullmatch(version):
-        raise ValueError(f"not a SemVer 2.0.0 value: {version}")
+        raise ValueError(f"not a SemVer value: {version}")
 
     (root / "VERSION").write_text(version + "\n", encoding="utf-8")
     for path in manifest_paths(root):
@@ -79,6 +79,11 @@ def bump(current: str, part: str) -> str:
 
     major, minor, patch = (int(match.group(index)) for index in (1, 2, 3))
     if part == "major":
+        if major == 0:
+            raise ValueError(
+                "pre-1.0 projects keep major version 0; use minor for interface changes "
+                "or set 1.0.0 explicitly only when the project is complete and stable"
+            )
         return f"{major + 1}.0.0"
     if part == "minor":
         return f"{major}.{minor + 1}.0"
@@ -97,9 +102,12 @@ def main() -> int:
 
     set_parser = subparsers.add_parser("set", help="Set VERSION and package manifest versions")
     set_parser.add_argument("root", help="Repository root")
-    set_parser.add_argument("version", help="SemVer value such as 2.0.0")
+    set_parser.add_argument("version", help="SemVer value such as 0.0.1")
 
-    bump_parser = subparsers.add_parser("bump", help="Bump stable VERSION and package manifest versions")
+    bump_parser = subparsers.add_parser(
+        "bump",
+        help="Bump stable VERSION and package manifest versions; pre-1.0 interface changes use minor",
+    )
     bump_parser.add_argument("root", help="Repository root")
     bump_parser.add_argument("part", choices=("major", "minor", "patch"))
 

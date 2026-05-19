@@ -1,7 +1,7 @@
 ---
 name: cx-bdd
 description: Use for BDD discovery, feature-folder naming, business rules, Gherkin-style examples, acceptance criteria, main/alternate/exception scenarios, and mapping behavior to later tests.
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx BDD Discovery And Scenario Documentation

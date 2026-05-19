@@ -1,7 +1,7 @@
 ---
 name: cx-pytorch-tdd
 description: 用于 Python、PyTorch、Lightning、tensor utilities、model training、data modules、metrics、ML tests、uv 项目环境、Python/PyTorch/CUDA 稳定版本核对和测试数据策略；强制 unittest-first、小测试、少 mock 和当前 API 验证。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Python / PyTorch / Lightning TDD

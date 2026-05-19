@@ -1,7 +1,7 @@
 ---
 name: cx-research
 description: Use for model selection research, AI paper surveys, model mechanism research, latest-six-month AI literature scans, source triage, blog interpretation, and citation-backed synthesis.
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx Research Workflow

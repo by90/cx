@@ -1,7 +1,7 @@
 ---
 name: cx-workflow
 description: 用于流程处理、任务分流、端到端研发编排、选择应使用的 cx skills、决定是否需要 BDD、TDD、changelog、发布版本、研究、证据审查或人工澄清。
-version: 1.0.0
+version: 0.0.1
 ---
 
 # cx 流程处理
