@@ -50,7 +50,7 @@ For Chinese, change `--subpath en` to `--subpath zh`.
 ## Core Workflow
 
 1. `$cx-workflow` classifies the request and selects the smallest necessary set of skills.
-2. `$cx-bdd` creates or updates the ordered feature folder and BDD scenarios.
+2. `$cx-bdd` creates or updates the ordered feature folder and BDD scenarios when behavior discovery is needed; ordinary non-programming tasks do not create BDD automatically.
 3. After `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md` are complete, the agent must stop, report the document result and next implementation plan, and wait for explicit user confirmation.
 4. After confirmation, `$cx-tdd` maps BDD scenarios to failing tests, runs red/green/refactor, and records evidence.
 5. Specialist skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, or `$cx-common-module` add language or design constraints.
@@ -90,31 +90,33 @@ For projects that also use Claude Code, keep `AGENTS.md` as the shared source of
 
 When the Chinese cx package is installed, every cx-generated or cx-maintained document must be Simplified Chinese. When the user asks to commit, deliver, open a PR, or release, the AGENTS template treats the current working tree as one commit and does not split files by who changed them or whether they are untracked.
 
-Feature documentation folders should be ordered and named by business capability:
+Every project is organized as multiple feature groups. Feature documentation folders must use a three-digit order prefix, lowercase words, and underscores:
 
 ```text
-docs/1.Configuration System/
-docs/2.User Sessions/
-docs/3.Model Evaluation/
+docs/001_configuration_system/
+docs/002_user_sessions/
+docs/003_model_evaluation/
 ```
 
 The BDD document inside the folder must use the same name:
 
 ```text
-docs/1.Configuration System/BDD.md
-# BDD: 1.Configuration System
+docs/001_configuration_system/BDD.md
+# BDD: 001_configuration_system
 
-Feature: 1.Configuration System
+Feature: 001_configuration_system
 ```
 
-Chinese projects use the same convention:
+Chinese projects use the same folder-name convention while writing document content in Simplified Chinese:
 
 ```text
-docs/1.配置系统/
-docs/1.配置系统/BDD.md
-# BDD: 1.配置系统
-Feature: 1.配置系统
+docs/001_config_system/
+docs/001_config_system/BDD.md
+# BDD: 001_config_system
+Feature: 001_config_system
 ```
+
+The `docs/` root is reserved for `INDEX.md`, `README.md`, and `VERSIONS.md`; concrete engineering documents live in numbered feature-group folders. If a non-programming request might or might not need BDD, `$cx-workflow` should ask the user first.
 
 ## Available Skills
 

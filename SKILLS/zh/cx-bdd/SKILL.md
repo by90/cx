@@ -12,56 +12,57 @@ version: 0.1.0
 
 ## 文档集命名
 
-`docs/` 下的功能文件夹必须使用带顺序号的业务功能名：
+`docs/` 下的功能文件夹必须使用三位顺序号、小写英文和下划线分隔的业务功能名。所有项目都按多个功能组组织，不使用 `docs/` 根目录作为单功能组文档集：
 
 ```text
-docs/1.配置系统/
-docs/2.用户会话/
-docs/3.模型评估/
+docs/001_config_system/
+docs/002_user_sessions/
+docs/003_model_evaluation/
 ```
 
 英文项目使用同样结构：
 
 ```text
-docs/1.Configuration System/
-docs/2.User Sessions/
-docs/3.Model Evaluation/
+docs/001_configuration_system/
+docs/002_user_sessions/
+docs/003_model_evaluation/
 ```
 
 文件夹里的 BDD 文档必须使用同一个名字：
 
 ```text
-docs/1.配置系统/BDD.md
-# BDD: 1.配置系统
+docs/001_config_system/BDD.md
+# BDD: 001_config_system
 
-Feature: 1.配置系统
+Feature: 001_config_system
 ```
 
 文件夹名、BDD 标题和 `Feature:` 名称必须完全一致。这样导航、提示词、场景和生成报告不会漂移。
 
 ## 必须执行的流程
 
-1. 阅读 `docs/INDEX.md` 或 `docs/README.md`，再选择或创建目标编号功能文件夹。
-2. 先创建或更新该文件夹中的 `BDD.md`，再写实现细节。
-3. 用业务语言识别产品价值、用户角色和目标行为。
-4. 使用 Three Amigos 思路：产品范围、测试边界、开发约束。
-5. 先记录业务规则，再写具体示例。
-6. 写主成功场景、分支场景和异常场景。
-7. 每个 BDD 场景都要有稳定 BDD ID，并能映射到后续测试目标。
-8. 除非业务行为本身就是技术能力，否则不要把实现细节写进 `Given` 和 `When`。
-9. 通用功能、可复用功能或可复用类必须把调用模型写成可观察行为：公共入口、常规调用方式、特殊场景入口、实例或状态生命周期、状态来源、测试如何覆盖所有源码调用和非目标。
-10. 通用/可复用功能的 BDD 场景优先描述调用方如何使用公共 API，而不是内部 helper 如何工作。
-11. 在同一文件夹的 `ENGINEERING_SPEC.md` 中回链 BDD ID 和业务规则。
-12. 同步同一文件夹的 `CHANGELOG.md`，让本次文档变更可审计。
-13. 完成 BDD、研发主文档和变更记录后必须停止，向用户汇报文档结果和下一步实现计划。
-14. 只有当用户明确确认继续，并且 BDD 场景足够清楚、能推导预期失败测试后，才交给 `$cx-tdd`。
+1. 阅读 `docs/INDEX.md` 或 `docs/README.md`，再选择或创建目标编号功能文件夹，例如 `docs/001_config_system/`。
+2. 只有编程研发、行为发现、业务规则或验收标准任务需要 BDD；普通、非编程任务不要自行创建 `BDD.md`，不确定时先问用户。
+3. 需要 BDD 时，先创建或更新该文件夹中的 `BDD.md`，再写实现细节。
+4. 用业务语言识别产品价值、用户角色和目标行为。
+5. 使用 Three Amigos 思路：产品范围、测试边界、开发约束。
+6. 先记录业务规则，再写具体示例。
+7. 写主成功场景、分支场景和异常场景。
+8. 每个 BDD 场景都要有稳定 BDD ID，并能映射到后续测试目标。
+9. 除非业务行为本身就是技术能力，否则不要把实现细节写进 `Given` 和 `When`。
+10. 通用功能、可复用功能或可复用类必须把调用模型写成可观察行为：公共入口、常规调用方式、特殊场景入口、实例或状态生命周期、状态来源、测试如何覆盖所有源码调用和非目标。
+11. 通用/可复用功能的 BDD 场景优先描述调用方如何使用公共 API，而不是内部 helper 如何工作。
+12. 在同一文件夹的 `ENGINEERING_SPEC.md` 中回链 BDD ID 和业务规则。
+13. 同步同一文件夹的 `CHANGELOG.md`，让本次文档变更可审计。
+14. 完成 BDD、研发主文档和变更记录后必须停止，向用户汇报文档结果和下一步实现计划。
+15. 只有当用户明确确认继续，并且 BDD 场景足够清楚、能推导预期失败测试后，才交给 `$cx-tdd`。
 
 ## BDD 格式
 
 长期项目文档使用 Markdown，场景块使用 Gherkin 风格：
 
 ```gherkin
-Feature: 1.配置系统
+Feature: 001_config_system
 
   In order to keep local agents predictable
   As a project maintainer
@@ -92,7 +93,7 @@ Feature: 1.配置系统
 
 每次 BDD 更新都应该留下：
 
-- `docs/` 下的编号功能文件夹。
+- `docs/` 下形如 `001_config_system` 的编号功能文件夹。
 - `BDD.md`，且标题和 `Feature:` 与文件夹名一致。
 - 稳定 BDD ID。
 - 主成功、分支和异常场景。

@@ -10,6 +10,7 @@ from pathlib import Path  # Path joins filesystem paths safely.
 
 
 VERSION_RE = re.compile(r"v\d+\.\d+\.\d+\Z")  # Match semantic versions like v0.0.1.
+FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # Match feature groups such as 001_project_template.
 DEFAULT_VERSIONS = "# VERSIONS.md\n\n## Versions\n"  # Minimum text for a new version index.
 
 
@@ -20,6 +21,14 @@ def join_values(values: tuple[str, ...], fallback: str = "TODO") -> str:
     if cleaned:  # Use caller-provided values when at least one remains.
         return ", ".join(cleaned)  # Join with commas for readability.
     return fallback  # Use the fallback when the caller has no values yet.
+
+
+def validate_feature_groups(groups: tuple[str, ...]) -> None:
+    """Ensure release entries only reference valid numbered feature groups."""
+
+    for group in groups:  # Check every feature group supplied by the caller.
+        if not FEATURE_FOLDER_RE.fullmatch(group):  # The group value must match the docs folder name.
+            raise ValueError("feature group must look like 001_project_template")  # Tell callers how to fix the value.
 
 
 def build_entry(
@@ -59,6 +68,7 @@ def append_version(
 
     if not VERSION_RE.fullmatch(version):  # Require explicit vX.Y.Z versions.
         raise ValueError("version must look like v0.0.1")  # Raise a clear correction message.
+    validate_feature_groups(groups)  # The version index must only record numbered feature groups.
     versions_path = root / "docs" / "VERSIONS.md"  # Keep the version index at the docs root.
     versions_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure docs/ exists.
     text = versions_path.read_text(encoding="utf-8") if versions_path.exists() else DEFAULT_VERSIONS  # Read or create text.

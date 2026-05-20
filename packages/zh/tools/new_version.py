@@ -10,6 +10,7 @@ from pathlib import Path  # Path 用于安全拼接文件路径。
 
 
 VERSION_RE = re.compile(r"v\d+\.\d+\.\d+\Z")  # 匹配 v0.0.1 这样的语义化版本。
+FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # 匹配 001_project_template 这类功能组名。
 DEFAULT_VERSIONS = "# VERSIONS.md\n\n## Versions\n"  # 新版本索引文件的最小内容。
 
 
@@ -20,6 +21,14 @@ def join_values(values: tuple[str, ...], fallback: str = "TODO") -> str:
     if cleaned:  # 如果调用方提供了有效值，就使用这些值。
         return ", ".join(cleaned)  # 用逗号连接，便于阅读和搜索。
     return fallback  # 没有值时返回占位文本。
+
+
+def validate_feature_groups(groups: tuple[str, ...]) -> None:
+    """确保版本条目只引用合法编号功能组。"""
+
+    for group in groups:  # 逐个检查调用方传入的功能组。
+        if not FEATURE_FOLDER_RE.fullmatch(group):  # 功能组名必须和 docs 目录名一致。
+            raise ValueError("feature group must look like 001_project_template")  # 报告可直接修复的格式要求。
 
 
 def build_entry(
@@ -59,6 +68,7 @@ def append_version(
 
     if not VERSION_RE.fullmatch(version):  # 版本号必须显式使用 vX.Y.Z 格式。
         raise ValueError("version must look like v0.0.1")  # 抛出清楚错误，方便调用方修正。
+    validate_feature_groups(groups)  # 版本索引只能记录编号功能组。
     versions_path = root / "docs" / "VERSIONS.md"  # 版本索引固定放在 docs 根目录。
     versions_path.parent.mkdir(parents=True, exist_ok=True)  # 确保 docs 目录存在。
     text = versions_path.read_text(encoding="utf-8") if versions_path.exists() else DEFAULT_VERSIONS  # 读取旧文本或模板。

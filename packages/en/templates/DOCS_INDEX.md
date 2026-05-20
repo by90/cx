@@ -1,30 +1,25 @@
 # docs/INDEX.md
 
-This file is the index and instruction page for the `docs/` root. In multi-feature projects, the `docs/` root keeps only indexes, instructions, and the version index long term; concrete engineering documents live in feature-group directories.
+This file is the index and instruction page for the `docs/` root. Every project is organized as multiple feature groups, so the `docs/` root keeps only indexes, instructions, and the version index long term; concrete engineering documents live in feature-group directories.
 
 ## Documentation Layout
 
 ```text
 docs/INDEX.md
 docs/VERSIONS.md
-docs/<feature-group>/ENGINEERING_SPEC.md
-docs/<feature-group>/CHANGELOG.md
-docs/<feature-group>/GUIDE.md
-```
-
-Single-feature projects may temporarily use:
-
-```text
-docs/ENGINEERING_SPEC.md
-docs/CHANGELOG.md
-docs/GUIDE.md
+docs/001_project_template/ENGINEERING_SPEC.md
+docs/001_project_template/CHANGELOG.md
+docs/001_project_template/GUIDE.md
+docs/002_next_feature/ENGINEERING_SPEC.md
+docs/002_next_feature/CHANGELOG.md
+docs/002_next_feature/GUIDE.md
 ```
 
 ## Feature Group Index
 
 | Group ID | Folder | Goal | Changelog | BDD IDs | Reusable components | Status | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| core | `docs/core/` | TODO | `docs/core/CHANGELOG.md` | TODO | TODO | planned | TODO |
+| 001 | `docs/001_project_template/` | TODO | `docs/001_project_template/CHANGELOG.md` | TODO | TODO | planned | TODO |
 
 ## Version Index
 
@@ -32,7 +27,8 @@ After a feature group is complete and merged into `dev`, use the version tool to
 
 ## Notes
 
-- Each feature-group directory maintains its own `ENGINEERING_SPEC.md`, `CHANGELOG.md`, and optional `GUIDE.md`.
-- Concrete change IDs belong only in the same feature group's `CHANGELOG.md`; do not copy them into the BDD spec.
+- Each feature-group directory must use a three-digit order prefix, lowercase words, and underscores, and maintain its own `ENGINEERING_SPEC.md`, `CHANGELOG.md`, and `GUIDE.md`.
+- Concrete change IDs belong only in the same feature group's `CHANGELOG.md`; do not copy them into BDD or the engineering spec.
+- Do not create BDD automatically for ordinary non-programming tasks; ask the user first when behavior discovery is unclear.
 - In principle, each feature group or change uses its own work branch, then merges into `dev` and deletes the work branch after completion.
 - Register reusable features, classes, or components first in the owning feature group's Reusable Capability Registry; also mark cross-feature reuse in this index.

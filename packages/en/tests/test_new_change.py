@@ -19,7 +19,7 @@ class TestNewChange(unittest.TestCase):
                 root,
                 "Create project template",
                 "feature",
-                doc_set="template",
+                doc_set="001_project_template",
                 today="2026-05-18",
                 branch="codex/create-template",
             )
@@ -27,11 +27,11 @@ class TestNewChange(unittest.TestCase):
                 root,
                 "Add usage guide",
                 "docs",
-                doc_set="template",
+                doc_set="001_project_template",
                 today="2026-05-18",
                 branch="codex/create-template",
             )
-            changelog = (root / "docs" / "template" / "CHANGELOG.md").read_text(encoding="utf-8")  # Read target changelog.
+            changelog = (root / "docs" / "001_project_template" / "CHANGELOG.md").read_text(encoding="utf-8")  # Read target changelog.
 
         self.assertEqual(first_id, "CHANGE-2026-001")  # First change ID should start at 001.
         self.assertEqual(second_id, "CHANGE-2026-002")  # Second change ID should increment.
@@ -40,6 +40,14 @@ class TestNewChange(unittest.TestCase):
             changelog.index("CHANGE-2026-002"),
         )
         self.assertIn("- Branch: codex/create-template", changelog)  # Changelog should keep the work branch.
+
+    def test_rejects_unnumbered_doc_set(self) -> None:
+        """The change helper should reject unnumbered feature folders."""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
+            root = Path(tmpdir)  # Convert the temporary path string into Path.
+            with self.assertRaisesRegex(ValueError, "001_project_template"):  # Assert that the hint shows the new format.
+                append_change(root, "Create project template", "feature", doc_set="template")  # Pass the old feature-group name.
 
 
 if __name__ == "__main__":

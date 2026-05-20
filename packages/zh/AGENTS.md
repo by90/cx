@@ -11,15 +11,16 @@
 5. **测试与源码一一对应**：单元测试目录必须镜像 `src` 结构，源文件 `src/<subsystem>/xx.py` 只能对应 `tests/<subsystem>/xx_test.py`；不要用一个大测试文件覆盖多个源文件，也不要为同一源文件拆出多个随意命名测试文件。
 6. **默认参数优先**：构造函数和普通函数优先使用清晰的类型标注与默认参数表达默认行为；不要在 `__init__` 里堆叠大量参数情况判断，复杂默认构造应放到 dataclass、配置对象、factory 或小型专用方法中。
 7. **代码极简和 OOP 访问**：禁止随意写出臃肿、冗长、难维护的代码；任何可能复用的功能、类或逻辑都必须先使用 `$cx-common-module` 搜索和设计公共入口。绝对禁止默认使用 `getattr`、`setattr`、`delattr`、monkey patch、动态注入或字符串分发；只有没有静态 OOP API 可走时才允许，并且必须记录理由、隔离实现和测试。
+8. **非编程不自动 BDD**：普通、非编程任务不要自行创建 BDD；如果不确定该任务是否需要行为发现或验收场景，先向用户提出一个最小澄清问题。
 
 ## 仓库工作约定
 
-本仓库使用 cx 文档集 BDD/TDD 工作流：`docs/` 根目录负责索引和说明，编号功能组拥有自己的研发文档集。
+本仓库使用 cx 文档集 BDD/TDD 工作流：所有项目都按多个功能组组织，`docs/` 根目录负责索引和说明，编号功能组拥有自己的研发文档集。
 
-1. 规划或修改代码前，先阅读 `docs/INDEX.md` 或 `docs/README.md`，再阅读目标功能文件夹的 `BDD.md`、`ENGINEERING_SPEC.md` 和 `CHANGELOG.md`。
+1. 规划或修改代码前，先阅读 `docs/INDEX.md` 或 `docs/README.md`，再阅读目标功能文件夹的 `ENGINEERING_SPEC.md`、`CHANGELOG.md`，以及存在时的 `BDD.md`。
 2. 流程处理、任务分流和不确定应使用哪个 cx skill 时，优先使用 `$cx-workflow`。
 3. 行为发现使用 `$cx-bdd`，测试先行实现使用 `$cx-tdd`。
-4. 不要为每个需求新建孤立的 `spec.md`、`plan.md`、`tasks.md` 或零散设计文档；多组功能使用 `docs/<feature-group>/` 文档集。
+4. 不要为每个需求新建孤立的 `spec.md`、`plan.md`、`tasks.md` 或零散设计文档；功能组文档集必须放在 `docs/001_feature_name/` 这类带三位序号、小写、下划线分隔的目录中。
 5. 新需求、BDD 场景、架构说明、任务拆解、测试映射和验证证据都回写到目标文档集的 `ENGINEERING_SPEC.md`。
 6. 目标文档集的 `CHANGELOG.md` 只做历史记录。每个 `CHANGE-*` 条目都必须能映射回同一文档集的研发主文档。
 7. 完成 BDD、研发主文档、实现计划或变更记录后必须停止，向用户汇报文档结果和下一步实现计划，等待用户明确确认；确认前不能写测试、不能改实现、不能进入 TDD。
@@ -94,27 +95,22 @@ coding-agent 提示词应说明：
 
 ## 文档策略
 
-单功能项目可以使用一个根文档集：
-
-```text
-docs/ENGINEERING_SPEC.md
-docs/CHANGELOG.md
-```
-
-多功能组项目使用编号功能目录，`docs/` 根目录只保留索引和说明：
+所有项目都使用多个编号功能目录，`docs/` 根目录只保留索引、说明和版本索引：
 
 ```text
 docs/INDEX.md
-docs/1.配置系统/BDD.md
-docs/1.配置系统/ENGINEERING_SPEC.md
-docs/1.配置系统/CHANGELOG.md
+docs/VERSIONS.md
+docs/001_config_system/BDD.md
+docs/001_config_system/ENGINEERING_SPEC.md
+docs/001_config_system/CHANGELOG.md
+docs/001_config_system/GUIDE.md
 ```
 
 其他生成文档默认视为临时文件，除非用户明确批准。需要计划时，写入目标文档集 `ENGINEERING_SPEC.md` 的 Task Queue 章节。
 
 安装中文 cx 包时，所有 cx 生成或维护的文档必须使用简体中文，并且长期保留的文档必须放在项目的 `docs/` 文件夹下。代码标识符、命令、API 名称和外部英文专名可以保留原文。
 
-BDD 场景、测试矩阵、实现计划和验证证据必须写入项目 `docs/` 文件夹中的目标研发文档集。
+BDD 场景、测试矩阵、实现计划和验证证据必须写入项目 `docs/` 文件夹中的目标研发文档集；普通、非编程任务不要自行创建 BDD，不确定时先询问用户。
 
 ## Git 提交规则
 

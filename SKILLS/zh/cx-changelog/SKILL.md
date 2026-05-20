@@ -8,7 +8,7 @@ version: 0.1.0
 
 ## 目的
 
-将目标文档集的 `CHANGELOG.md` 维护为简洁的历史索引。它不能变成第二份需求文档，也不能复制长篇行为说明。多功能组项目中，每个 `docs/<feature-group>/CHANGELOG.md` 只记录该功能组历史，`docs/INDEX.md` 负责跨功能组索引。
+将目标文档集的 `CHANGELOG.md` 维护为简洁的历史索引。它不能变成第二份需求文档，也不能复制长篇行为说明。所有项目都按多个功能组组织，每个 `docs/001_feature_name/CHANGELOG.md` 只记录该功能组历史，`docs/INDEX.md` 负责跨功能组索引。
 
 ## 规则
 

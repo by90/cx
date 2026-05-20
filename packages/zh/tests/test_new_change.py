@@ -19,7 +19,7 @@ class TestNewChange(unittest.TestCase):
                 root,
                 "创建项目模板",
                 "feature",
-                doc_set="template",
+                doc_set="001_project_template",
                 today="2026-05-18",
                 branch="codex/create-template",
             )
@@ -27,11 +27,11 @@ class TestNewChange(unittest.TestCase):
                 root,
                 "补充使用指南",
                 "docs",
-                doc_set="template",
+                doc_set="001_project_template",
                 today="2026-05-18",
                 branch="codex/create-template",
             )
-            changelog = (root / "docs" / "template" / "CHANGELOG.md").read_text(encoding="utf-8")  # 读取目标 changelog。
+            changelog = (root / "docs" / "001_project_template" / "CHANGELOG.md").read_text(encoding="utf-8")  # 读取目标 changelog。
 
         self.assertEqual(first_id, "CHANGE-2026-001")  # 第一条变更编号应从 001 开始。
         self.assertEqual(second_id, "CHANGE-2026-002")  # 第二条变更编号应递增。
@@ -40,6 +40,14 @@ class TestNewChange(unittest.TestCase):
             changelog.index("CHANGE-2026-002"),
         )
         self.assertIn("- Branch: codex/create-template", changelog)  # 变更记录应保存工作分支。
+
+    def test_rejects_unnumbered_doc_set(self) -> None:
+        """变更工具应拒绝未编号的功能组目录。"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
+            root = Path(tmpdir)  # 把临时目录转成 Path。
+            with self.assertRaisesRegex(ValueError, "001_project_template"):  # 断言错误提示给出新格式。
+                append_change(root, "创建项目模板", "feature", doc_set="template")  # 传入旧式功能组名。
 
 
 if __name__ == "__main__":

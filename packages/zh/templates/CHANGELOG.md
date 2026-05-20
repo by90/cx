@@ -1,6 +1,6 @@
 # CHANGELOG.md
 
-本文件是当前文档集唯一按顺序记录变更和变更任务的地方。完整需求、BDD 场景、架构、测试矩阵和验证证据都应该放在同目录 `ENGINEERING_SPEC.md`；这里不复制长篇业务描述。
+本文件是当前文档集唯一按顺序记录变更和变更任务的地方。完整需求、架构、测试矩阵和验证证据应该放在同目录 `ENGINEERING_SPEC.md`；需要行为发现时，BDD 场景放在同目录 `BDD.md`。这里不复制长篇业务描述。
 
 ## Unreleased
 
@@ -11,7 +11,7 @@
 - Status: done
 - Branch: codex/install-cx-workflow
 - Base branch: dev
-- Feature group: root
+- Feature group: 001_project_template
 - Task order: 1
 - Summary: 安装 cx 文档集 BDD/TDD 工作流包。
 - Related scenarios: BDD-CX-001

@@ -20,14 +20,22 @@ class TestNewVersion(unittest.TestCase):
                 "v0.0.1",
                 "Create project template",
                 today="2026-05-18",
-                groups=("template",),
+                groups=("001_project_template",),
                 changes=("CHANGE-2026-001",),
             )
             text = (root / "docs" / "VERSIONS.md").read_text(encoding="utf-8")  # Read the version index.
 
         self.assertIn("## v0.0.1 - Create project template", text)  # Heading should include version and title.
-        self.assertIn("- Feature groups: template", text)  # Version should record completed feature groups.
+        self.assertIn("- Feature groups: 001_project_template", text)  # Version should record completed feature groups.
         self.assertIn("- Changes: CHANGE-2026-001", text)  # Version should record related changes.
+
+    def test_rejects_unnumbered_feature_group(self) -> None:
+        """The version helper should reject unnumbered feature-group names."""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
+            root = Path(tmpdir)  # Convert the temporary path string into Path.
+            with self.assertRaisesRegex(ValueError, "001_project_template"):  # Assert that the hint shows the required format.
+                append_version(root, "v0.0.1", "Create project template", groups=("template",))  # Pass the old unnumbered group value.
 
 
 if __name__ == "__main__":

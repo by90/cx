@@ -19,7 +19,7 @@ Review whether the work is actually supported by tests and the target documentat
 5. After documents were complete and before testing or implementation began, was there explicit user confirmation?
 6. Was the red failure shown before implementation?
 7. Are test commands and results recorded?
-8. In multi-feature projects, does the `docs/` root contain only indexes and instructions, with feature documents under `docs/<feature-group>/`?
+8. Does the `docs/` root contain only indexes, instructions, and the version index, with concrete documents under numbered lowercase underscore feature folders such as `docs/001_feature_name/`?
 9. Were orphan planning documents created?
 10. Were reusable features, classes, or components searched across existing implementation, related skills, and the Reusable Capability Registry before extraction or explicit non-extraction?
 11. Are Python tests `unittest` unless a project exception exists?
@@ -37,7 +37,8 @@ Review whether the work is actually supported by tests and the target documentat
 23. When adding a peer capability, config section, field, or data source, does the design avoid hard-coded export logic or control-flow branches?
 24. Were Rust commands run when Rust code changed?
 25. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
-26. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
+26. Did ordinary non-programming tasks avoid creating BDD automatically, and did unclear boundaries trigger a user question first?
+27. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
 
 ## Output format
 

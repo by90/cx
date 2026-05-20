@@ -8,16 +8,17 @@
 
 cx 是工作流包，不是组件库。它规范人类和 AI 如何发现行为、先写文档、等待确认、再写测试和实现代码，并管理研究、发布版本和审查证据。
 
-功能文件夹按业务能力编号：
+所有项目都按多个功能组组织；功能文件夹按业务能力编号，使用三位序号、小写英文和下划线：
 
 ```text
-docs/1.配置系统/
-docs/1.配置系统/BDD.md
-docs/1.配置系统/ENGINEERING_SPEC.md
-docs/1.配置系统/CHANGELOG.md
+docs/001_config_system/
+docs/001_config_system/BDD.md
+docs/001_config_system/ENGINEERING_SPEC.md
+docs/001_config_system/CHANGELOG.md
+docs/001_config_system/GUIDE.md
 ```
 
-`BDD.md` 的标题和 `Feature:` 名称必须与文件夹名一致。
+`BDD.md` 的标题和 `Feature:` 名称必须与文件夹名一致。普通、非编程任务不要自行创建 BDD；不确定是否需要行为发现时先询问用户。
 
 ## 快速开始
 
@@ -46,7 +47,7 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 功能或缺陷：
 
 ```text
-请使用 $cx-workflow，选择最小必要 cx skills。先用 $cx-bdd 创建或更新编号功能文件夹、BDD.md、ENGINEERING_SPEC.md 和 CHANGELOG.md；完成文档后停止并等待我确认。确认后再用 $cx-tdd 写失败测试并实现。
+请使用 $cx-workflow，选择最小必要 cx skills。先用 $cx-bdd 创建或更新 docs/001_feature_name 形式的编号功能文件夹、BDD.md、ENGINEERING_SPEC.md 和 CHANGELOG.md；完成文档后停止并等待我确认。确认后再用 $cx-tdd 写失败测试并实现。
 ```
 
 Git 提交：

@@ -1,14 +1,15 @@
 # ENGINEERING_SPEC.md
 
-This is the long-lived engineering specification for one ordered feature group. Single-feature projects may place it at `docs/ENGINEERING_SPEC.md`; multi-feature projects should place it at `docs/1.Configuration System/ENGINEERING_SPEC.md` and link it from `docs/INDEX.md`.
+This is the long-lived engineering specification for one ordered feature group. Every project is organized as multiple feature groups, and this file must live under a numbered lowercase underscore folder such as `docs/001_config_system/ENGINEERING_SPEC.md`, linked from `docs/INDEX.md`.
 
 ## 0. Document Rules
 
 - This feature group's architecture, task queue, test matrix, reusable feature/class/component decisions, and verification evidence live here.
-- BDD scenarios live in the sibling `BDD.md`, whose heading and `Feature:` name must match the folder name.
+- When behavior discovery is needed, BDD scenarios live in the sibling `BDD.md`, whose heading and `Feature:` name must match the folder name.
+- Do not create `BDD.md` automatically for ordinary non-programming tasks; ask the user first when unsure.
 - The sibling `CHANGELOG.md` records this feature group's history only.
-- Every `CHANGE-*` entry must appear in both the sibling `CHANGELOG.md` and this file.
-- Every new or changed behavior should have a main success scenario, necessary alternate scenarios, and exception scenarios in `BDD.md`.
+- Every `CHANGE-*` entry belongs only in the sibling `CHANGELOG.md`; this file maps to those entries through section, behavior, or task names.
+- Every new or changed behavior should have a main success scenario, necessary alternate scenarios, and exception scenarios in `BDD.md`; non-behavior documentation maintenance may have no BDD.
 - Every BDD scenario should map to tests before implementation; after documents are complete, the agent must wait for user confirmation before writing tests or implementation.
 
 ## 1. Product Intent
@@ -17,7 +18,7 @@ TODO: Describe the product, users, current goals, and non-goals.
 
 ## 2. Change Index
 
-- CHANGE-2026-001: Initial cx workflow installation.
+- Initial cx workflow installation: matches the initial entry in the sibling `CHANGELOG.md`.
 
 ## 3. Behavior Map
 
@@ -40,15 +41,15 @@ And it records verification evidence after the tests pass
 
 Alternate scenarios:
 
-- Single-feature projects may use `docs/ENGINEERING_SPEC.md` and `docs/CHANGELOG.md` directly.
-- Multi-feature projects should use `docs/<feature-group>/ENGINEERING_SPEC.md` and the sibling `CHANGELOG.md`.
+- Every project uses `docs/001_feature_name/ENGINEERING_SPEC.md` and the sibling `CHANGELOG.md`.
+- The `docs/` root keeps only index and instruction files such as `INDEX.md`, `README.md`, or `VERSIONS.md`.
 
 Exception scenarios:
 
 - If the target documentation set is missing, create it first and register it in `docs/INDEX.md`.
 - If a `CHANGE-*` appears only in changelog and does not map back to the engineering spec, delivery validation must fail.
 
-- Related change: CHANGE-2026-001
+- Related changelog entry: the initial entry in the sibling `CHANGELOG.md`
 - Business rule: Work must remain searchable and auditable in the target documentation set.
 - Edge cases: urgent bugfixes, refactors, Python ML work, Rust UI work, reusable module extraction.
 - Related tests: `tools/validate_single_source.py`, `tools/validate_skill_pack.py`, `tools/validate_cx_pack.py`
@@ -67,7 +68,7 @@ TODO: Describe important modules, interfaces, data flow, error handling, and int
 
 | Task | Source | Status | Notes |
 | --- | --- | --- | --- |
-| Install cx package | CHANGE-2026-001 | done | Replace TODO sections with project-specific content. |
+| Install cx package | Initial changelog entry | done | Replace TODO sections with project-specific content. |
 
 ## 8. Reusable Capability Registry
 
@@ -83,7 +84,7 @@ TODO: Describe important modules, interfaces, data flow, error handling, and int
 
 | Date | Change | Command | Result | Notes |
 | --- | --- | --- | --- | --- |
-| 2026-05-13 | CHANGE-2026-001 | `python tools/validate_single_source.py examples/python_ml_project` | pass | Example validation |
+| 2026-05-13 | Initial validation | `python tools/validate_single_source.py examples/python_ml_project` | pass | Example validation |
 
 ## 10. Decision Log
 

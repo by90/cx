@@ -8,32 +8,25 @@ from tools.validate_single_source import validate_single_source  # Import the fu
 
 
 class TestValidateSingleSource(unittest.TestCase):
-    """Cover single-set, multi-set, and invalid documentation layouts."""
+    """Cover numbered feature-set and invalid documentation layouts."""
 
-    def test_valid_docs_pass(self) -> None:
-        """A single-feature project may keep one documentation set in docs/."""
+    def test_root_doc_set_is_error(self) -> None:
+        """Every project must use numbered feature groups, not root docs sets."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
             docs = root / "docs"  # Point to the docs directory.
             docs.mkdir()  # Create the docs directory.
-            (docs / "ENGINEERING_SPEC.md").write_text(  # Write the root engineering spec.
-                """# ENGINEERING_SPEC.md
-
-## 4. BDD Scenarios
-
-BDD-TRAIN-001
-CHANGE-2026-001
-
-## 6. Test Matrix
-""",
-                encoding="utf-8",
-            )
-            (docs / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the root changelog.
+            (docs / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Write a forbidden root spec.
+            (docs / "CHANGELOG.md").write_text("# changelog\n", encoding="utf-8")  # Write a forbidden root changelog.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertTrue(report.ok, report.errors)  # The single-set layout should pass.
+        self.assertFalse(report.ok)  # Root documentation sets should fail.
+        self.assertIn(  # Error should instruct moving to a numbered feature group.
+            "root docs must contain only indexes; move docs/ENGINEERING_SPEC.md into docs/001_feature_name/",
+            report.errors,
+        )
 
     def test_valid_feature_folder_docs_pass(self) -> None:
         """A multi-feature project may keep documentation sets in docs subfolders."""
@@ -41,38 +34,67 @@ CHANGE-2026-001
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
             docs = root / "docs"  # Point to the docs root.
-            feature = docs / "1.Training"  # Point to one ordered feature-group docs folder.
+            feature = docs / "001_training"  # Point to one numbered lowercase feature-group docs folder.
             feature.mkdir(parents=True)  # Create docs and the feature folder.
             (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # Write the root index.
+            (docs / "VERSIONS.md").write_text("# versions\n", encoding="utf-8")  # Write the root version index.
             (feature / "BDD.md").write_text(  # Write the feature BDD document.
-                "# BDD: 1.Training\n\nFeature: 1.Training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                "# BDD: 001_training\n\nFeature: 001_training\n\nScenario: BDD-TRAIN-001 - Train model\n",
                 encoding="utf-8",
             )
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
+            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write the feature usage guide.
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.
 
             report = validate_single_source(root)  # Run validation.
 
         self.assertTrue(report.ok, report.errors)  # The multi-set layout should pass.
 
-    def test_change_in_changelog_must_appear_in_spec(self) -> None:
-        """A CHANGE in changelog must also appear in the same set's spec."""
+    def test_change_id_in_spec_is_error(self) -> None:
+        """A CHANGE belongs only in changelog, not in the engineering spec."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
-            docs = root / "docs"  # Point to the docs directory.
-            docs.mkdir()  # Create docs.
-            (docs / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Spec intentionally lacks CHANGE.
-            (docs / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Changelog includes CHANGE.
+            docs = root / "docs"  # Point to the docs root.
+            feature = docs / "001_training"  # Point to the feature docs folder.
+            feature.mkdir(parents=True)  # Create docs and feature folder.
+            (docs / "INDEX.md").write_text("# index\n", encoding="utf-8")  # Write the root index.
+            (feature / "ENGINEERING_SPEC.md").write_text(  # Spec intentionally includes an invalid CHANGE.
+                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                encoding="utf-8",
+            )
+            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write the usage guide.
+            (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write changelog.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertFalse(report.ok)  # Missing mapping should fail.
+        self.assertFalse(report.ok)  # CHANGE in spec should fail.
         self.assertIn(  # Error should point to the same documentation set.
-            "CHANGE-2026-001 appears in docs/CHANGELOG.md but not docs/ENGINEERING_SPEC.md",
+            "CHANGE-2026-001 must be recorded in docs/001_training/CHANGELOG.md, not docs/001_training/ENGINEERING_SPEC.md",
+            report.errors,
+        )
+
+    def test_bad_feature_folder_name_is_error(self) -> None:
+        """Feature folders must use a number and lowercase underscores."""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
+            root = Path(tmpdir)  # Convert the temporary path string into Path.
+            docs = root / "docs"  # Point to the docs root.
+            feature = docs / "1.Training"  # Intentionally use the old dot and uppercase name.
+            feature.mkdir(parents=True)  # Create docs and feature folder.
+            (docs / "INDEX.md").write_text("# index\n", encoding="utf-8")  # Write the root index.
+            (feature / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Write spec.
+            (feature / "CHANGELOG.md").write_text("# changelog\n", encoding="utf-8")  # Write changelog.
+            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write guide.
+
+            report = validate_single_source(root)  # Run validation.
+
+        self.assertFalse(report.ok)  # Old naming should fail.
+        self.assertIn(  # Error should provide the new naming example.
+            "feature documentation folder must be named like docs/001_project_template: docs/1.Training",
             report.errors,
         )
 
@@ -83,8 +105,6 @@ CHANGE-2026-001
             root = Path(tmpdir)  # Convert the temporary path string into Path.
             docs = root / "docs"  # Point to the docs directory.
             docs.mkdir()  # Create docs.
-            (docs / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Write a spec.
-            (docs / "CHANGELOG.md").write_text("# changelog\n", encoding="utf-8")  # Write a changelog.
             (docs / "random_plan.md").write_text("# random\n", encoding="utf-8")  # Write a forbidden orphan document.
 
             report = validate_single_source(root)  # Run validation.
@@ -97,16 +117,17 @@ CHANGE-2026-001
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
             root = Path(tmpdir)  # Convert the temporary path string into Path.
-            feature = root / "docs" / "1.Training"  # Point to one feature docs folder.
+            feature = root / "docs" / "001_training"  # Point to one feature docs folder.
             feature.mkdir(parents=True)  # Create the feature folder.
             (feature / "BDD.md").write_text(  # Write the required BDD document.
-                "# BDD: 1.Training\n\nFeature: 1.Training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+                "# BDD: 001_training\n\nFeature: 001_training\n\nScenario: BDD-TRAIN-001 - Train model\n",
                 encoding="utf-8",
             )
             (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
+                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
                 encoding="utf-8",
             )
+            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write the usage guide.
             (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.
 
             report = validate_single_source(root)  # Run validation.

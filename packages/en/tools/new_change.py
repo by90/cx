@@ -10,7 +10,7 @@ from pathlib import Path  # Path joins filesystem paths safely across platforms.
 
 
 CHANGE_ID_RE = re.compile(r"CHANGE-(\d{4})-(\d{3})")  # Match CHANGE-year-number IDs.
-ROOT_DOC_SET_NAMES = {"", ".", "docs", "root"}  # These names mean the root docs set.
+FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # Match numbered lowercase feature folders.
 DEFAULT_CHANGELOG = "# CHANGELOG.md\n\n## Unreleased\n"  # Minimum text for a new changelog.
 
 
@@ -27,13 +27,13 @@ def next_change_id(changelog_text: str, year: int) -> str:
 
 
 def changelog_path_for(root: Path, doc_set: str | None) -> Path:
-    """Return the changelog path for a root or feature documentation set."""
+    """Return the changelog path for a numbered feature documentation set."""
 
     normalized = (doc_set or "").strip().strip("/\\")  # Remove whitespace and edge separators.
-    if normalized in ROOT_DOC_SET_NAMES:  # Root-style names use docs/CHANGELOG.md.
-        return root / "docs" / "CHANGELOG.md"  # Return the root changelog path.
     if normalized.startswith("docs/") or normalized.startswith("docs\\"):  # Accept docs/<group> input.
         normalized = normalized[5:]  # Strip docs/ so the path is not duplicated.
+    if not FEATURE_FOLDER_RE.fullmatch(normalized):  # Every project uses numbered feature folders.
+        raise ValueError("doc_set must look like 001_project_template")  # Tell callers how to fix the value.
     return root / "docs" / normalized / "CHANGELOG.md"  # Return the feature-group changelog path.
 
 
@@ -96,7 +96,7 @@ def append_change(
     actual_today = today or dt.date.today().isoformat()  # Use today's date when none is provided.
     year = int(actual_today[:4])  # The year segment controls the CHANGE ID group.
     change_id = next_change_id(text, year)  # Generate the next stable ID.
-    feature_group = doc_set or "root"  # Record which feature group owns this change.
+    feature_group = changelog_path.parent.name  # Record which numbered feature group owns this change.
     entry = build_entry(change_id, title, change_type, actual_today, branch, base_branch, feature_group)  # Build Markdown.
     updated_text = append_under_unreleased(text, entry)  # Append to the Unreleased section.
     changelog_path.write_text(updated_text, encoding="utf-8")  # Save the updated changelog as UTF-8.

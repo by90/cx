@@ -1,14 +1,15 @@
 # ENGINEERING_SPEC.md
 
-这是某个编号功能组的长期研发主文档。单功能项目可以把它放在 `docs/ENGINEERING_SPEC.md`；多功能组项目应放在 `docs/1.配置系统/ENGINEERING_SPEC.md`，并从 `docs/INDEX.md` 链接到这里。
+这是某个编号功能组的长期研发主文档。所有项目都按多个功能组组织，本文件必须放在 `docs/001_config_system/ENGINEERING_SPEC.md` 这类带三位序号、小写、下划线分隔的功能组目录中，并从 `docs/INDEX.md` 链接到这里。
 
 ## 0. Document Rules
 
 - 本功能组的架构、任务队列、测试矩阵、可复用功能/类/组件决策和验证证据都放在这里。
-- BDD 场景放在同目录 `BDD.md`，其标题和 `Feature:` 名称必须与文件夹名一致。
+- 需要行为发现时，BDD 场景放在同目录 `BDD.md`，其标题和 `Feature:` 名称必须与文件夹名一致。
+- 普通、非编程任务不要自行创建 `BDD.md`；如果不确定是否需要 BDD，先询问用户。
 - 同一目录下的 `CHANGELOG.md` 只记录本功能组历史。
-- 每个 `CHANGE-*` 条目都必须出现在同一文档集的 `CHANGELOG.md` 和这里。
-- 每个新增或变化的行为都应该在 `BDD.md` 中有主成功场景、必要分支场景和异常场景。
+- 每个 `CHANGE-*` 条目只写在同一文档集的 `CHANGELOG.md`，这里通过章节、行为或任务名称与它对应。
+- 每个新增或变化的行为都应该在 `BDD.md` 中有主成功场景、必要分支场景和异常场景；非行为文档维护任务可以没有 BDD。
 - 每个 BDD 场景都应该在实现前映射到测试；文档完成后必须等待用户确认，确认后才能写测试和实现。
 
 ## 1. Product Intent
@@ -17,7 +18,7 @@ TODO：描述产品、用户、当前目标和非目标。
 
 ## 2. Change Index
 
-- CHANGE-2026-001：初始安装 cx 工作流。
+- 初始安装 cx 工作流：对应同目录 `CHANGELOG.md` 中的初始条目。
 
 ## 3. Behavior Map
 
@@ -40,15 +41,15 @@ And 测试通过后记录验证证据
 
 Alternate scenarios:
 
-- 单功能项目可以直接使用 `docs/ENGINEERING_SPEC.md` 和 `docs/CHANGELOG.md`。
-- 多功能组项目应使用 `docs/<feature-group>/ENGINEERING_SPEC.md` 和同目录 `CHANGELOG.md`。
+- 所有项目都使用 `docs/001_feature_name/ENGINEERING_SPEC.md` 和同目录 `CHANGELOG.md`。
+- `docs/` 根目录只保留 `INDEX.md`、`README.md` 或 `VERSIONS.md` 这类索引和说明文件。
 
 Exception scenarios:
 
 - 如果缺少目标文档集，先创建文档集并登记到 `docs/INDEX.md`。
 - 如果 `CHANGE-*` 只出现在 changelog 而没有映射回研发主文档，交付前验证必须失败。
 
-- Related change: CHANGE-2026-001
+- Related changelog entry: 同目录 `CHANGELOG.md` 的初始条目
 - Business rule: 工作必须在目标文档集中保持可搜索、可审计。
 - Edge cases: 紧急 bugfix、重构、Python ML、Rust UI、通用功能或复用类抽取。
 - Related tests: `tools/validate_single_source.py`, `tools/validate_skill_pack.py`, `tools/validate_cx_pack.py`
@@ -67,7 +68,7 @@ TODO：描述重要模块、接口、数据流、错误处理和集成边界。
 
 | Task | Source | Status | Notes |
 | --- | --- | --- | --- |
-| 安装 cx 包 | CHANGE-2026-001 | done | 将 TODO 章节替换为项目内容。 |
+| 安装 cx 包 | 初始 changelog 条目 | done | 将 TODO 章节替换为项目内容。 |
 
 ## 8. Reusable Capability Registry
 
@@ -83,7 +84,7 @@ TODO：描述重要模块、接口、数据流、错误处理和集成边界。
 
 | Date | Change | Command | Result | Notes |
 | --- | --- | --- | --- | --- |
-| 2026-05-13 | CHANGE-2026-001 | `python tools/validate_single_source.py examples/python_ml_project` | pass | 示例验证 |
+| 2026-05-13 | 初始验证 | `python tools/validate_single_source.py examples/python_ml_project` | pass | 示例验证 |
 
 ## 10. Decision Log
 

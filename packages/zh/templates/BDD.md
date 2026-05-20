@@ -1,6 +1,6 @@
-# BDD: 1.配置系统
+# BDD: 001_config_system
 
-Feature: 1.配置系统
+Feature: 001_config_system
 
   In order to TODO
   As a TODO
@@ -12,4 +12,3 @@ Feature: 1.配置系统
       Given TODO
       When TODO
       Then TODO
-

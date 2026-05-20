@@ -12,56 +12,57 @@ Use this skill before implementation and before TDD. BDD is the collaboration la
 
 ## Documentation Set Naming
 
-Feature folders under `docs/` must use an ordered business-feature name:
+Feature folders under `docs/` must use a three-digit order prefix, lowercase English words, and underscores. Every project is organized as multiple feature groups; do not use the `docs/` root as a single-feature documentation set:
 
 ```text
-docs/1.Configuration System/
-docs/2.User Sessions/
-docs/3.Model Evaluation/
+docs/001_configuration_system/
+docs/002_user_sessions/
+docs/003_model_evaluation/
 ```
 
-Chinese projects should use the same pattern with Chinese feature names:
+Chinese projects use the same folder-name rule, even when the document body is Simplified Chinese:
 
 ```text
-docs/1.配置系统/
-docs/2.用户会话/
-docs/3.模型评估/
+docs/001_config_system/
+docs/002_user_sessions/
+docs/003_model_evaluation/
 ```
 
 The BDD document inside the folder must use the same name as the folder:
 
 ```text
-docs/1.配置系统/BDD.md
-# BDD: 1.配置系统
+docs/001_config_system/BDD.md
+# BDD: 001_config_system
 
-Feature: 1.配置系统
+Feature: 001_config_system
 ```
 
 The folder name, BDD heading, and `Feature:` name must match exactly. This keeps navigation, prompts, scenarios, and generated reports aligned.
 
 ## Required Flow
 
-1. Read `docs/INDEX.md` or `docs/README.md`, then choose or create the target ordered feature folder.
-2. Create or update `BDD.md` in that folder before editing implementation details.
-3. Identify the product value, user role, and intended behavior in plain business language.
-4. Use Three-Amigos thinking: product scope, tester edge cases, and developer constraints.
-5. Capture business rules first, then concrete examples.
-6. Write main success scenarios, alternate scenarios, and exception scenarios.
-7. Map each BDD scenario to a stable BDD ID and later test target.
-8. Keep implementation mechanics out of `Given` and `When` unless the business behavior is explicitly technical.
-9. Generic capabilities, reusable features, or reusable classes must write the calling model as observable behavior: public entrypoint, normal call style, special-case entrypoint, instance or state lifecycle, state source, how tests cover all source call sites, and non-goals.
-10. BDD scenarios for generic/reusable capabilities should first describe how callers use the public API, not how internal helpers work.
-11. Update the same folder's `ENGINEERING_SPEC.md` with links back to BDD IDs and rules.
-12. Update the same folder's `CHANGELOG.md` so the document change is auditable.
-13. After BDD, engineering spec, and changelog updates are complete, stop and report the document result and next implementation plan to the user.
-14. Hand off to `$cx-tdd` only after the user explicitly confirms continuation and the BDD scenarios are clear enough to produce expected failing tests.
+1. Read `docs/INDEX.md` or `docs/README.md`, then choose or create the target ordered feature folder, such as `docs/001_config_system/`.
+2. BDD is required for programming development, behavior discovery, business rules, or acceptance criteria; do not create `BDD.md` automatically for ordinary non-programming tasks, and ask the user first when unsure.
+3. When BDD is needed, create or update `BDD.md` in that folder before editing implementation details.
+4. Identify the product value, user role, and intended behavior in plain business language.
+5. Use Three-Amigos thinking: product scope, tester edge cases, and developer constraints.
+6. Capture business rules first, then concrete examples.
+7. Write main success scenarios, alternate scenarios, and exception scenarios.
+8. Map each BDD scenario to a stable BDD ID and later test target.
+9. Keep implementation mechanics out of `Given` and `When` unless the business behavior is explicitly technical.
+10. Generic capabilities, reusable features, or reusable classes must write the calling model as observable behavior: public entrypoint, normal call style, special-case entrypoint, instance or state lifecycle, state source, how tests cover all source call sites, and non-goals.
+11. BDD scenarios for generic/reusable capabilities should first describe how callers use the public API, not how internal helpers work.
+12. Update the same folder's `ENGINEERING_SPEC.md` with links back to BDD IDs and rules.
+13. Update the same folder's `CHANGELOG.md` so the document change is auditable.
+14. After BDD, engineering spec, and changelog updates are complete, stop and report the document result and next implementation plan to the user.
+15. Hand off to `$cx-tdd` only after the user explicitly confirms continuation and the BDD scenarios are clear enough to produce expected failing tests.
 
 ## BDD Format
 
 Use Markdown as the durable project document and Gherkin-style blocks for scenarios:
 
 ```gherkin
-Feature: 1.配置系统
+Feature: 001_config_system
 
   In order to keep local agents predictable
   As a project maintainer
@@ -92,7 +93,7 @@ Feature: 1.配置系统
 
 Every BDD update should leave:
 
-- An ordered feature folder under `docs/`.
+- An ordered feature folder under `docs/`, such as `001_config_system`.
 - A `BDD.md` whose heading and `Feature:` match the folder name.
 - Stable BDD IDs.
 - Main, alternate, and exception scenarios.

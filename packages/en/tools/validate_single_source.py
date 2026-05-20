@@ -11,9 +11,11 @@ from pathlib import Path  # Path handles filesystem paths in an object-oriented 
 
 CHANGE_ID_RE = re.compile(r"CHANGE-\d{4}-\d{3}")  # Match stable change IDs.
 BDD_ID_RE = re.compile(r"BDD-[A-Z0-9]+-\d{3}")  # Match stable behavior scenario IDs.
-ROOT_INDEX_DOCS = {"INDEX.md", "README.md"}  # Root docs may keep index/instruction files.
-DOC_SET_FILES = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md"}  # Each documentation set needs these files.
-OPTIONAL_DOC_SET_FILES = {"INDEX.md", "README.md"}  # A doc-set folder may also include local notes.
+FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # Match folders like 001_project_template.
+ROOT_INDEX_DOCS = {"INDEX.md", "README.md", "VERSIONS.md"}  # Root docs may keep only indexes, instructions, and versions.
+ROOT_FORBIDDEN_DOCS = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # Root docs must not hold feature files.
+DOC_SET_FILES = {"ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # Each feature set needs these files.
+OPTIONAL_DOC_SET_FILES = {"BDD.md", "INDEX.md", "README.md"}  # BDD exists only when behavior work needs it.
 
 
 @dataclass(frozen=True)
@@ -52,26 +54,17 @@ def markdown_files(directory: Path) -> set[str]:
 
 
 def discover_doc_sets(root: Path) -> list[DocSet]:
-    """Find root or feature-folder documentation sets under docs/."""
+    """Find numbered feature-folder documentation sets under docs/."""
 
     docs_dir = root / "docs"  # All long-lived docs live under docs/.
     doc_sets: list[DocSet] = []  # Store every discovered documentation set.
-    root_spec = docs_dir / "ENGINEERING_SPEC.md"  # Root-set engineering spec path.
-    root_changelog = docs_dir / "CHANGELOG.md"  # Root-set changelog path.
-    if root_spec.exists() or root_changelog.exists():  # Either core file makes the root a candidate set.
-        doc_sets.append(  # Save the root documentation set for later validation.
-            DocSet(
-                root_relative="docs",  # User-facing root docs path.
-                directory=docs_dir,  # Root documentation set directory.
-                spec_path=root_spec,  # Root engineering spec file.
-                changelog_path=root_changelog,  # Root changelog file.
-            )
-        )
     if docs_dir.exists():  # Scan children only when docs/ exists.
         for child in sorted(path for path in docs_dir.iterdir() if path.is_dir()):  # Inspect first-level feature folders.
             child_spec = child / "ENGINEERING_SPEC.md"  # Feature-set engineering spec path.
             child_changelog = child / "CHANGELOG.md"  # Feature-set changelog path.
-            if child_spec.exists() or child_changelog.exists():  # Either core file makes the child a candidate set.
+            child_guide = child / "GUIDE.md"  # Feature-set usage guide path.
+            child_bdd = child / "BDD.md"  # Optional behavior document path.
+            if child_spec.exists() or child_changelog.exists() or child_guide.exists() or child_bdd.exists():  # Any set file makes a child candidate.
                 doc_sets.append(  # Save this feature-group documentation set.
                     DocSet(
                         root_relative=f"docs/{child.name}",  # User-facing feature docs path.
@@ -88,15 +81,15 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
     errors: list[str] = []  # Collect this set's errors.
     warnings: list[str] = []  # Collect this set's warnings.
-    if doc_set.root_relative != "docs" and not re.fullmatch(r"\d+\..+", doc_set.directory.name):  # Feature folders are ordered.
-        errors.append(f"feature documentation folder must be named like docs/1.Configuration System: {doc_set.root_relative}")  # Report bad naming.
-    bdd_path = doc_set.directory / "BDD.md"  # BDD lives beside the engineering spec.
-    if doc_set.root_relative != "docs" and not bdd_path.exists():  # Multi-feature sets must carry their BDD document.
-        errors.append(f"missing {doc_set.root_relative}/BDD.md")  # Report missing BDD doc.
+    if not FEATURE_FOLDER_RE.fullmatch(doc_set.directory.name):  # Feature folders need a number and lowercase underscores.
+        errors.append(f"feature documentation folder must be named like docs/001_project_template: {doc_set.root_relative}")  # Report bad naming.
+    bdd_path = doc_set.directory / "BDD.md"  # BDD exists only when behavior work needs it.
     if not doc_set.spec_path.exists():  # Every set needs an engineering spec.
         errors.append(f"missing {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Report the missing spec.
     if not doc_set.changelog_path.exists():  # Every set needs a changelog.
         errors.append(f"missing {doc_set.root_relative}/CHANGELOG.md")  # Report the missing changelog.
+    if not (doc_set.directory / "GUIDE.md").exists():  # Every feature group needs a usage guide.
+        errors.append(f"missing {doc_set.root_relative}/GUIDE.md")  # Report the missing guide.
 
     allowed = DOC_SET_FILES | OPTIONAL_DOC_SET_FILES  # Core files and local notes are allowed.
     for doc_name in sorted(markdown_files(doc_set.directory) - allowed):  # Find extra Markdown files.
@@ -104,19 +97,17 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
     spec_text = read_text(doc_set.spec_path)  # Read the engineering spec text.
     bdd_text = read_text(bdd_path)  # Read the BDD document text.
-    changelog_text = read_text(doc_set.changelog_path)  # Read the changelog text.
-    change_ids_in_changelog = set(CHANGE_ID_RE.findall(changelog_text))  # Extract change IDs from changelog.
     change_ids_in_spec = set(CHANGE_ID_RE.findall(spec_text))  # Extract change IDs from spec.
-    for change_id in sorted(change_ids_in_changelog - change_ids_in_spec):  # Every changelog change must map to spec.
-        errors.append(  # Build a clear mapping error.
-            f"{change_id} appears in {doc_set.root_relative}/CHANGELOG.md but not "
-            f"{doc_set.root_relative}/ENGINEERING_SPEC.md"
-        )
+    change_ids_in_bdd = set(CHANGE_ID_RE.findall(bdd_text))  # Extract change IDs from BDD.
+    for change_id in sorted(change_ids_in_spec):  # Specs must not keep concrete change IDs.
+        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Report misplaced change.
+    for change_id in sorted(change_ids_in_bdd):  # BDD docs must not keep concrete change IDs.
+        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/BDD.md")  # Report misplaced change.
 
-    if bdd_text and doc_set.root_relative != "docs":  # Check feature-name alignment when BDD exists.
-        expected = doc_set.directory.name  # BDD title and Feature name should match this folder.
-        if f"# BDD: {expected}" not in bdd_text and f"Feature: {expected}" not in bdd_text:  # Require at least one exact marker.
-            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD or Feature name as its folder")  # Report drift.
+    if bdd_text:  # Check feature-name alignment only when BDD exists.
+        expected = doc_set.directory.name  # The BDD heading and Feature name should both equal the folder name.
+        if f"# BDD: {expected}" not in bdd_text or f"Feature: {expected}" not in bdd_text:  # Require both names to match.
+            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD and Feature name as its folder")  # Report BDD naming drift.
 
     bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text + "\n" + bdd_text)))  # Extract BDD scenario IDs from docs.
     if doc_set.spec_path.exists() and not bdd_ids:  # A spec without BDD IDs is suspicious but not fatal.
@@ -127,7 +118,7 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
 
 def validate_single_source(root: Path, allowed_docs: set[str] | None = None) -> ValidationReport:
-    """Validate either one root docs set or many feature-folder docs sets."""
+    """Validate numbered feature-folder documentation sets."""
 
     extra_allowed_docs = allowed_docs or set()  # Allow callers to whitelist extra root Markdown files.
     docs_dir = root / "docs"  # The docs directory is the long-lived documentation root.
@@ -138,20 +129,16 @@ def validate_single_source(root: Path, allowed_docs: set[str] | None = None) -> 
         errors.append("missing docs directory")  # Report missing docs/.
         return ValidationReport(ok=False, errors=tuple(errors), warnings=tuple(warnings))  # Stop early.
 
-    doc_sets = discover_doc_sets(root)  # Discover root and feature documentation sets.
+    doc_sets = discover_doc_sets(root)  # Discover all numbered feature-group documentation sets.
     if not doc_sets:  # At least one documentation set is required.
-        errors.append("missing docs/ENGINEERING_SPEC.md or docs/<feature-group>/ENGINEERING_SPEC.md")  # Report missing spec.
+        errors.append("missing docs/<numbered_feature_group>/ENGINEERING_SPEC.md")  # Report missing numbered feature spec.
 
-    has_root_set = any(doc_set.root_relative == "docs" for doc_set in doc_sets)  # Detect root-set mode.
-    has_child_sets = any(doc_set.root_relative != "docs" for doc_set in doc_sets)  # Detect feature-set mode.
-    if has_root_set and has_child_sets:  # Multi-feature mode should not keep concrete specs in the root.
-        errors.append("multi-doc-set mode must keep docs/ root to INDEX.md or README.md; move root spec/changelog into a feature folder")  # Report conflict.
-    if has_child_sets and not any((docs_dir / name).exists() for name in ROOT_INDEX_DOCS):  # Feature sets need an index.
+    for doc_name in sorted(markdown_files(docs_dir) & ROOT_FORBIDDEN_DOCS):  # Root docs cannot hold feature documents.
+        errors.append(f"root docs must contain only indexes; move docs/{doc_name} into docs/001_feature_name/")  # Report root feature doc.
+    if doc_sets and not any((docs_dir / name).exists() for name in ROOT_INDEX_DOCS):  # Feature sets need an index.
         errors.append("multi-doc-set mode requires docs/INDEX.md or docs/README.md")  # Report missing root index.
 
     root_allowed = ROOT_INDEX_DOCS | extra_allowed_docs  # Root docs are index-only by default.
-    if has_root_set and not has_child_sets:  # Single-set mode allows root spec/changelog.
-        root_allowed = root_allowed | DOC_SET_FILES  # Allow root ENGINEERING_SPEC.md and CHANGELOG.md.
     for doc_name in sorted(markdown_files(docs_dir) - root_allowed):  # Reject extra root Markdown files.
         errors.append(f"unexpected long-lived docs file: docs/{doc_name}")  # Report the orphan root file.
 

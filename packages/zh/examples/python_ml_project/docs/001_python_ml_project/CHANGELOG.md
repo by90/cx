@@ -1,6 +1,6 @@
 # CHANGELOG.md
 
-本文件只记录当前文档集的历史。完整需求、BDD 场景、架构、测试矩阵和验证证据都应该放在同一目录的 `ENGINEERING_SPEC.md`。
+本文件只记录当前文档集的历史。完整需求、架构、测试矩阵和验证证据应该放在同一目录的 `ENGINEERING_SPEC.md`；需要行为发现时，BDD 场景放在同一目录的 `BDD.md`。
 
 ## Unreleased
 

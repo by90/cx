@@ -17,7 +17,7 @@ Use this skill as the cx workflow entry point. It classifies the user's request,
 3. Check whether the project already has `docs/INDEX.md` or `docs/README.md`, one or more documentation sets, and `AGENTS.md`.
 4. Decide whether the request changes behavior, public APIs, data structures, user workflows, release mechanics, or research conclusions.
 5. Select the smallest necessary set of cx skills. Do not apply every skill by default.
-6. Select the target documentation set. Multi-feature work uses `docs/<feature-group>/`; single-feature work may keep using the root `docs/` documentation set.
+6. Select the target documentation set. Every project is organized as multiple feature groups, and concrete engineering documents must live under numbered lowercase underscore folders such as `docs/001_feature_name/`.
 7. If the task involves a generic capability, reusable feature, reusable class, shared tool, configuration, logging, paths, cache, environment probing, or data-access entrypoint, enter the "generic/reusable capability gate" before BDD/TDD or implementation.
 8. State the current step or execute directly. Ask first only when a missing requirement would likely cause the wrong implementation.
 
@@ -82,6 +82,7 @@ Ask a clarifying question only when a missing field would likely cause wrong beh
 - Behavior discovery, requirements, acceptance criteria, business rules, or scenario writing: use `$cx-bdd`.
 - Test-first implementation after BDD is clear: use `$cx-tdd`.
 - Behavior changes, bug fixes, architecture changes, or implementation planning: use `$cx-bdd`, then `$cx-tdd`.
+- Do not create BDD automatically for ordinary non-programming tasks; if it is unclear whether behavior discovery is needed, ask the user one minimal clarification question.
 - Changelog-only updates or change ID checks: use `$cx-changelog`.
 - Release version decisions, SemVer bumps, tags, or release notes: use `$cx-version`.
 - Model selection, model mechanism research, recent AI papers, academic/blog synthesis, or research reports: use `$cx-research`.
@@ -92,15 +93,15 @@ Ask a clarifying question only when a missing field would likely cause wrong beh
 
 ## Execution Order
 
-1. For normal development tasks, start or switch to a dedicated feature-group branch before editing project files.
-2. Then use `$cx-bdd`, choose or create the target ordered feature folder, and update `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md`.
+1. For normal programming development tasks, start or switch to a dedicated feature-group branch before editing project files.
+2. Then use `$cx-bdd`, choose or create the target ordered feature folder, such as `docs/001_config_system/`, and update `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md`.
 3. After the document update is complete, stop, report the document changes and next implementation plan to the user, and wait for explicit user confirmation.
 4. After user confirmation, use `$cx-tdd` and any specialist skill to write the failing test, record the red failure, implement the smallest change, and validate it.
 5. When a feature group is complete, merge its branch into `dev`; never merge a feature branch directly into `main`.
 6. For finishing work around an existing implementation, check docs and test evidence before using `$cx-evidence`.
-7. For installation, update, language switching, or shskills usage questions, answer with commands directly and do not start BDD/TDD.
+7. For ordinary non-programming tasks, such as installation, updates, language switching, shskills usage, read-only research organization, small wording edits, or maintenance documentation updates, answer or make the update directly and do not start BDD/TDD; if the task boundary may affect business behavior, ask whether BDD is required.
 8. For read-only analysis or code review, read the relevant files and list risks before making changes, unless the user asks for fixes.
-9. For broad changes across multiple feature groups, split the work into feature-group documentation sets and record order, dependencies, and status in `docs/INDEX.md`.
+9. For every project, record multiple feature groups, order, dependencies, and status in `docs/INDEX.md`; never place concrete engineering documents in the `docs/` root as a single-feature documentation set.
 10. For potentially reusable features, classes, components, data structures, test harnesses, or UI state models, use `$cx-common-module` first to search existing implementations and registries before adding a new abstraction.
 11. For component domains such as progress UI or ragged tensor utilities, do not invent a new cx skill. Treat them as project components with their own README and tests.
 12. For release work, use `$cx-version`: after the user confirms the version is complete, merge `dev` into `main`; only `main` may be used for the version commit, annotated release tag, and release-tag push. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.

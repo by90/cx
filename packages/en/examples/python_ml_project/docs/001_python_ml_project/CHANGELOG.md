@@ -1,6 +1,6 @@
 # CHANGELOG.md
 
-This file records history for the current documentation set only. Full requirements, BDD scenarios, architecture, test matrix entries, and verification evidence belong in the sibling `ENGINEERING_SPEC.md`.
+This file records history for the current documentation set only. Full requirements, architecture, test matrix entries, and verification evidence belong in the sibling `ENGINEERING_SPEC.md`; when behavior discovery is needed, BDD scenarios belong in the sibling `BDD.md`.
 
 ## Unreleased
 

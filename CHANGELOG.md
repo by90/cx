@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added coding and TDD layout rules requiring subsystem source under `src/<subsystem>/`, mirrored one-to-one tests under `tests/`, and explanatory comments for code files, classes, functions, and each line of business code.
 - Documented "verified basis" or "verification evidence" as the replacement wording for the unclear phrase "engineering facts".
 - Refocused `$cx-common-module` and related workflow gates on generic capabilities, reusable features, reusable classes, public entrypoints, lifecycle/state sources, and minimal code instead of module-only abstractions.
+- Replaced single-feature/root documentation sets with mandatory numbered feature-group folders such as `docs/001_feature_name/`, and clarified that ordinary non-programming tasks must not create BDD automatically.
 
 ## [0.1.0] - 2026-05-19
 
@@ -44,7 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added a coding-agent prompt contract for goal, context, constraints, workflow, verification, and deliverables, aligned with Codex and Claude Code instruction-file practices.
 - Rebased cx as an experimental pre-1.0 package starting at `0.0.1`; while major version is `0`, interface and workflow contract changes use minor bumps.
 - Strengthened Python/PyTorch guidance with explicit OOP design and dynamic-reflection restrictions.
-- Added ordered feature-folder naming such as `docs/1.配置系统/`, with matching `BDD.md` heading and `Feature:` name.
+- Added ordered feature-folder naming such as `docs/001_config_system/`, with matching `BDD.md` heading and `Feature:` name.
 
 ### Removed
 

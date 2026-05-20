@@ -10,7 +10,7 @@ from pathlib import Path  # Path 用于安全拼接跨平台文件路径。
 
 
 CHANGE_ID_RE = re.compile(r"CHANGE-(\d{4})-(\d{3})")  # 匹配 CHANGE-年份-序号。
-ROOT_DOC_SET_NAMES = {"", ".", "docs", "root"}  # 这些名字表示使用 docs 根文档集。
+FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # 匹配编号小写下划线功能组目录。
 DEFAULT_CHANGELOG = "# CHANGELOG.md\n\n## Unreleased\n"  # 新 changelog 的最小可用内容。
 
 
@@ -27,13 +27,13 @@ def next_change_id(changelog_text: str, year: int) -> str:
 
 
 def changelog_path_for(root: Path, doc_set: str | None) -> Path:
-    """根据文档集名称计算 changelog 路径。"""
+    """根据编号功能组名称计算 changelog 路径。"""
 
     normalized = (doc_set or "").strip().strip("/\\")  # 清理空白和首尾路径分隔符。
-    if normalized in ROOT_DOC_SET_NAMES:  # 根文档集直接使用 docs/CHANGELOG.md。
-        return root / "docs" / "CHANGELOG.md"  # 返回根 changelog 路径。
     if normalized.startswith("docs/") or normalized.startswith("docs\\"):  # 允许用户传入 docs/<group>。
         normalized = normalized[5:]  # 去掉 docs/ 前缀，避免得到 docs/docs/<group>。
+    if not FEATURE_FOLDER_RE.fullmatch(normalized):  # 所有项目都必须使用编号功能组目录。
+        raise ValueError("doc_set must look like 001_project_template")  # 给调用方清楚的修复提示。
     return root / "docs" / normalized / "CHANGELOG.md"  # 返回功能组 changelog 路径。
 
 
@@ -96,7 +96,7 @@ def append_change(
     actual_today = today or dt.date.today().isoformat()  # 没传日期时使用今天。
     year = int(actual_today[:4])  # CHANGE 编号按日期年份分组。
     change_id = next_change_id(text, year)  # 生成下一个稳定编号。
-    feature_group = doc_set or "root"  # 记录该变更所属功能组。
+    feature_group = changelog_path.parent.name  # 记录该变更所属编号功能组。
     entry = build_entry(change_id, title, change_type, actual_today, branch, base_branch, feature_group)  # 生成 Markdown 条目。
     updated_text = append_under_unreleased(text, entry)  # 把条目追加到 Unreleased 小节末尾。
     changelog_path.write_text(updated_text, encoding="utf-8")  # 用 UTF-8 写回 changelog。

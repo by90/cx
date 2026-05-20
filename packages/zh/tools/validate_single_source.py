@@ -11,9 +11,11 @@ from pathlib import Path  # Path 用面向对象方式处理文件路径。
 
 CHANGE_ID_RE = re.compile(r"CHANGE-\d{4}-\d{3}")  # 匹配稳定变更编号。
 BDD_ID_RE = re.compile(r"BDD-[A-Z0-9]+-\d{3}")  # 匹配稳定行为场景编号。
-ROOT_INDEX_DOCS = {"INDEX.md", "README.md"}  # 多文档集模式下 docs 根目录允许的索引文件。
-DOC_SET_FILES = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md"}  # 一个研发文档集必须包含的核心文件。
-OPTIONAL_DOC_SET_FILES = {"INDEX.md", "README.md"}  # 文档集目录内允许存在的说明文件。
+FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # 匹配 001_project_template 这类功能组目录。
+ROOT_INDEX_DOCS = {"INDEX.md", "README.md", "VERSIONS.md"}  # docs 根目录只允许索引、说明和版本索引。
+ROOT_FORBIDDEN_DOCS = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # 根目录禁止承载具体功能组文件。
+DOC_SET_FILES = {"ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # 一个功能组文档集必须包含的核心文件。
+OPTIONAL_DOC_SET_FILES = {"BDD.md", "INDEX.md", "README.md"}  # BDD 只在行为任务需要时存在，说明文件也可选。
 
 
 @dataclass(frozen=True)
@@ -52,26 +54,17 @@ def markdown_files(directory: Path) -> set[str]:
 
 
 def discover_doc_sets(root: Path) -> list[DocSet]:
-    """Find root or feature-folder documentation sets under docs/."""
+    """Find numbered feature-folder documentation sets under docs/."""
 
     docs_dir = root / "docs"  # cx 约定所有长期文档都在 docs 目录下。
     doc_sets: list[DocSet] = []  # 用列表保存发现的文档集。
-    root_spec = docs_dir / "ENGINEERING_SPEC.md"  # 单文档集模式的主文档路径。
-    root_changelog = docs_dir / "CHANGELOG.md"  # 单文档集模式的变更记录路径。
-    if root_spec.exists() or root_changelog.exists():  # 只要出现任一核心文件，就把根目录视作文档集候选。
-        doc_sets.append(  # 保存根文档集，稍后再验证两个文件是否齐全。
-            DocSet(
-                root_relative="docs",  # 根文档集的用户可读路径。
-                directory=docs_dir,  # 根文档集所在目录。
-                spec_path=root_spec,  # 根文档集主文档。
-                changelog_path=root_changelog,  # 根文档集变更记录。
-            )
-        )
     if docs_dir.exists():  # 只有 docs 存在时才扫描子目录。
         for child in sorted(path for path in docs_dir.iterdir() if path.is_dir()):  # 逐个检查一级功能目录。
             child_spec = child / "ENGINEERING_SPEC.md"  # 功能目录主文档路径。
             child_changelog = child / "CHANGELOG.md"  # 功能目录变更记录路径。
-            if child_spec.exists() or child_changelog.exists():  # 出现任一核心文件就视作文档集候选。
+            child_guide = child / "GUIDE.md"  # 功能目录使用指南路径。
+            child_bdd = child / "BDD.md"  # 功能目录可选 BDD 文档路径。
+            if child_spec.exists() or child_changelog.exists() or child_guide.exists() or child_bdd.exists():  # 出现任一文档集文件就视为候选。
                 doc_sets.append(  # 保存功能组文档集。
                     DocSet(
                         root_relative=f"docs/{child.name}",  # 功能组文档集的用户可读路径。
@@ -88,15 +81,15 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
     errors: list[str] = []  # 收集当前文档集的错误。
     warnings: list[str] = []  # 收集当前文档集的警告。
-    if doc_set.root_relative != "docs" and not re.fullmatch(r"\d+\..+", doc_set.directory.name):
-        errors.append(f"feature documentation folder must be named like docs/1.配置系统: {doc_set.root_relative}")
-    bdd_path = doc_set.directory / "BDD.md"
-    if doc_set.root_relative != "docs" and not bdd_path.exists():
-        errors.append(f"missing {doc_set.root_relative}/BDD.md")
+    if not FEATURE_FOLDER_RE.fullmatch(doc_set.directory.name):  # 功能组目录必须带三位序号并使用小写下划线。
+        errors.append(f"feature documentation folder must be named like docs/001_project_template: {doc_set.root_relative}")  # 报告命名错误。
+    bdd_path = doc_set.directory / "BDD.md"  # BDD 文档只在行为任务需要时存在。
     if not doc_set.spec_path.exists():  # 每个文档集必须有研发主文档。
         errors.append(f"missing {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 报告缺失主文档。
     if not doc_set.changelog_path.exists():  # 每个文档集必须有变更记录。
         errors.append(f"missing {doc_set.root_relative}/CHANGELOG.md")  # 报告缺失变更记录。
+    if not (doc_set.directory / "GUIDE.md").exists():  # 每个功能组必须有使用指南。
+        errors.append(f"missing {doc_set.root_relative}/GUIDE.md")  # 报告缺失使用指南。
 
     allowed = DOC_SET_FILES | OPTIONAL_DOC_SET_FILES  # 文档集目录内允许核心文件和说明文件。
     for doc_name in sorted(markdown_files(doc_set.directory) - allowed):  # 找出额外 Markdown 文件。
@@ -104,19 +97,17 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
     spec_text = read_text(doc_set.spec_path)  # 读取主文档文本。
     bdd_text = read_text(bdd_path)
-    changelog_text = read_text(doc_set.changelog_path)  # 读取变更记录文本。
-    change_ids_in_changelog = set(CHANGE_ID_RE.findall(changelog_text))  # 提取 changelog 中的变更编号。
     change_ids_in_spec = set(CHANGE_ID_RE.findall(spec_text))  # 提取主文档中的变更编号。
-    for change_id in sorted(change_ids_in_changelog - change_ids_in_spec):  # 每个 changelog 变更都必须回指主文档。
-        errors.append(  # 把缺失映射写成清楚的错误。
-            f"{change_id} appears in {doc_set.root_relative}/CHANGELOG.md but not "
-            f"{doc_set.root_relative}/ENGINEERING_SPEC.md"
-        )
+    change_ids_in_bdd = set(CHANGE_ID_RE.findall(bdd_text))  # 提取 BDD 文档中的变更编号。
+    for change_id in sorted(change_ids_in_spec):  # 研发主文档不能保存具体变更编号。
+        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 报告主文档误放变更。
+    for change_id in sorted(change_ids_in_bdd):  # BDD 文档也不能保存具体变更编号。
+        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/BDD.md")  # 报告 BDD 误放变更。
 
-    if bdd_text and doc_set.root_relative != "docs":
-        expected = doc_set.directory.name
-        if f"# BDD: {expected}" not in bdd_text and f"Feature: {expected}" not in bdd_text:
-            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD or Feature name as its folder")
+    if bdd_text:  # 只有存在 BDD 文档时才校验名称一致性，避免非编程任务被迫创建 BDD。
+        expected = doc_set.directory.name  # BDD 标题和 Feature 名都应等于功能组目录名。
+        if f"# BDD: {expected}" not in bdd_text or f"Feature: {expected}" not in bdd_text:  # 两处名称必须同时一致。
+            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD and Feature name as its folder")  # 报告 BDD 命名漂移。
 
     bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text + "\n" + bdd_text)))  # 提取 BDD 场景编号。
     if doc_set.spec_path.exists() and not bdd_ids:  # 主文档存在但没有 BDD ID 时给警告。
@@ -127,7 +118,7 @@ def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
 
 
 def validate_single_source(root: Path, allowed_docs: set[str] | None = None) -> ValidationReport:
-    """Validate either one root docs set or many feature-folder docs sets."""
+    """Validate numbered feature-folder documentation sets."""
 
     extra_allowed_docs = allowed_docs or set()  # 调用方可以额外允许根目录 Markdown 文件。
     docs_dir = root / "docs"  # 所有长期文档必须在 docs 目录下。
@@ -138,20 +129,16 @@ def validate_single_source(root: Path, allowed_docs: set[str] | None = None) -> 
         errors.append("missing docs directory")  # 报告缺失 docs。
         return ValidationReport(ok=False, errors=tuple(errors), warnings=tuple(warnings))  # 提前返回。
 
-    doc_sets = discover_doc_sets(root)  # 找出根文档集和功能组文档集。
+    doc_sets = discover_doc_sets(root)  # 找出所有编号功能组文档集。
     if not doc_sets:  # 至少需要一个文档集。
-        errors.append("missing docs/ENGINEERING_SPEC.md or docs/<feature-group>/ENGINEERING_SPEC.md")  # 报告缺失主文档。
+        errors.append("missing docs/<numbered_feature_group>/ENGINEERING_SPEC.md")  # 报告缺失编号功能组主文档。
 
-    has_root_set = any(doc_set.root_relative == "docs" for doc_set in doc_sets)  # 判断是否存在根文档集。
-    has_child_sets = any(doc_set.root_relative != "docs" for doc_set in doc_sets)  # 判断是否存在功能组文档集。
-    if has_root_set and has_child_sets:  # 多功能组模式下不允许根目录同时承载具体研发文档。
-        errors.append("multi-doc-set mode must keep docs/ root to INDEX.md or README.md; move root spec/changelog into a feature folder")  # 报告布局冲突。
-    if has_child_sets and not any((docs_dir / name).exists() for name in ROOT_INDEX_DOCS):  # 多功能组需要根索引。
+    for doc_name in sorted(markdown_files(docs_dir) & ROOT_FORBIDDEN_DOCS):  # 根目录不能直接保存功能组文档。
+        errors.append(f"root docs must contain only indexes; move docs/{doc_name} into docs/001_feature_name/")  # 报告根目录具体文档。
+    if doc_sets and not any((docs_dir / name).exists() for name in ROOT_INDEX_DOCS):  # 多功能组需要根索引。
         errors.append("multi-doc-set mode requires docs/INDEX.md or docs/README.md")  # 报告缺失索引。
 
     root_allowed = ROOT_INDEX_DOCS | extra_allowed_docs  # 根目录默认只允许索引和用户额外白名单。
-    if has_root_set and not has_child_sets:  # 单文档集模式允许根目录放核心文件。
-        root_allowed = root_allowed | DOC_SET_FILES  # 加入 ENGINEERING_SPEC.md 和 CHANGELOG.md。
     for doc_name in sorted(markdown_files(docs_dir) - root_allowed):  # 检查根目录多余 Markdown 文件。
         errors.append(f"unexpected long-lived docs file: docs/{doc_name}")  # 报告孤立根文档。
 

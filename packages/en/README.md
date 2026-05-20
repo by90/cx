@@ -8,16 +8,17 @@ Do not install both language packs into the same target project. English and Chi
 
 cx is a workflow package, not a component library. It standardizes how humans and AI agents discover behavior, write documents first, wait for confirmation, then write tests and implementation code, while managing research, release versions, and evidence review.
 
-Feature folders should be ordered by business capability:
+Every project is organized as multiple feature groups. Feature folders are ordered by business capability and use a three-digit prefix, lowercase words, and underscores:
 
 ```text
-docs/1.Configuration System/
-docs/1.Configuration System/BDD.md
-docs/1.Configuration System/ENGINEERING_SPEC.md
-docs/1.Configuration System/CHANGELOG.md
+docs/001_configuration_system/
+docs/001_configuration_system/BDD.md
+docs/001_configuration_system/ENGINEERING_SPEC.md
+docs/001_configuration_system/CHANGELOG.md
+docs/001_configuration_system/GUIDE.md
 ```
 
-The BDD document heading and `Feature:` name must match the folder name.
+The BDD document heading and `Feature:` name must match the folder name. Do not create BDD automatically for ordinary non-programming tasks; ask the user first when behavior discovery is unclear.
 
 ## Quick Start
 
@@ -46,7 +47,7 @@ Prefer naming the target feature folder, the cx skills to use, commands that mus
 Feature or bugfix:
 
 ```text
-Use $cx-workflow. Select the smallest required cx skills. Start with $cx-bdd, create or update the ordered feature folder, BDD.md, ENGINEERING_SPEC.md, and CHANGELOG.md; after the documents are complete, stop and wait for my confirmation. After confirmation, use $cx-tdd to write the failing test and implement.
+Use $cx-workflow. Select the smallest required cx skills. Start with $cx-bdd, create or update the ordered feature folder in docs/001_feature_name form, BDD.md, ENGINEERING_SPEC.md, and CHANGELOG.md; after the documents are complete, stop and wait for my confirmation. After confirmation, use $cx-tdd to write the failing test and implement.
 ```
 
 Git commit:

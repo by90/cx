@@ -8,7 +8,7 @@ version: 0.1.0
 
 ## Purpose
 
-Maintain the target documentation set's `CHANGELOG.md` as a compact historical index. It must not become a second requirements document and must not duplicate long behavior descriptions. In multi-feature projects, each `docs/<feature-group>/CHANGELOG.md` records that feature group's history, while `docs/INDEX.md` handles cross-feature indexing.
+Maintain the target documentation set's `CHANGELOG.md` as a compact historical index. It must not become a second requirements document and must not duplicate long behavior descriptions. Every project is organized as multiple feature groups, and each `docs/001_feature_name/CHANGELOG.md` records that feature group's history while `docs/INDEX.md` handles cross-feature indexing.
 
 ## Rules
 

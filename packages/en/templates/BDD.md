@@ -1,6 +1,6 @@
-# BDD: 1.Configuration System
+# BDD: 001_configuration_system
 
-Feature: 1.Configuration System
+Feature: 001_configuration_system
 
   In order to TODO
   As a TODO
@@ -12,4 +12,3 @@ Feature: 1.Configuration System
       Given TODO
       When TODO
       Then TODO
-
