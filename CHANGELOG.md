@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Added a hard workflow gate requiring agents to stop after BDD/spec/changelog updates and wait for explicit user confirmation before tests or implementation.
+- Strengthened Chinese-pack documentation rules so all cx-maintained documents must be Simplified Chinese when the Chinese package is installed.
+- Expanded AGENTS guidance for Git submission: stage tracked and untracked files as one working-tree change set and create a single commit without splitting by file ownership.
+- Added post-completion Git flow rules: merge feature branches into `dev`, delete local feature branches after merge, and push feature branches only on explicit user request.
+- Added Windows toolchain guidance to install a required `ng` CLI instead of replacing it with PowerShell or `ps` substitutes.
+- Documented "verified basis" or "verification evidence" as the replacement wording for the unclear phrase "engineering facts".
+
 ## [0.1.0] - 2026-05-19
 
 ### Changed

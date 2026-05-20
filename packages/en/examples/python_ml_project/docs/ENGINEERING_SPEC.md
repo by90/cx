@@ -8,7 +8,7 @@ This is the long-lived engineering specification for one feature group. Single-f
 - The sibling `CHANGELOG.md` records this feature group's history only.
 - Every `CHANGE-*` entry must appear in both the sibling `CHANGELOG.md` and this file.
 - Every new or changed behavior should have a main success scenario, necessary alternate scenarios, and exception scenarios.
-- Every BDD scenario should map to tests before implementation.
+- Every BDD scenario should map to tests before implementation; after documents are complete, the agent must wait for user confirmation before writing tests or implementation.
 
 ## 1. Product Intent
 
@@ -33,7 +33,8 @@ Main success scenario:
 Given a developer asks for a feature or bugfix
 When the assistant plans and implements the work
 Then it updates the target engineering spec and changelog before implementation
-And it writes failing tests before production code
+And it stops and waits for the user to confirm the documents and next implementation plan
+And after user confirmation, it writes failing tests before production code
 And it records verification evidence after the tests pass
 
 Alternate scenarios:

@@ -6,7 +6,7 @@ Do not install both language packs into the same target project. English and Chi
 
 ## Core Contract
 
-cx is a workflow package, not a component library. It standardizes how humans and AI agents discover behavior, write tests first, implement code, research technical choices, manage release versions, and review evidence.
+cx is a workflow package, not a component library. It standardizes how humans and AI agents discover behavior, write documents first, wait for confirmation, then write tests and implementation code, while managing research, release versions, and evidence review.
 
 Feature folders should be ordered by business capability:
 
@@ -41,12 +41,18 @@ Verification:
 Deliverables:
 ```
 
-Prefer naming the target feature folder, the cx skills to use, commands that must pass, and the evidence that should be recorded. For Claude Code projects, keep `AGENTS.md` as the shared rule source and have `CLAUDE.md` import or reference it.
+Prefer naming the target feature folder, the cx skills to use, commands that must pass, and the evidence that should be recorded. For Claude Code projects, keep `AGENTS.md` as the shared rule source and have `CLAUDE.md` import or reference it. When the Chinese pack is installed, all cx documents must be Simplified Chinese.
 
 Feature or bugfix:
 
 ```text
-Use $cx-workflow. Select the smallest required cx skills. Start with $cx-bdd, create or update the ordered feature folder and BDD.md, then use $cx-tdd to write the failing test before implementation.
+Use $cx-workflow. Select the smallest required cx skills. Start with $cx-bdd, create or update the ordered feature folder, BDD.md, ENGINEERING_SPEC.md, and CHANGELOG.md; after the documents are complete, stop and wait for my confirmation. After confirmation, use $cx-tdd to write the failing test and implement.
+```
+
+Git commit:
+
+```text
+When committing, follow AGENTS.md: treat the current working tree as one change set, stage tracked and untracked files, create one commit, and do not analyze who changed which files.
 ```
 
 Python / PyTorch / Lightning:
