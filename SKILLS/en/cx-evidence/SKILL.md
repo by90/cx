@@ -21,17 +21,23 @@ Review whether the work is actually supported by tests and the target documentat
 7. Are test commands and results recorded?
 8. In multi-feature projects, does the `docs/` root contain only indexes and instructions, with feature documents under `docs/<feature-group>/`?
 9. Were orphan planning documents created?
-10. Were reusable components searched across existing implementation, related skills, and the Common Module Registry before extraction or explicit non-extraction?
+10. Were reusable features, classes, or components searched across existing implementation, related skills, and the Reusable Capability Registry before extraction or explicit non-extraction?
 11. Are Python tests `unittest` unless a project exception exists?
 12. Does Python source live under `src/<subsystem>/`, do tests under `tests/` mirror the `src` structure, and do test files map one-to-one as `xx.py` -> `xx_test.py`?
 13. Do added or edited code files, classes, functions, and every line of business code have explanatory comments?
 14. Does Python express default behavior through default parameters, config objects, dataclasses, factories, or small methods instead of long branch stacks inside `__init__`?
 15. Does the work follow the corresponding implementation skill's `## Minimal Implementation Discipline`: absolutely no unmaintainable pile-up code, no premature frameworkization, generalization, abstraction, or requirement-external validation?
-16. Is the code minimal, small, and direct, and was reusable logic first searched and registered through `$cx-common-module`?
+16. Is the code minimal, small, and direct, and were reusable features, classes, or logic first searched and registered through `$cx-common-module`?
 17. Does the code avoid non-OOP dynamic access such as `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch; if unavoidable, is the reason documented, implementation isolated, and behavior tested?
-18. Were Rust commands run when Rust code changed?
-19. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
-20. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
+18. For a generic capability, reusable feature, or reusable class, were the public entrypoint, normal call style, special-case entrypoint, instance or state lifecycle, state source, test coverage path for all source call sites, and non-goals defined first?
+19. Does GUIDE or README show a normal-call example, and do tests cover that example?
+20. Do tests cover the special entrypoint, lifecycle, state restoration, or test isolation path?
+21. Are there helpers, wrappers, validators, or constants with only one call site and no real complexity to isolate?
+22. Did the work avoid requirement-external validation, exception wrapping, dynamic construction, scanners, registries, or future extension entrypoints?
+23. When adding a peer capability, config section, field, or data source, does the design avoid hard-coded export logic or control-flow branches?
+24. Were Rust commands run when Rust code changed?
+25. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
+26. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
 
 ## Output format
 

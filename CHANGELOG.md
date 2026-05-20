@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added non-negotiable AGENTS rules for complete commits, comprehensive comments, document confirmation, Chinese documentation, source/test mapping, default-parameter design, minimal code, and OOP access. These rules explicitly override other workflow instructions unless the user overrides a specific rule in the current conversation.
 - Added coding and TDD layout rules requiring subsystem source under `src/<subsystem>/`, mirrored one-to-one tests under `tests/`, and explanatory comments for code files, classes, functions, and each line of business code.
 - Documented "verified basis" or "verification evidence" as the replacement wording for the unclear phrase "engineering facts".
+- Refocused `$cx-common-module` and related workflow gates on generic capabilities, reusable features, reusable classes, public entrypoints, lifecycle/state sources, and minimal code instead of module-only abstractions.
 
 ## [0.1.0] - 2026-05-19
 

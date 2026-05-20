@@ -19,7 +19,7 @@ The cx workflow uses this order:
 11. Run tests until green.
 12. Refactor only while keeping tests green.
 13. Record verification evidence.
-14. Search existing implementation, related skills, and registries to decide whether duplicated logic should become a reusable component.
+14. Search existing implementation, related skills, and registries to decide whether duplicated logic should become a reusable feature, class, or component.
 15. Merge the completed feature-group branch into `dev`; release handoff from `dev` to `main` happens only after user version confirmation.
 
 ## Why docs documentation sets

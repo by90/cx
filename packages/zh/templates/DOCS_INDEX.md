@@ -35,4 +35,4 @@ docs/GUIDE.md
 - 每个功能组目录维护自己的 `ENGINEERING_SPEC.md`、`CHANGELOG.md` 和可选 `GUIDE.md`。
 - 具体变更编号只写入同一功能组的 `CHANGELOG.md`，不要复制进 BDD 主文档。
 - 理论上一个功能组或一次变更使用单独工作分支，完成后合并到 `dev` 并删除工作分支。
-- 可复用组件先登记到所在功能组的 Reusable Component Registry；跨功能组复用时，也在本索引中标注。
+- 可复用功能、类或组件先登记到所在功能组的 Reusable Capability Registry；跨功能组复用时，也在本索引中标注。

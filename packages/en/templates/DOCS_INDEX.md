@@ -35,4 +35,4 @@ After a feature group is complete and merged into `dev`, use the version tool to
 - Each feature-group directory maintains its own `ENGINEERING_SPEC.md`, `CHANGELOG.md`, and optional `GUIDE.md`.
 - Concrete change IDs belong only in the same feature group's `CHANGELOG.md`; do not copy them into the BDD spec.
 - In principle, each feature group or change uses its own work branch, then merges into `dev` and deletes the work branch after completion.
-- Register reusable components first in the owning feature group's Reusable Component Registry; also mark cross-feature reuse in this index.
+- Register reusable features, classes, or components first in the owning feature group's Reusable Capability Registry; also mark cross-feature reuse in this index.

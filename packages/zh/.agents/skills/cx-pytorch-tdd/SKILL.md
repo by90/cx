@@ -13,14 +13,14 @@ version: 0.1.0
 ## 必须执行的流程
 
 1. 先确认用户已经在文档更新后明确同意进入测试和实现阶段；没有确认时停止并请求确认。
-2. 阅读目标文档集 `ENGINEERING_SPEC.md` 中相关 BDD ID 和 Common Module Registry 条目。
+2. 阅读目标文档集 `ENGINEERING_SPEC.md` 中相关 BDD ID 和 Reusable Capability Registry 条目。
 3. 使用项目级 `uv` 虚拟环境；优先通过 `uv sync`、`uv run` 或项目已有 `uv` 工作流安装依赖和运行测试。
 4. 创建或重建环境前，访问 Python 官网下载页和 PyTorch 官网 Start Locally 页，确认 Python、PyTorch、CUDA 选择的是当前官方稳定组合；不要默认使用 nightly、预发布或非官方轮子。
 5. API 行为可能受版本影响时，查询 PyTorch 和 Lightning 官方最新文档。
 6. 默认先写 Python `unittest` 测试；不要引入 `pytest`，除非项目已有明确例外。
 7. 测试必须确定性、小规模、CPU 优先，除非目标行为就是 GPU 行为。
 8. tensor 变换优先写成纯函数，Lightning orchestration 尽量保持很薄。
-9. 新增 dataset、tensor 容器、indexed series 或 test harness 前，先叠加 `$cx-common-module` 搜索已有复用组件。
+9. 新增 dataset、tensor 容器、indexed series 或 test harness 前，先叠加 `$cx-common-module` 搜索已有可复用功能、类或组件。
 10. 遵循 `$cx-tdd` 的源码/测试布局和注释规则：源文件放在 `src/<subsystem>/`，测试镜像到 `tests/<subsystem>/`，源文件与 `*_test.py` 一一对应，并为代码文件、类、函数和每一行业务代码写说明注释。
 11. 代码遵循 Black 默认规范，不修改无关用户代码。
 

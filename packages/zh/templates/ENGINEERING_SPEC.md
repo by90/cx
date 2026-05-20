@@ -4,7 +4,7 @@
 
 ## 0. Document Rules
 
-- 本功能组的架构、任务队列、测试矩阵、复用组件决策和验证证据都放在这里。
+- 本功能组的架构、任务队列、测试矩阵、可复用功能/类/组件决策和验证证据都放在这里。
 - BDD 场景放在同目录 `BDD.md`，其标题和 `Feature:` 名称必须与文件夹名一致。
 - 同一目录下的 `CHANGELOG.md` 只记录本功能组历史。
 - 每个 `CHANGE-*` 条目都必须出现在同一文档集的 `CHANGELOG.md` 和这里。
@@ -50,7 +50,7 @@ Exception scenarios:
 
 - Related change: CHANGE-2026-001
 - Business rule: 工作必须在目标文档集中保持可搜索、可审计。
-- Edge cases: 紧急 bugfix、重构、Python ML、Rust UI、复用组件抽取。
+- Edge cases: 紧急 bugfix、重构、Python ML、Rust UI、通用功能或复用类抽取。
 - Related tests: `tools/validate_single_source.py`, `tools/validate_skill_pack.py`, `tools/validate_cx_pack.py`
 
 ## 5. Technical Architecture
@@ -69,7 +69,7 @@ TODO：描述重要模块、接口、数据流、错误处理和集成边界。
 | --- | --- | --- | --- |
 | 安装 cx 包 | CHANGE-2026-001 | done | 将 TODO 章节替换为项目内容。 |
 
-## 8. Reusable Component Registry
+## 8. Reusable Capability Registry
 
 | Component | Purpose | Public API | Owners/Callers | Tests | Migration notes |
 | --- | --- | --- | --- | --- | --- |

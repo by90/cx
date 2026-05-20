@@ -49,7 +49,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Avoid cloning to appease the borrow checker. Decide ownership deliberately.
 - Keep functions small, direct, and minimal. Do not create bloated, long, hard-to-maintain code, and do not fragment logic into meaningless wrappers.
 - Keep modules cohesive and public APIs narrow.
-- Any potentially reusable logic must first invoke `$cx-common-module` to search existing implementation and design the common module.
+- Any potentially reusable feature, class, or logic must first invoke `$cx-common-module` to search existing implementation and design the public entrypoint.
 - Use `Option` for absence and `Result` for failure; do not encode errors as magic strings or sentinel values.
 - Document unsafe code with `SAFETY:` comments and tests around the safe boundary. Do not add unsafe code unless there is no safe design.
 

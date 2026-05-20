@@ -10,7 +10,7 @@
 4. **中文包全中文**：安装中文 cx 包时，所有 cx 生成或维护的文档必须使用简体中文；代码标识符、命令、API 名称和外部英文专名可以保留原文。
 5. **测试与源码一一对应**：单元测试目录必须镜像 `src` 结构，源文件 `src/<subsystem>/xx.py` 只能对应 `tests/<subsystem>/xx_test.py`；不要用一个大测试文件覆盖多个源文件，也不要为同一源文件拆出多个随意命名测试文件。
 6. **默认参数优先**：构造函数和普通函数优先使用清晰的类型标注与默认参数表达默认行为；不要在 `__init__` 里堆叠大量参数情况判断，复杂默认构造应放到 dataclass、配置对象、factory 或小型专用方法中。
-7. **代码极简和 OOP 访问**：禁止随意写出臃肿、冗长、难维护的代码；任何可能复用的逻辑都必须先使用 `$cx-common-module` 搜索和设计公共模块。绝对禁止默认使用 `getattr`、`setattr`、`delattr`、monkey patch、动态注入或字符串分发；只有没有静态 OOP API 可走时才允许，并且必须记录理由、隔离实现和测试。
+7. **代码极简和 OOP 访问**：禁止随意写出臃肿、冗长、难维护的代码；任何可能复用的功能、类或逻辑都必须先使用 `$cx-common-module` 搜索和设计公共入口。绝对禁止默认使用 `getattr`、`setattr`、`delattr`、monkey patch、动态注入或字符串分发；只有没有静态 OOP API 可走时才允许，并且必须记录理由、隔离实现和测试。
 
 ## 仓库工作约定
 
@@ -24,7 +24,7 @@
 6. 目标文档集的 `CHANGELOG.md` 只做历史记录。每个 `CHANGE-*` 条目都必须能映射回同一文档集的研发主文档。
 7. 完成 BDD、研发主文档、实现计划或变更记录后必须停止，向用户汇报文档结果和下一步实现计划，等待用户明确确认；确认前不能写测试、不能改实现、不能进入 TDD。
 8. 用户确认后，从 BDD 行为开始，先写失败测试，再实现最小改动，然后重构。
-9. 优先封装可复用组件和通用模块；新增工具、数据结构、测试夹具或 UI state 前，先搜索已有实现、相关 skills 和 Common Module Registry。
+9. 优先封装可复用功能、类、组件和能力入口；新增工具、数据结构、测试夹具或 UI state 前，先搜索已有实现、相关 skills 和 Reusable Capability Registry。
 10. 任何功能组都必须使用独立分支。完成的功能组分支先合并到 `dev`，不得直接合并到 `main`。
 11. 只有用户确认版本完成后，才允许将 `dev` 合并到 `main`；只有 `main` 可用于版本提交、release tag 和 release tag push。功能分支和 `dev` 仍然可以为了协作、备份或 CI 正常 push。
 12. 修改后先运行最窄的有效测试，再按需要运行更宽的验证，并记录命令和结果。
@@ -54,7 +54,7 @@ coding-agent 提示词应说明：
 - `$cx-research`：模型选择、AI 论文研究、来源筛选和带引用综合分析。
 - `$cx-pytorch-tdd`：Python、PyTorch、Lightning、tensor、训练与 ML 测试。
 - `$cx-rust-tdd`：Rust 实现、所有权设计和 cargo test/fmt/clippy。
-- `$cx-common-module`：复用组件、通用模块抽取和公共 API 设计。
+- `$cx-common-module`：通用功能、可复用功能、可复用类、可复用能力抽取和公共 API 设计。
 - `$cx-evidence`：合并或交付前的证据审查。
 
 ## Python 规则
@@ -66,7 +66,7 @@ coding-agent 提示词应说明：
 - 对状态、生命周期、不变量和领域对象协作使用面向对象设计。
 - 构造函数和普通函数优先用类型标注与默认参数表达默认行为；不要在 `__init__` 里用大量 `if`/`None`/类型分支处理各种参数组合。
 - 禁止默认使用 `getattr`、`setattr`、`delattr`、monkey patch、动态注入方法或字符串分发；只有没有明确静态 OOP API 时才允许，并且必须记录理由、隔离实现和测试。
-- 代码必须保持短小、直接、可读；发现可复用逻辑时，先使用 `$cx-common-module` 搜索已有实现和 Common Module Registry，再决定新增或复用公共模块。
+- 代码必须保持短小、直接、可读；发现可复用功能、类或逻辑时，先使用 `$cx-common-module` 搜索已有实现和 Reusable Capability Registry，再决定新增或复用公共入口。
 - 代码格式遵循 Black 默认规范。
 - 测试使用 Python 自带的 `unittest`，不要引入 `pytest`，除非项目已经明确采用它。
 - 单元测试目录必须镜像 `src` 目录结构，并与源代码文件一一对应：`src/config/cnn_config.py` 的测试文件必须是 `tests/config/cnn_config_test.py`。不要把多个源文件的单元测试混进一个宽泛测试文件，也不要为同一个源文件拆出多个随意命名的测试文件。
@@ -88,7 +88,7 @@ coding-agent 提示词应说明：
 - 用 struct/enum/trait 和明确 `Result` 错误表达领域状态。
 - 生产路径避免 `unwrap`、`expect` 和 `panic!`，除非不变量局部、已证明并记录。
 - 将纯状态、reducer 和渲染代码分离。
-- 新增可复用 UI state、组件 API 或 reducer 前，先搜索 Common Module Registry 和已有实现。
+- 新增可复用 UI state、组件 API 或 reducer 前，先搜索 Reusable Capability Registry 和已有实现。
 - 尽可能使用无状态 gpui-component 元素，由 view 持有状态。
 - UI 组件 API 保持小而可复用。
 

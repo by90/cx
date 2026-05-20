@@ -128,7 +128,7 @@ Feature: 1.Configuration System
 | `$cx-research` | 模型选择、模型原理研究、近期 AI 论文扫描、学术/博客综合分析和带引用建议。 |
 | `$cx-pytorch-tdd` | Python、PyTorch、Lightning、tensor 工具、ML 测试、确定性小测试数据，以及严格 Python OOP/TDD 质量规则。 |
 | `$cx-rust-tdd` | Rust 实现和 TDD：struct/enum/trait、ownership、`Result` 错误、`cargo test`、`rustfmt`、`clippy` 和非 UI Rust 代码质量。 |
-| `$cx-common-module` | 复用组件抽取、通用模块设计、稳定 API、迁移计划和重复逻辑控制。 |
+| `$cx-common-module` | 通用功能、可复用功能、可复用类、稳定 API、迁移计划和重复逻辑控制。 |
 | `$cx-evidence` | 交付前审查 BDD/TDD 合规、测试输出、changelog/spec 一致性和缺失证据。 |
 
 ## 发布版本管理

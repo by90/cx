@@ -91,7 +91,7 @@ Rust：
 | `$cx-research` | 模型选择、模型原理、近期论文、带来源综合分析 |
 | `$cx-pytorch-tdd` | Python/PyTorch/Lightning 实现和测试 |
 | `$cx-rust-tdd` | Rust 实现、所有权设计、cargo test/fmt/clippy |
-| `$cx-common-module` | 通用模块抽取和 API 设计 |
+| `$cx-common-module` | 通用功能、可复用功能、可复用类和 API 设计 |
 | `$cx-evidence` | 交付前证据审查 |
 
 ## 验证

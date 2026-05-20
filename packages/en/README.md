@@ -91,7 +91,7 @@ Use $cx-version. Feature-group work must happen on its own branch and merge to d
 | `$cx-research` | Model choice, model mechanisms, recent papers, sourced synthesis |
 | `$cx-pytorch-tdd` | Python/PyTorch/Lightning implementation and tests |
 | `$cx-rust-tdd` | Rust implementation, ownership-aware design, cargo test/fmt/clippy |
-| `$cx-common-module` | Reusable module extraction and API design |
+| `$cx-common-module` | Generic capabilities, reusable features/classes, and API design |
 | `$cx-evidence` | Final evidence review |
 
 ## Validation

@@ -13,14 +13,14 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 ## Required workflow
 
 1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
-2. Read the related BDD IDs and Common Module Registry entries in the target documentation set's `ENGINEERING_SPEC.md`.
+2. Read the related BDD IDs and Reusable Capability Registry entries in the target documentation set's `ENGINEERING_SPEC.md`.
 3. Use the project-level `uv` virtual environment. Prefer `uv sync`, `uv run`, or the repository's existing `uv` workflow for dependency installation and test execution.
 4. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
 5. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
 6. Write Python `unittest` tests first. Do not introduce `pytest` unless the repository has an explicit exception.
 7. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
 8. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
-9. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable components.
+9. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable features, classes, or components.
 10. Follow the source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`, tests mirror them under `tests/<subsystem>/`, each source file maps to one `*_test.py`, and code files, classes, functions, and every line of business code have explanatory comments.
 11. Use Black-compatible formatting and avoid changing unrelated user code.
 

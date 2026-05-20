@@ -10,7 +10,7 @@ These rules override every other rule in this file, all cx skills, templates, ex
 4. **Chinese package means Chinese documents**: when the Chinese cx package is installed, every cx-generated or cx-maintained document must be Simplified Chinese; code identifiers, commands, API names, and quoted external names may remain in their source language.
 5. **Tests map one-to-one to source**: unit test directories must mirror `src`, and `src/<subsystem>/xx.py` maps only to `tests/<subsystem>/xx_test.py`; do not use one broad test file for multiple source files, and do not split one source file across multiple arbitrarily named test files.
 6. **Default parameters first**: constructors and functions should express defaults with clear type annotations and default parameters; do not build long `__init__` branches for parameter cases, and move complex default construction into dataclasses, config objects, factories, or small dedicated methods.
-7. **Minimal code and OOP access**: do not create bloated, long, hard-to-maintain code. Any reusable logic must first go through `$cx-common-module` search and common-module design. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default; allow them only when no static OOP API works, and then document the reason, isolate the implementation, and test it.
+7. **Minimal code and OOP access**: do not create bloated, long, hard-to-maintain code. Any reusable feature, class, or logic must first go through `$cx-common-module` search and public-entrypoint design. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default; allow them only when no static OOP API works, and then document the reason, isolate the implementation, and test it.
 
 ## Repository working agreement
 
@@ -24,7 +24,7 @@ This repository uses the cx documentation-set BDD/TDD workflow: the `docs/` root
 6. Use the target documentation set's `CHANGELOG.md` only as a historical log. Every `CHANGE-*` entry must link back to the same documentation set's engineering spec.
 7. After BDD, engineering spec, implementation plan, or changelog updates are complete, stop, report the document result and next implementation plan to the user, and wait for explicit user confirmation. Do not write tests, edit implementation, or enter TDD before confirmation.
 8. After user confirmation, start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
-9. Prefer reusable components and common modules over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Common Module Registry.
+9. Prefer reusable features, classes, components, and public capability entrypoints over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Reusable Capability Registry.
 10. Every feature group must use its own branch. Merge completed feature-group branches into `dev`; do not merge them directly into `main`.
 11. Only after the user confirms the version is complete may `dev` be merged into `main`; only `main` may be used for version commits, release tags, and release-tag pushes. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.
 12. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
@@ -54,7 +54,7 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 - `$cx-research`: model selection, AI paper research, source screening, and cited synthesis.
 - `$cx-pytorch-tdd`: Python, PyTorch, Lightning, tensors, training, and ML tests.
 - `$cx-rust-tdd`: Rust implementation, ownership-aware design, and cargo test/fmt/clippy.
-- `$cx-common-module`: reusable component extraction, common module extraction, and common API design.
+- `$cx-common-module`: generic capabilities, reusable features, reusable classes, reusable-capability extraction, and common API design.
 - `$cx-evidence`: final review before merge or delivery.
 
 ## Python rules
@@ -66,7 +66,7 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 - Use object-oriented design for state, lifecycle, invariants, and domain collaborations.
 - Prefer typed default parameters for constructors and functions. Do not fill `__init__` with long `if`/`None`/type-branch handling for many parameter cases.
 - Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic method injection, or stringly typed dispatch unless no explicit static OOP API works; document the reason and isolate it behind tests.
-- Keep code short, direct, and readable. When logic may be reusable, use `$cx-common-module` to search existing implementation and the Common Module Registry before adding or reusing a shared module.
+- Keep code short, direct, and readable. When a feature, class, or logic may be reusable, use `$cx-common-module` to search existing implementation and the Reusable Capability Registry before adding or reusing a public entrypoint.
 - Format with Black defaults.
 - Tests must use Python's built-in `unittest`; do not introduce `pytest` unless the repository already explicitly uses it.
 - Unit test directories must mirror the `src` structure and map one-to-one with source files: the test for `src/config/cnn_config.py` must be `tests/config/cnn_config_test.py`. Do not mix multiple source files into one broad test file, and do not split one source file across multiple arbitrarily named test files.
@@ -88,7 +88,7 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 - Model domain state with structs/enums/traits and explicit `Result` errors.
 - Avoid `unwrap`, `expect`, and `panic!` in production paths unless the invariant is local, proven, and documented.
 - Separate pure state and reducers from rendering code.
-- Before adding reusable UI state, component APIs, or reducers, search the Common Module Registry and existing implementations.
+- Before adding reusable UI state, component APIs, or reducers, search the Reusable Capability Registry and existing implementations.
 - Prefer stateless gpui-component elements where possible; let views own state.
 - Keep UI component APIs small and reusable.
 

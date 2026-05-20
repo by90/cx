@@ -4,7 +4,7 @@ This is the long-lived engineering specification for one feature group. Single-f
 
 ## 0. Document Rules
 
-- This feature group's requirements, BDD scenarios, architecture, task queue, test matrix, reusable component decisions, and verification evidence live here.
+- This feature group's requirements, BDD scenarios, architecture, task queue, test matrix, reusable feature/class/component decisions, and verification evidence live here.
 - The sibling `CHANGELOG.md` records this feature group's history only.
 - Every `CHANGE-*` entry must appear in both the sibling `CHANGELOG.md` and this file.
 - Every new or changed behavior should have a main success scenario, necessary alternate scenarios, and exception scenarios.
@@ -68,7 +68,7 @@ TODO: Describe important modules, interfaces, data flow, error handling, and int
 | --- | --- | --- | --- |
 | Install cx package | CHANGE-2026-001 | done | Replace TODO sections with project-specific content. |
 
-## 8. Reusable Component Registry
+## 8. Reusable Capability Registry
 
 | Component | Purpose | Public API | Owners/Callers | Tests | Migration notes |
 | --- | --- | --- | --- | --- | --- |

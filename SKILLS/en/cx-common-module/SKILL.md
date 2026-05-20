@@ -1,14 +1,14 @@
 ---
 name: cx-common-module
-description: Use for code duplication, shared utilities, reusable components, component extraction, API design, indexed-series-like data structures, and deciding whether repeated implementation logic should become common modules.
+description: Use for code duplication, shared utilities, reusable features, reusable classes, reusable components, component extraction, API design, indexed-series-like data structures, and deciding whether repeated implementation logic should become common modules.
 version: 0.1.0
 ---
 
-# cx Reusable Component And Common Module Extraction
+# cx Reusable Feature, Reusable Class, And Common Module Extraction
 
 ## Purpose
 
-Turn repeated logic, stable data structures, test harnesses, and UI state models into small, stable, tested reusable components. AI-assisted coding often creates similar code in multiple places; this skill stops that drift by requiring search, API design, migration planning, and tests when duplication becomes meaningful.
+Turn repeated logic, stable data structures, reusable classes, generic capabilities, test harnesses, and UI state models into small, stable, tested reusable capabilities. AI-assisted coding often creates similar code in multiple places; this skill stops that drift by requiring search, calling-model design, API design, migration planning, and tests when duplication becomes meaningful.
 
 ## Minimal Implementation Discipline
 
@@ -23,22 +23,46 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
 - Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
 - Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
+- A generic capability, reusable feature, or reusable class should first abstract the public entrypoint, call style, lifecycle, state source, and test isolation; do not first abstract one-off file reads, one-off validation, single-field conversion, or future-maybe internal steps.
 - Refactoring should delete code, reduce branches, and shrink the public surface, not move logic into more small functions.
+
+## Calling Model Gate
+
+Before adding or changing a generic capability, reusable feature, reusable class, shared tool, or stable API, write down:
+
+```text
+Public entrypoint:
+Normal call style:
+Special-case entrypoint:
+Instance or state lifecycle:
+State source:
+How tests cover all source call sites:
+Non-goals:
+```
+
+The abstraction boundary must answer four questions:
+
+1. Does this abstraction hide caller complexity, or create internal complexity?
+2. Does the caller need to know one less thing?
+3. When adding a peer capability, config section, field, or data source, can we change data declarations rather than control-flow code?
+4. Does a helper have at least two real call sites, or truly isolate real complexity?
+
+If the answers do not support abstraction, inline the logic or keep the direct implementation.
 
 ## Reuse Discovery
 
 Before adding a new abstraction, search:
 
-1. The current project's `src/`, `tests/`, `docs/`, and the target documentation set's Common Module Registry.
+1. The current project's `src/`, `tests/`, `docs/`, and the target documentation set's Reusable Capability Registry.
 2. Enabled related workflow skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, `$cx-tdd`, and this skill.
 3. Existing projects or prior implementations explicitly mentioned by the user, such as `IndexedSeries` in `rise202604`.
 4. Adjacent structures with the same shape, such as indexed series, packed tensor batches, ragged tensors, time-window datasets, or GPUI state reducers.
 
-Record candidates, accept/reject reasons, and migration impact. Do not add a reusable component without search evidence.
+Record candidates, accept/reject reasons, and migration impact. Do not add a reusable feature, reusable class, or reusable component without search evidence.
 
 ## Extract when
 
-Extract a common module when at least one is true:
+Extract a generic capability, reusable class, or common module when at least one is true:
 
 - The same logic appears in two or more places.
 - A behavior is important enough to have its own BDD scenario.
@@ -51,23 +75,23 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 ## Required output
 
 - Search evidence and candidate comparison.
-- Public API proposal with inputs, outputs, error policy, and a minimal example.
+- Public API proposal with public entrypoint, normal call style, special-case entrypoint, lifecycle, state source, inputs, outputs, error policy, and a minimal example.
 - Tests first, preferably covering real small data and edge cases.
 - Backward-compatible migration plan describing which call sites move and which stay unchanged.
-- Common Module Registry update in the target documentation set's `ENGINEERING_SPEC.md`.
+- Reusable Capability Registry update in the target documentation set's `ENGINEERING_SPEC.md`.
 - Test Matrix update in the target documentation set.
 
 ## Code Constraints
 
-- Any common-module code added or edited by this skill must follow comprehensive comments: file-level explanations, class/type explanations, function explanations, and explanations for every line of business code.
-- Common modules must be minimal, stable, and low-coupling. Do not abstract for its own sake, and do not copy repeated logic into multiple similar implementations.
-- Python common modules should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`.
+- Any reusable-capability code added or edited by this skill must follow comprehensive comments: file-level explanations, class/type explanations, function explanations, and explanations for every line of business code.
+- Generic capabilities, reusable classes, reusable components, and common modules must be minimal, stable, and low-coupling. Do not abstract for its own sake, and do not copy repeated logic into multiple similar implementations.
+- Python reusable capabilities should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`.
 - Public APIs must use explicit OOP or static interfaces. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default.
 
 ## Registry Fields
 
 ```text
-Component | Purpose | Public API | Owners/Callers | Tests | Migration notes
+Capability | Purpose | Public API | Owners/Callers | Tests | Migration notes
 ```
 
 ## Initial module priorities

@@ -49,10 +49,12 @@ The folder name, BDD heading, and `Feature:` name must match exactly. This keeps
 6. Write main success scenarios, alternate scenarios, and exception scenarios.
 7. Map each BDD scenario to a stable BDD ID and later test target.
 8. Keep implementation mechanics out of `Given` and `When` unless the business behavior is explicitly technical.
-9. Update the same folder's `ENGINEERING_SPEC.md` with links back to BDD IDs and rules.
-10. Update the same folder's `CHANGELOG.md` so the document change is auditable.
-11. After BDD, engineering spec, and changelog updates are complete, stop and report the document result and next implementation plan to the user.
-12. Hand off to `$cx-tdd` only after the user explicitly confirms continuation and the BDD scenarios are clear enough to produce expected failing tests.
+9. Generic capabilities, reusable features, or reusable classes must write the calling model as observable behavior: public entrypoint, normal call style, special-case entrypoint, instance or state lifecycle, state source, how tests cover all source call sites, and non-goals.
+10. BDD scenarios for generic/reusable capabilities should first describe how callers use the public API, not how internal helpers work.
+11. Update the same folder's `ENGINEERING_SPEC.md` with links back to BDD IDs and rules.
+12. Update the same folder's `CHANGELOG.md` so the document change is auditable.
+13. After BDD, engineering spec, and changelog updates are complete, stop and report the document result and next implementation plan to the user.
+14. Hand off to `$cx-tdd` only after the user explicitly confirms continuation and the BDD scenarios are clear enough to produce expected failing tests.
 
 ## BDD Format
 
@@ -84,6 +86,7 @@ Feature: 1.配置系统
 - Use `Rule:` to group scenarios by business rule.
 - Use `Scenario Outline` only when example tables reduce duplication without hiding intent.
 - Every exception scenario must state cause, system response, user-visible outcome, and evidence or logging expectation.
+- A generic capability, reusable feature, or reusable class should include at least one normal-call scenario; if tests, temporary configuration, alternate data sources, or different runtime environments exist, also include special-entrypoint and restoration scenarios.
 
 ## Output
 

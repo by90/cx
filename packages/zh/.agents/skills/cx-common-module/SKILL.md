@@ -1,14 +1,14 @@
 ---
 name: cx-common-module
-description: 用于 code duplication、shared utilities、reusable components、component extraction、API design、indexed-series-like data structures，以及判断重复实现逻辑是否应该成为 common modules。
+description: 用于 code duplication、shared utilities、reusable features、reusable classes、reusable components、component extraction、API design、indexed-series-like data structures，以及判断重复实现逻辑是否应该成为 common modules。
 version: 0.1.0
 ---
 
-# cx 复用组件与通用模块抽取
+# cx 复用功能、复用类与通用模块抽取
 
 ## 目的
 
-将重复逻辑、稳定数据结构、测试夹具和 UI 状态模型变成小而稳定、经过测试的复用组件。AI 辅助编程很容易在多个地方生成相似代码，本 skill 用搜索、API、迁移和测试约束来阻止这种漂移。
+将重复逻辑、稳定数据结构、可复用类、通用功能、测试夹具和 UI 状态模型变成小而稳定、经过测试的复用能力。AI 辅助编程很容易在多个地方生成相似代码，本 skill 用搜索、调用模型、API、迁移和测试约束来阻止这种漂移。
 
 ## 最小实现纪律
 
@@ -24,21 +24,45 @@ version: 0.1.0
 - YAML、JSON、数据库、文件系统等解析错误默认交给对应库或标准库处理；仅在业务规则明确要求时增加语义检查。
 - 每个 helper 函数必须同时满足：有明确名字、减少重复或隔离真实复杂度、调用点不止一个或能显著提升可读性。否则内联。
 - 重构目标是删除代码、降低分支、缩小公开面，而不是把逻辑搬到更多小函数里。
+- 通用功能、可复用功能或可复用类优先抽象公共入口、调用方式、生命周期、状态来源和测试隔离；不要优先抽象单次文件读取、单次校验、单字段转换或未来可能复用的内部步骤。
+
+## 调用模型门禁
+
+新增或修改通用功能、可复用功能、可复用类、共享工具或稳定 API 前，必须先写出：
+
+```text
+公共入口：
+常规调用方式：
+特殊场景入口：
+实例或状态生命周期：
+状态来源：
+测试如何覆盖所有源码调用：
+非目标：
+```
+
+抽象边界必须回答四个问题：
+
+1. 这个抽象隐藏的是调用复杂度，还是制造了内部复杂度？
+2. 调用方是否少知道了一件事？
+3. 新增一个同类能力、配置节、字段或数据源时，是否只改数据结构或实例声明，而不是改流程代码？
+4. helper 是否至少有两个真实调用点，或确实隔离了真实复杂度？
+
+如果答案不能支撑抽象，就先内联或保留直接实现。
 
 ## 复用发现
 
 新增抽象前必须先搜索：
 
-1. 当前项目的 `src/`、`tests/`、`docs/` 和目标文档集 Common Module Registry。
+1. 当前项目的 `src/`、`tests/`、`docs/` 和目标文档集 Reusable Capability Registry。
 2. 已启用的相关 workflow skills，例如 `$cx-pytorch-tdd`、`$cx-rust-tdd`、`$cx-tdd` 和本 skill。
 3. 用户明确提到的既有项目或历史实现，例如 `rise202604` 中的 `IndexedSeries`。
 4. 相邻领域是否已有同构结构，例如 indexed series、packed tensor batch、ragged tensor、time-window dataset、GPUI state reducer。
 
-搜索后必须记录候选、采用/拒绝理由和迁移影响；没有搜索证据时，不要新增复用组件。
+搜索后必须记录候选、采用/拒绝理由和迁移影响；没有搜索证据时，不要新增复用功能、复用类或复用组件。
 
 ## 何时抽取
 
-至少满足以下之一时抽取通用模块：
+至少满足以下之一时抽取通用功能、复用类或通用模块：
 
 - 同一逻辑出现在两个或更多地方。
 - 某个行为重要到需要自己的 BDD 场景。
@@ -51,23 +75,23 @@ version: 0.1.0
 ## 必须输出
 
 - 搜索证据和候选实现对比。
-- 公共 API 提案，包含输入、输出、错误策略和最小示例。
+- 公共 API 提案，包含公共入口、常规调用方式、特殊场景入口、生命周期、状态来源、错误策略和最小示例。
 - 测试先行，优先覆盖真实小数据和边界条件。
 - 兼容迁移计划，说明哪些调用点迁移、哪些保持不动。
-- 更新目标文档集 `ENGINEERING_SPEC.md` 中的 Common Module Registry。
+- 更新目标文档集 `ENGINEERING_SPEC.md` 中的 Reusable Capability Registry。
 - 更新目标文档集 Test Matrix。
 
 ## 代码约束
 
-- 任何由本 skill 新增或修改的公共模块代码都必须遵守全面注释：文件级说明、类/类型说明、函数说明和每一行业务代码说明。
-- 公共模块必须极简、稳定、低耦合；不要为了抽象而抽象，也不要把重复逻辑复制成多个相似实现。
-- Python 公共模块优先用类型标注和默认参数表达默认行为；不要在 `__init__` 里堆叠大量参数情况判断。
+- 任何由本 skill 新增或修改的可复用能力代码都必须遵守全面注释：文件级说明、类/类型说明、函数说明和每一行业务代码说明。
+- 通用功能、复用类、复用组件和公共模块必须极简、稳定、低耦合；不要为了抽象而抽象，也不要把重复逻辑复制成多个相似实现。
+- Python 可复用能力优先用类型标注和默认参数表达默认行为；不要在 `__init__` 里堆叠大量参数情况判断。
 - 公共 API 必须使用明确 OOP 或静态接口；默认禁止 `getattr`、`setattr`、`delattr`、monkey patch、动态注入和字符串分发。
 
 ## Registry 字段
 
 ```text
-Component | Purpose | Public API | Owners/Callers | Tests | Migration notes
+Capability | Purpose | Public API | Owners/Callers | Tests | Migration notes
 ```
 
 ## 初始模块优先级
