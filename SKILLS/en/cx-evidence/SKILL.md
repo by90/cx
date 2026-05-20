@@ -23,9 +23,14 @@ Review whether the work is actually supported by tests and the target documentat
 9. Were orphan planning documents created?
 10. Were reusable components searched across existing implementation, related skills, and the Common Module Registry before extraction or explicit non-extraction?
 11. Are Python tests `unittest` unless a project exception exists?
-12. Were Rust commands run when Rust code changed?
-13. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
-14. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
+12. Does Python source live under `src/<subsystem>/`, do tests under `tests/` mirror the `src` structure, and do test files map one-to-one as `xx.py` -> `xx_test.py`?
+13. Do added or edited code files, classes, functions, and every line of business code have explanatory comments?
+14. Does Python express default behavior through default parameters, config objects, dataclasses, factories, or small methods instead of long branch stacks inside `__init__`?
+15. Is the code minimal, small, and direct, and was reusable logic first searched and registered through `$cx-common-module`?
+16. Does the code avoid non-OOP dynamic access such as `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch; if unavoidable, is the reason documented, implementation isolated, and behavior tested?
+17. Were Rust commands run when Rust code changed?
+18. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
+19. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
 
 ## Output format
 
