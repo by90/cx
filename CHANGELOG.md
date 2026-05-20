@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Expanded AGENTS guidance for Git submission: stage tracked and untracked files as one working-tree change set and create a single commit without splitting by file ownership.
 - Added post-completion Git flow rules: merge feature branches into `dev`, delete local feature branches after merge, and push feature branches only on explicit user request.
 - Added Windows toolchain guidance to install a required `ng` CLI instead of replacing it with PowerShell or `ps` substitutes.
+- Added non-negotiable AGENTS rules for complete commits, comprehensive comments, document confirmation, Chinese documentation, source/test mapping, default-parameter design, minimal code, and OOP access. These rules explicitly override other workflow instructions unless the user overrides a specific rule in the current conversation.
+- Added coding and TDD layout rules requiring subsystem source under `src/<subsystem>/`, mirrored one-to-one tests under `tests/`, and explanatory comments for code files, classes, functions, and each line of business code.
 - Documented "verified basis" or "verification evidence" as the replacement wording for the unclear phrase "engineering facts".
 
 ## [0.1.0] - 2026-05-19

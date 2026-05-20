@@ -21,7 +21,8 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 7. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
 8. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
 9. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable components.
-10. Use Black-compatible formatting and avoid changing unrelated user code.
+10. Follow the source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`, tests mirror them under `tests/<subsystem>/`, each source file maps to one `*_test.py`, and code files, classes, functions, and every line of business code have explanatory comments.
+11. Use Black-compatible formatting and avoid changing unrelated user code.
 
 ## Python Design Rules
 

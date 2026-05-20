@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Non-Negotiable Rules
+
+These rules override every other rule in this file, all cx skills, templates, examples, and temporary task instructions. Follow a different path only when the user explicitly overrides a specific rule in the current conversation.
+
+1. **Commit and push without ownership splitting**: when the user asks to commit, deliver, open a PR, or release, treat the current working tree as one complete change set, stage and commit tracked and untracked files, and do not analyze who changed which files or split commits by file origin.
+2. **Comprehensive comments**: all added or edited code must include file-level explanations, class explanations, function explanations, and line-by-line explanations for business code; only blank lines, pure formatting lines, or repeated structural lines may omit adjacent explanatory comments.
+3. **Document confirmation gate**: after BDD, engineering spec, implementation plan, or changelog updates are complete, stop, report the document result and next implementation plan to the user, and wait for explicit user confirmation; do not write tests, edit implementation, or enter TDD before confirmation.
+4. **Chinese package means Chinese documents**: when the Chinese cx package is installed, every cx-generated or cx-maintained document must be Simplified Chinese; code identifiers, commands, API names, and quoted external names may remain in their source language.
+5. **Tests map one-to-one to source**: unit test directories must mirror `src`, and `src/<subsystem>/xx.py` maps only to `tests/<subsystem>/xx_test.py`; do not use one broad test file for multiple source files, and do not split one source file across multiple arbitrarily named test files.
+6. **Default parameters first**: constructors and functions should express defaults with clear type annotations and default parameters; do not build long `__init__` branches for parameter cases, and move complex default construction into dataclasses, config objects, factories, or small dedicated methods.
+7. **Minimal code and OOP access**: do not create bloated, long, hard-to-maintain code. Any reusable logic must first go through `$cx-common-module` search and common-module design. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default; allow them only when no static OOP API works, and then document the reason, isolate the implementation, and test it.
+
 ## Repository working agreement
 
 This repository uses the cx documentation-set BDD/TDD workflow: the `docs/` root is for indexes and instructions, while ordered feature groups own their own documentation sets.
@@ -16,7 +28,7 @@ This repository uses the cx documentation-set BDD/TDD workflow: the `docs/` root
 10. Every feature group must use its own branch. Merge completed feature-group branches into `dev`; do not merge them directly into `main`.
 11. Only after the user confirms the version is complete may `dev` be merged into `main`; only `main` may be used for version commits, release tags, and release-tag pushes. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.
 12. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
-13. When adding or editing code, add beginner-friendly explanatory comments for code files, classes, functions, and important statements. Explain code intent line by line by default, except for pure formatting or repeated structural lines.
+13. When adding or editing code, add beginner-friendly explanatory comments for code files, classes, functions, and every line of business code. Code files must have a file-level explanation, classes and functions must describe their responsibilities, and code intent must be explained line by line by default except for pure formatting, blank lines, or repeated structural lines.
 
 ## Prompt contract
 
@@ -47,13 +59,17 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 
 ## Python rules
 
+- Subsystem source code must live under `src/<subsystem>/`; for example, the config subsystem lives under `src/config/`, and CNN configuration belongs in its own file, `src/config/cnn_config.py`.
 - Use the project-level `uv` virtual environment. Install dependencies and run Python commands with `uv sync`, `uv run`, or the repository's existing `uv` workflow.
 - Before creating or rebuilding a Python / PyTorch environment, visit the official Python and PyTorch websites and choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
-- Use Python functions by default. Use classes only when they make the design clearer or when the user asks.
+- Use functions for stateless logic by default; use object-oriented design for state, lifecycle, invariants, and domain collaborations.
 - Use object-oriented design for state, lifecycle, invariants, and domain collaborations.
-- Do not use `getattr`, `setattr`, `delattr`, monkey-patching, or dynamic method injection unless no explicit static API works; document the reason and isolate it behind tests.
+- Prefer typed default parameters for constructors and functions. Do not fill `__init__` with long `if`/`None`/type-branch handling for many parameter cases.
+- Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic method injection, or stringly typed dispatch unless no explicit static OOP API works; document the reason and isolate it behind tests.
+- Keep code short, direct, and readable. When logic may be reusable, use `$cx-common-module` to search existing implementation and the Common Module Registry before adding or reusing a shared module.
 - Format with Black defaults.
 - Tests must use Python's built-in `unittest`; do not introduce `pytest` unless the repository already explicitly uses it.
+- Unit test directories must mirror the `src` structure and map one-to-one with source files: the test for `src/config/cnn_config.py` must be `tests/config/cnn_config_test.py`. Do not mix multiple source files into one broad test file, and do not split one source file across multiple arbitrarily named test files.
 - For PyTorch and Lightning, verify current official docs when APIs or versions matter.
 - Test tensor shape, dtype, device, determinism, and edge cases.
 - Keep training tests tiny: CPU-first, tiny batches, tiny models, `fast_dev_run`, or limited batches.
