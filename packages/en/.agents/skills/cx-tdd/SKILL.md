@@ -17,13 +17,14 @@ Use this skill after `$cx-bdd` has defined the behavior. TDD turns BDD examples 
 3. Select one BDD ID and one observable behavior.
 4. Confirm the prompt provides verification commands or infer the narrowest existing command from the repository. If neither is possible, ask before implementation.
 5. Add or update the Test Matrix before implementation.
-6. Write the narrowest failing test first.
-7. Run the test and record the expected red failure.
-8. Implement the smallest production change that can make the test pass.
-9. Run the narrow test until green.
-10. Refactor only after green, and keep tests green while refactoring.
-11. Run broader validation when the change touches shared behavior.
-12. Record commands, results, and residual gaps in the target feature folder.
+6. Place source files under `src/<subsystem>/` and create one-to-one test files under the matching test path; for example, `src/config/cnn_config.py` maps to `tests/config/cnn_config_test.py`.
+7. Write the narrowest failing test first.
+8. Run the test and record the expected red failure.
+9. Implement the smallest production change that can make the test pass.
+10. Run the narrow test until green.
+11. Refactor only after green, and keep tests green while refactoring.
+12. Run broader validation when the change touches shared behavior.
+13. Record commands, results, and residual gaps in the target feature folder.
 
 ## Code Quality Rules
 
@@ -34,14 +35,19 @@ Use this skill after `$cx-bdd` has defined the behavior. TDD turns BDD examples 
 - If dynamic reflection appears necessary, first prove there is no clearer static API, record the reason, add focused tests, and isolate it behind a small adapter.
 - Avoid global mutable state, hidden singletons, catch-all exception handling, and broad mock-heavy tests.
 - Keep public APIs small and documented through tests.
+- Python code must include file-level explanations, class responsibility notes, function responsibility notes, and line-by-line intent comments. Except for blank lines, pure formatting lines, or repeated structural lines, every line of business code must have an adjacent explanatory comment.
+- Subsystem code must not be flattened into the project root or mixed into unrelated directories. For the config subsystem, the source directory is `src/config/`, and CNN configuration must live in its own file, `src/config/cnn_config.py`.
+- Unit tests must live under `tests/`, mirror the `src` structure, and map one-to-one with source files by appending `_test.py`; do not use one broad test file for multiple source files, and do not split one source file across multiple arbitrarily named test files.
+- Constructors and functions should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`; move complex default construction into dataclasses, config objects, factories, or small dedicated methods.
+- Code must stay minimal, small, and direct. Do not create bloated, long, hard-to-maintain code. Any potentially reusable logic must first invoke `$cx-common-module` to search existing implementation and design the common module.
 - Before final output, review the diff against the prompt contract: goal met, constraints honored, verification run, and residual risks stated.
 
 ## Test Matrix Format
 
 ```text
-BDD-CONFIG-001 -> tests/test_config.py::ConfigValidationTest::test_missing_model_name_is_rejected
+BDD-CONFIG-001 -> tests/config/cnn_config_test.py::CnnConfigTest::test_missing_model_name_is_rejected
 Expected red: validator currently accepts missing model names
-Command: uv run python -m unittest tests.test_config.ConfigValidationTest.test_missing_model_name_is_rejected
+Command: uv run python -m unittest tests.config.cnn_config_test.CnnConfigTest.test_missing_model_name_is_rejected
 ```
 
 ## Output

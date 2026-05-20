@@ -17,13 +17,14 @@ version: 0.1.0
 3. 选择一个 BDD ID 和一个可观察行为。
 4. 确认提示词提供了验证命令，或从仓库中推断最窄的现有命令；两者都做不到时，先询问再实现。
 5. 实现前先新增或更新 Test Matrix。
-6. 先写最窄的失败测试。
-7. 运行测试并记录预期 red failure。
-8. 写能让测试通过的最小生产代码。
-9. 运行最窄测试直到 green。
-10. 只有 green 以后才重构，并且重构期间保持测试 green。
-11. 变更影响共享行为时，运行更宽的验证。
-12. 在目标功能文件夹中记录命令、结果和残留缺口。
+6. 按 `src/<subsystem>/` 放置源文件，并按同构路径创建一一对应测试文件；例如 `src/config/cnn_config.py` 对应 `tests/config/cnn_config_test.py`。
+7. 先写最窄的失败测试。
+8. 运行测试并记录预期 red failure。
+9. 写能让测试通过的最小生产代码。
+10. 运行最窄测试直到 green。
+11. 只有 green 以后才重构，并且重构期间保持测试 green。
+12. 变更影响共享行为时，运行更宽的验证。
+13. 在目标功能文件夹中记录命令、结果和残留缺口。
 
 ## 代码质量规则
 
@@ -34,14 +35,19 @@ version: 0.1.0
 - 如果确实需要动态反射，必须先证明没有更清晰的静态 API，记录理由，增加针对性测试，并把它隔离在小适配器里。
 - 避免全局可变状态、隐藏 singleton、兜底式异常吞噬和过度 mock 的测试。
 - 公共 API 必须小，并通过测试体现文档作用。
+- Python 代码必须包含文件级说明、类职责说明、函数职责说明和逐行意图注释；除空行、纯格式行或重复结构外，每一行业务代码都要有相邻说明注释。
+- 子系统代码不得平铺在项目根目录或混入无关目录；以 config 子系统为例，源代码目录必须是 `src/config/`，CNN 配置必须是独立文件 `src/config/cnn_config.py`。
+- 单元测试必须放在 `tests/` 下并镜像 `src` 结构，测试文件名必须与源文件一一对应并追加 `_test.py`；不要用一个大测试文件覆盖多个源文件，也不要为同一个源文件创建多个随意命名测试文件。
+- 构造函数和普通函数优先使用类型标注与默认参数表达默认行为；不要在 `__init__` 里堆叠大量参数情况判断，复杂默认构造应拆到 dataclass、配置对象、factory 或小型专用方法。
+- 代码必须极简、短小、直接；禁止随意写出臃肿冗长的屎山代码。任何可能复用的逻辑都必须先调用 `$cx-common-module` 搜索已有实现和设计公共模块。
 - 最终输出前，按提示词契约审查 diff：目标是否达成、约束是否遵守、验证是否运行、残留风险是否说明。
 
 ## Test Matrix 格式
 
 ```text
-BDD-CONFIG-001 -> tests/test_config.py::ConfigValidationTest::test_missing_model_name_is_rejected
+BDD-CONFIG-001 -> tests/config/cnn_config_test.py::CnnConfigTest::test_missing_model_name_is_rejected
 Expected red: validator currently accepts missing model names
-Command: uv run python -m unittest tests.test_config.ConfigValidationTest.test_missing_model_name_is_rejected
+Command: uv run python -m unittest tests.config.cnn_config_test.CnnConfigTest.test_missing_model_name_is_rejected
 ```
 
 ## 输出

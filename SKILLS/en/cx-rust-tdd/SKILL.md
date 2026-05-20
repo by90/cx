@@ -26,13 +26,15 @@ Use this skill for Rust implementation work after behavior is defined by `$cx-bd
 
 ## Rust Design Rules
 
+- Rust code must also follow comprehensive comments: source files need file-level explanations, structs/enums/traits need responsibility explanations, functions need responsibility explanations, and every line of business code needs an adjacent intent comment; only blank lines, pure formatting lines, or repeated structural lines may omit comments.
 - Model domain state with named `struct` and `enum` types. Do not pass loose maps, stringly typed state, or unvalidated tuples when a type can express the invariant.
 - Use traits for stable behavior boundaries, not as a substitute for unclear design.
 - Prefer `Result<T, E>` and explicit error enums for recoverable failures.
 - Avoid `unwrap`, `expect`, and `panic!` in production paths unless the invariant is local, proven, and documented.
 - Avoid cloning to appease the borrow checker. Decide ownership deliberately.
-- Keep functions small, but do not fragment logic into meaningless wrappers.
+- Keep functions small, direct, and minimal. Do not create bloated, long, hard-to-maintain code, and do not fragment logic into meaningless wrappers.
 - Keep modules cohesive and public APIs narrow.
+- Any potentially reusable logic must first invoke `$cx-common-module` to search existing implementation and design the common module.
 - Use `Option` for absence and `Result` for failure; do not encode errors as magic strings or sentinel values.
 - Document unsafe code with `SAFETY:` comments and tests around the safe boundary. Do not add unsafe code unless there is no safe design.
 

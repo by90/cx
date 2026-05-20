@@ -21,7 +21,8 @@ version: 0.1.0
 7. 测试必须确定性、小规模、CPU 优先，除非目标行为就是 GPU 行为。
 8. tensor 变换优先写成纯函数，Lightning orchestration 尽量保持很薄。
 9. 新增 dataset、tensor 容器、indexed series 或 test harness 前，先叠加 `$cx-common-module` 搜索已有复用组件。
-10. 代码遵循 Black 默认规范，不修改无关用户代码。
+10. 遵循 `$cx-tdd` 的源码/测试布局和注释规则：源文件放在 `src/<subsystem>/`，测试镜像到 `tests/<subsystem>/`，源文件与 `*_test.py` 一一对应，并为代码文件、类、函数和每一行业务代码写说明注释。
+11. 代码遵循 Black 默认规范，不修改无关用户代码。
 
 ## Python 设计规则
 

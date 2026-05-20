@@ -42,6 +42,13 @@ version: 0.1.0
 - 更新目标文档集 `ENGINEERING_SPEC.md` 中的 Common Module Registry。
 - 更新目标文档集 Test Matrix。
 
+## 代码约束
+
+- 任何由本 skill 新增或修改的公共模块代码都必须遵守全面注释：文件级说明、类/类型说明、函数说明和每一行业务代码说明。
+- 公共模块必须极简、稳定、低耦合；不要为了抽象而抽象，也不要把重复逻辑复制成多个相似实现。
+- Python 公共模块优先用类型标注和默认参数表达默认行为；不要在 `__init__` 里堆叠大量参数情况判断。
+- 公共 API 必须使用明确 OOP 或静态接口；默认禁止 `getattr`、`setattr`、`delattr`、monkey patch、动态注入和字符串分发。
+
 ## Registry 字段
 
 ```text
