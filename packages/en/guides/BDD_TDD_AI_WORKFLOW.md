@@ -12,14 +12,15 @@ The cx workflow uses this order:
 4. Update the target `BDD.md` with business rules, main success scenarios, alternate scenarios, and exception scenarios.
 5. Update the target `CHANGELOG.md` with a `CHANGE-*` entry.
 6. Update the target `ENGINEERING_SPEC.md` with architecture notes, task queue, and test matrix links back to BDD IDs.
-7. Write the expected failing test.
-8. Run the narrow test and record the red failure.
-9. Implement the smallest change.
-10. Run tests until green.
-11. Refactor only while keeping tests green.
-12. Record verification evidence.
-13. Search existing implementation, related skills, and registries to decide whether duplicated logic should become a reusable component.
-14. Merge the completed feature-group branch into `dev`; release handoff from `dev` to `main` happens only after user version confirmation.
+7. Stop, report the document result and next implementation plan to the user, and wait for explicit user confirmation.
+8. After user confirmation, write the expected failing test.
+9. Run the narrow test and record the red failure.
+10. Implement the smallest change.
+11. Run tests until green.
+12. Refactor only while keeping tests green.
+13. Record verification evidence.
+14. Search existing implementation, related skills, and registries to decide whether duplicated logic should become a reusable component.
+15. Merge the completed feature-group branch into `dev`; release handoff from `dev` to `main` happens only after user version confirmation.
 
 ## Why docs documentation sets
 
@@ -28,7 +29,7 @@ Many AI workflows generate a new spec, plan, or task file for every request. Tha
 ## Recommended prompt
 
 ```text
-Use $cx-bdd and $cx-tdd. First create or switch to the feature-group branch, then choose or create the ordered feature folder and update its BDD.md, ENGINEERING_SPEC.md, and CHANGELOG.md. Derive main success scenarios, alternate scenarios, exception scenarios, and failing tests. Show the expected red failure, implement the smallest change, run validation, record evidence, and merge the completed feature branch to dev. Do not create separate planning docs.
+Use $cx-bdd and $cx-tdd. First create or switch to the feature-group branch, then choose or create the ordered feature folder and update its BDD.md, ENGINEERING_SPEC.md, and CHANGELOG.md. Derive main success scenarios, alternate scenarios, exception scenarios, and failing-test mappings. After the documents are complete, stop, report the document result and next implementation plan, and wait for my confirmation. After confirmation, show the expected red failure, implement the smallest change, run validation, record evidence, and merge the completed feature branch to dev. Do not create separate planning docs.
 ```
 
 ## Specialized prompts

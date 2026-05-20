@@ -6,7 +6,7 @@
 
 ## 核心契约
 
-cx 是工作流包，不是组件库。它规范人类和 AI 如何发现行为、先写测试、实现代码、研究技术选择、管理发布版本和审查证据。
+cx 是工作流包，不是组件库。它规范人类和 AI 如何发现行为、先写文档、等待确认、再写测试和实现代码，并管理研究、发布版本和审查证据。
 
 功能文件夹按业务能力编号：
 
@@ -41,12 +41,18 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 交付物：
 ```
 
-优先说明目标功能文件夹、要使用的 cx skills、必须通过的命令，以及要记录的证据。使用 Claude Code 的项目，应把 `AGENTS.md` 作为共同规则来源，让 `CLAUDE.md` 引用或指向它。
+优先说明目标功能文件夹、要使用的 cx skills、必须通过的命令，以及要记录的证据。使用 Claude Code 的项目，应把 `AGENTS.md` 作为共同规则来源，让 `CLAUDE.md` 引用或指向它。安装中文包时，所有 cx 文档必须使用简体中文。
 
 功能或缺陷：
 
 ```text
-请使用 $cx-workflow，选择最小必要 cx skills。先用 $cx-bdd 创建或更新编号功能文件夹和 BDD.md，再用 $cx-tdd 在实现前写失败测试。
+请使用 $cx-workflow，选择最小必要 cx skills。先用 $cx-bdd 创建或更新编号功能文件夹、BDD.md、ENGINEERING_SPEC.md 和 CHANGELOG.md；完成文档后停止并等待我确认。确认后再用 $cx-tdd 写失败测试并实现。
+```
+
+Git 提交：
+
+```text
+提交时请按 AGENTS.md 规则处理：把当前工作区作为一次整体变更，暂存已跟踪和未跟踪文件，创建一个提交，不分析哪些文件是谁修改的。
 ```
 
 Python / PyTorch / Lightning：

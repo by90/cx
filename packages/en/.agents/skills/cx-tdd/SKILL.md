@@ -12,17 +12,18 @@ Use this skill after `$cx-bdd` has defined the behavior. TDD turns BDD examples 
 
 ## Required Workflow
 
-1. Read the target feature folder's `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md`.
-2. Select one BDD ID and one observable behavior.
-3. Confirm the prompt provides verification commands or infer the narrowest existing command from the repository. If neither is possible, ask before implementation.
-4. Add or update the Test Matrix before implementation.
-5. Write the narrowest failing test first.
-6. Run the test and record the expected red failure.
-7. Implement the smallest production change that can make the test pass.
-8. Run the narrow test until green.
-9. Refactor only after green, and keep tests green while refactoring.
-10. Run broader validation when the change touches shared behavior.
-11. Record commands, results, and residual gaps in the target feature folder.
+1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
+2. Read the target feature folder's `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md`.
+3. Select one BDD ID and one observable behavior.
+4. Confirm the prompt provides verification commands or infer the narrowest existing command from the repository. If neither is possible, ask before implementation.
+5. Add or update the Test Matrix before implementation.
+6. Write the narrowest failing test first.
+7. Run the test and record the expected red failure.
+8. Implement the smallest production change that can make the test pass.
+9. Run the narrow test until green.
+10. Refactor only after green, and keep tests green while refactoring.
+11. Run broader validation when the change touches shared behavior.
+12. Record commands, results, and residual gaps in the target feature folder.
 
 ## Code Quality Rules
 
