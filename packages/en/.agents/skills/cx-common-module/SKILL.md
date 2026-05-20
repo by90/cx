@@ -83,7 +83,7 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 
 ## Code Constraints
 
-- Any reusable-capability code added or edited by this skill must follow comprehensive comments: file-level explanations, class/type explanations, function explanations, and explanations for every line of business code.
+- Any reusable-capability code or tests added or edited by this skill must follow comprehensive comments: file-level explanations must state file purpose and main classes, functions, or test targets; classes/types need responsibility explanations; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; every line of business code and test business logic needs an adjacent intent comment.
 - Generic capabilities, reusable classes, reusable components, and common modules must be minimal, stable, and low-coupling. Do not abstract for its own sake, and do not copy repeated logic into multiple similar implementations.
 - Python reusable capabilities should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`.
 - Public APIs must use explicit OOP or static interfaces. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default.

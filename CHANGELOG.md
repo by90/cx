@@ -15,9 +15,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added Windows toolchain guidance to install a required `ng` CLI instead of replacing it with PowerShell or `ps` substitutes.
 - Added non-negotiable AGENTS rules for complete commits, comprehensive comments, document confirmation, Chinese documentation, source/test mapping, default-parameter design, minimal code, and OOP access. These rules explicitly override other workflow instructions unless the user overrides a specific rule in the current conversation.
 - Added coding and TDD layout rules requiring subsystem source under `src/<subsystem>/`, mirrored one-to-one tests under `tests/`, and explanatory comments for code files, classes, functions, and each line of business code.
+- Tightened the comment gate so source files and unit tests must include file-level purpose notes, class notes, function parameter/return explanations, and line-by-line intent comments; also made Black checks mandatory after Python source or test edits.
 - Documented "verified basis" or "verification evidence" as the replacement wording for the unclear phrase "engineering facts".
 - Refocused `$cx-common-module` and related workflow gates on generic capabilities, reusable features, reusable classes, public entrypoints, lifecycle/state sources, and minimal code instead of module-only abstractions.
 - Replaced single-feature/root documentation sets with mandatory numbered feature-group folders such as `docs/001_feature_name/`, and clarified that ordinary non-programming tasks must not create BDD automatically.
+- Replaced the target-project version helper with project-local `tools/semver.py`, updated `$cx-version` to require that tool, and clarified the `0.x.x` rule: new feature groups bump minor, while changes inside existing feature groups bump patch.
 
 ## [0.1.0] - 2026-05-19
 

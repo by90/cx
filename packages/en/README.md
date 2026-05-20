@@ -78,6 +78,8 @@ Release:
 
 ```text
 Use $cx-version. Feature-group work must happen on its own branch and merge to dev. Feature branches and dev may still be pushed for collaboration or CI. After the user confirms the version is complete, merge dev to main; only on main update VERSION/manifests/CHANGELOG, validate, create the annotated vX.Y.Z tag, then push main and the release tag.
+
+Target projects must use their project-local `tools/semver.py`; if the project does not have the tool yet, copy it from `$cx-version`'s `scripts/semver.py`. During `0.x.x`, use `python tools/semver.py next feature-group --root .` to compute the next minor for a new feature group; use `python tools/semver.py next patch --root .` to compute the next patch for changes, bug fixes, or adjustments inside an existing feature group. When preparing a release, use `python tools/semver.py prepare <version> "<title>" --root .` to update `VERSION`, optional `pyproject.toml`, and `docs/VERSIONS.md`.
 ```
 
 ## Skill Map
@@ -88,7 +90,7 @@ Use $cx-version. Feature-group work must happen on its own branch and merge to d
 | `$cx-bdd` | BDD discovery, ordered feature folders, business rules, scenarios |
 | `$cx-tdd` | Red-green-refactor, test matrices, code quality gates |
 | `$cx-changelog` | `CHANGE-*` entries and changelog consistency |
-| `$cx-version` | SemVer, `VERSION`, changelog, release tags |
+| `$cx-version` | Project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, release tags |
 | `$cx-research` | Model choice, model mechanisms, recent papers, sourced synthesis |
 | `$cx-pytorch-tdd` | Python/PyTorch/Lightning implementation and tests |
 | `$cx-rust-tdd` | Rust implementation, ownership-aware design, cargo test/fmt/clippy |

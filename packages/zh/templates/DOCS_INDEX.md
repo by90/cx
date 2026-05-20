@@ -23,7 +23,9 @@ docs/002_next_feature/GUIDE.md
 
 ## 版本索引
 
-完成一组功能并合并到 `dev` 后，使用版本工具在 `docs/VERSIONS.md` 中追加版本条目，例如 `v0.0.1 "创建项目模板"`。
+完成一组功能并合并到 `dev` 后，使用项目内 `tools/semver.py` 在 `docs/VERSIONS.md` 中追加版本条目，例如 `v0.0.1 "创建项目模板"`。
+
+`0.x.x` 阶段新增功能组只更新 minor：`python tools/semver.py next feature-group --root .`。既有功能组内修改、bug 修复或调整只更新 patch：`python tools/semver.py next patch --root .`。
 
 ## 说明
 

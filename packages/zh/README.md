@@ -78,6 +78,8 @@ Rust：
 
 ```text
 请使用 $cx-version。功能组工作必须在独立分支完成并合并到 dev。功能分支和 dev 仍可为了协作或 CI 正常 push。用户确认版本完成后，再将 dev 合并到 main；只有在 main 上才更新 VERSION/manifests/CHANGELOG、验证、创建带注释 vX.Y.Z tag，然后 push main 和发布 tag。
+
+目标项目必须使用项目内 `tools/semver.py`；如果项目还没有该工具，从 `$cx-version` 的 `scripts/semver.py` 复制过去。`0.x.x` 阶段新增功能组用 `python tools/semver.py next feature-group --root .` 计算下一个 minor；既有功能组内修改、bug 修复或调整用 `python tools/semver.py next patch --root .` 计算下一个 patch。准备发布时用 `python tools/semver.py prepare <version> "<标题>" --root .` 更新 `VERSION`、可选的 `pyproject.toml` 和 `docs/VERSIONS.md`。
 ```
 
 ## Skill 对照表
@@ -88,7 +90,7 @@ Rust：
 | `$cx-bdd` | BDD 发现、编号功能文件夹、业务规则、场景 |
 | `$cx-tdd` | Red-green-refactor、测试矩阵、代码质量门槛 |
 | `$cx-changelog` | `CHANGE-*` 条目和变更记录一致性 |
-| `$cx-version` | SemVer、`VERSION`、changelog、发布 tag |
+| `$cx-version` | 项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md`、发布 tag |
 | `$cx-research` | 模型选择、模型原理、近期论文、带来源综合分析 |
 | `$cx-pytorch-tdd` | Python/PyTorch/Lightning 实现和测试 |
 | `$cx-rust-tdd` | Rust 实现、所有权设计、cargo test/fmt/clippy |

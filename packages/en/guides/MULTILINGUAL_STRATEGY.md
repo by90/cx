@@ -25,7 +25,7 @@ Put a short `README.md` in the repository root and link to `README.zh-CN.md`. Gi
 
 ## Naming stability
 
-Keep names stable across language packages. During pre-1.0 development, interface and workflow changes use minor versions while the major version stays `0`; after `1.0.0`, incompatible renames require a major release:
+Keep names stable across language packages. During pre-1.0 development, new feature groups use minor versions, while changes, bug fixes, or adjustments inside existing feature groups use patch versions and the major version stays `0`; after `1.0.0`, incompatible renames require a major release:
 
 - `$cx-bdd`
 - `$cx-tdd`

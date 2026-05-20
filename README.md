@@ -60,7 +60,7 @@ For Chinese, change `--subpath en` to `--subpath zh`.
 
 Every feature group must be developed on its own branch. When the feature group is complete, merge that branch into `dev`; do not merge feature branches directly into `main`.
 
-When one feature group is complete during pre-1.0 development, the version moves from `0.0.x` to the next minor line such as `0.1.0`. Confirm the completed version with the user before creating a release.
+When a feature group is added and completed during pre-1.0 development, bump only the minor version, such as `0.1.3` to `0.2.0`. Changes, bug fixes, or adjustments inside an existing feature group bump only the patch version, such as `0.1.3` to `0.1.4`. Confirm the completed version with the user before creating a release.
 
 Release order is strict:
 
@@ -126,7 +126,7 @@ The `docs/` root is reserved for `INDEX.md`, `README.md`, and `VERSIONS.md`; con
 | `$cx-bdd` | BDD discovery, ordered feature-folder naming, business rules, Gherkin-style examples, acceptance criteria, and main/alternate/exception scenarios. |
 | `$cx-tdd` | Test-first implementation after BDD: red-green-refactor, narrow failing tests, Test Matrix updates, code quality gates, and verification evidence. |
 | `$cx-changelog` | `CHANGE-*` entries, changelog consistency, and mapping changes back to the same feature documentation set. |
-| `$cx-version` | Release version management using SemVer, root `VERSION`, Keep a Changelog, annotated `vX.Y.Z` Git tags, and GitHub Releases. |
+| `$cx-version` | Release version management using the target project's `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, annotated `vX.Y.Z` Git tags, and GitHub Releases. |
 | `$cx-research` | Model selection, model mechanism research, recent AI paper scans, academic/blog synthesis, and citation-backed recommendations. |
 | `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensor utilities, ML tests, deterministic small test data, and strict Python OOP/TDD quality rules. |
 | `$cx-rust-tdd` | Rust implementation and TDD: structs/enums/traits, ownership, `Result` errors, `cargo test`, `rustfmt`, `clippy`, and non-UI Rust code quality. |
@@ -147,8 +147,8 @@ Version numbers use `MAJOR.MINOR.PATCH`:
 
 - New or unproven projects start at `0.0.1` unless the user explicitly says the project has reached `1.0.0`.
 - Major version `0` means the project is not formally released. Interface and workflow contract changes are expected during this phase.
-- While major version is `0`, minor bumps such as `0.1.0` represent interface or workflow contract changes.
-- While major version is `0`, patch bumps such as `0.0.2` represent bugfixes, wording fixes, examples, translations, or validation fixes that do not change the public contract.
+- While major version is `0`, adding a feature group bumps only minor, for example `0.1.3` to `0.2.0`.
+- While major version is `0`, changes, bug fixes, or adjustments inside an existing feature group bump only patch, for example `0.1.3` to `0.1.4`.
 - `1.0.0` means the first stable public workflow/API contract after the project is complete and explicitly declared stable.
 - After `1.0.0`, compatible public additions use minor versions such as `1.1.0`, and incompatible public contract changes use major versions such as `2.0.0`.
 
@@ -160,6 +160,14 @@ Useful commands:
 python tools/cx_version.py show .
 python tools/cx_version.py check .
 python tools/validate_release.py .  # must run on main for release commits/tags
+```
+
+For target projects, copy `SKILLS/<language>/cx-version/scripts/semver.py` to the project's `tools/semver.py`, then use:
+
+```bash
+python tools/semver.py next feature-group --root .
+python tools/semver.py next patch --root .
+python tools/semver.py prepare <version> "<title>" --root .
 ```
 
 ## Research Basis

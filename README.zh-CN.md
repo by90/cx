@@ -60,7 +60,7 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CO
 
 任何功能组都必须在独立分支上开发。功能组完成后，先合并到 `dev`；不要把功能分支直接合并到 `main`。
 
-pre-1.0 阶段完成一个功能组后，版本从 `0.0.x` 进入下一个 minor，例如 `0.1.0`。创建发布前必须先和用户确认该版本已经完成。
+pre-1.0 阶段新增并完成一个功能组后，只更新 minor，例如 `0.1.3` 到 `0.2.0`。既有功能组内的修改、bug 修复或调整只更新 patch，例如 `0.1.3` 到 `0.1.4`。创建发布前必须先和用户确认该版本已经完成。
 
 发布顺序是强制的：
 
@@ -126,7 +126,7 @@ Feature: 001_configuration_system
 | `$cx-bdd` | BDD 发现、编号功能文件夹命名、业务规则、Gherkin 风格示例、验收标准、主成功/分支/异常场景。 |
 | `$cx-tdd` | BDD 明确后的测试先行实现：red-green-refactor、最窄失败测试、Test Matrix、代码质量门槛和验证证据。 |
 | `$cx-changelog` | `CHANGE-*` 条目、变更记录一致性，以及变更到同一功能文档集的映射。 |
-| `$cx-version` | 使用 SemVer、根 `VERSION`、Keep a Changelog、带注释 `vX.Y.Z` Git tag 和 GitHub Release 管理发布版本。 |
+| `$cx-version` | 使用目标项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md`、带注释 `vX.Y.Z` Git tag 和 GitHub Release 管理发布版本。 |
 | `$cx-research` | 模型选择、模型原理研究、近期 AI 论文扫描、学术/博客综合分析和带引用建议。 |
 | `$cx-pytorch-tdd` | Python、PyTorch、Lightning、tensor 工具、ML 测试、确定性小测试数据，以及严格 Python OOP/TDD 质量规则。 |
 | `$cx-rust-tdd` | Rust 实现和 TDD：struct/enum/trait、ownership、`Result` 错误、`cargo test`、`rustfmt`、`clippy` 和非 UI Rust 代码质量。 |
@@ -147,8 +147,8 @@ cx 使用标准发布机制：
 
 - 新项目或未经验证的项目默认从 `0.0.1` 开始，除非用户明确说明项目已经达到 `1.0.0`。
 - 主版本号 `0` 表示尚未正式发布；这个阶段接口和工作流契约变化是正常的。
-- 当主版本号为 `0` 时，`0.1.0` 这类 minor 表示接口或工作流契约变化。
-- 当主版本号为 `0` 时，`0.0.2` 这类 patch 表示 bugfix、文案、示例、翻译或验证脚本修复，且不改变公开契约。
+- 当主版本号为 `0` 时，新增功能组只更新 minor，例如 `0.1.3` 到 `0.2.0`。
+- 当主版本号为 `0` 时，既有功能组内修改、bug 修复或调整只更新 patch，例如 `0.1.3` 到 `0.1.4`。
 - `1.0.0` 表示项目完成并被明确声明稳定后的第一版公开工作流/API 契约。
 - `1.0.0` 之后，兼容性新增使用 `1.1.0` 这类 minor；破坏兼容性使用 `2.0.0` 这类 major。
 
@@ -160,6 +160,14 @@ cx 使用标准发布机制：
 python tools/cx_version.py show .
 python tools/cx_version.py check .
 python tools/validate_release.py .  # release commit/tag 前必须在 main 上运行
+```
+
+目标项目从 `SKILLS/<language>/cx-version/scripts/semver.py` 复制到项目内 `tools/semver.py` 后，使用：
+
+```bash
+python tools/semver.py next feature-group --root .
+python tools/semver.py next patch --root .
+python tools/semver.py prepare <version> "<标题>" --root .
 ```
 
 ## 调研依据
