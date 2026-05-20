@@ -33,16 +33,18 @@ uv tool install shskills
 
 ## Install Or Update
 
+Local Codex skills must be installed or updated only from the repository's default `main` branch. Do not pass `--ref`, and do not update local skills from `dev` or feature branches.
+
 Install the English cx skills into the global Codex skills directory:
 
 ```powershell
-shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath en --ref main --force --clean
+shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath en --force --clean
 ```
 
 If `CODEX_HOME` is set, use:
 
 ```powershell
-shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CODEX_HOME\skills" --subpath en --ref main --force --clean
+shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CODEX_HOME\skills" --subpath en --force --clean
 ```
 
 For Chinese, change `--subpath en` to `--subpath zh`.

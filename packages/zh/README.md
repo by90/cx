@@ -22,9 +22,11 @@ docs/001_config_system/GUIDE.md
 
 ## 快速开始
 
+本地 Codex skills 只能从仓库默认的 `main` 分支安装或更新；安装命令不要传 `--ref`。
+
 ```powershell
 uv tool install shskills
-shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath zh --ref main --force --clean
+shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath zh --force --clean
 ```
 
 如果设置了 `CODEX_HOME`，目标目录改为 `$env:CODEX_HOME\skills`。

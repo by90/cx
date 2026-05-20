@@ -22,9 +22,11 @@ The BDD document heading and `Feature:` name must match the folder name. Do not 
 
 ## Quick Start
 
+Local Codex skills must be installed or updated only from the repository's default `main` branch; do not pass `--ref` in the install command.
+
 ```powershell
 uv tool install shskills
-shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath en --ref main --force --clean
+shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath en --force --clean
 ```
 
 If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.

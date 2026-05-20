@@ -33,16 +33,18 @@ uv tool install shskills
 
 ## 安装或更新
 
+本地 Codex skills 只能从仓库默认的 `main` 分支安装或更新。不要传 `--ref`，也不要从 `dev` 或功能分支更新本机 skills。
+
 安装中文 cx skills 到全局 Codex skills 目录：
 
 ```powershell
-shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath zh --ref main --force --clean
+shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath zh --force --clean
 ```
 
 如果设置了 `CODEX_HOME`，可以改成：
 
 ```powershell
-shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CODEX_HOME\skills" --subpath zh --ref main --force --clean
+shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CODEX_HOME\skills" --subpath zh --force --clean
 ```
 
 英文版只需要把 `--subpath zh` 改成 `--subpath en`。

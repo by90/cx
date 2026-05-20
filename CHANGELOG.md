@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refocused `$cx-common-module` and related workflow gates on generic capabilities, reusable features, reusable classes, public entrypoints, lifecycle/state sources, and minimal code instead of module-only abstractions.
 - Replaced single-feature/root documentation sets with mandatory numbered feature-group folders such as `docs/001_feature_name/`, and clarified that ordinary non-programming tasks must not create BDD automatically.
 - Replaced the target-project version helper with project-local `tools/semver.py`, updated `$cx-version` to require that tool, and clarified the `0.x.x` rule: new feature groups bump minor, while changes inside existing feature groups bump patch.
+- Clarified that local cx skills must be installed or updated only from the repository's default `main` branch, without passing `--ref`.
 
 ## [0.1.0] - 2026-05-19
 
