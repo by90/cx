@@ -27,6 +27,7 @@ Use this skill as the cx workflow entry point. It classifies the user's request,
 3. When the user asks to commit, deliver, open a PR, or release, treat the working tree as one change set: stage tracked and untracked files and make one commit. Do not analyze which files were changed by the assistant versus the user, and do not split commits by ownership; stop first only for obvious secrets, build artifacts, or unrelated large files.
 4. After work is complete, merge the related feature branch into `dev` and delete the local feature branch. Push the feature branch to the remote only when the user explicitly asks; by default, push only `dev`, and push `main` only when the user explicitly asks for a release handoff.
 5. Use "verified basis" or "verification evidence" for information backed by documents, tests, command output, or cited sources. Do not use the unclear phrase "engineering facts."
+6. Any implementation, fix, refactor, or common-module extraction task must follow the corresponding implementation skill's `## Minimal Implementation Discipline`: absolutely no unmaintainable pile-up code, and default to the least code that satisfies the current need.
 
 ## Prompt Intake Contract
 

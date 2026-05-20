@@ -10,6 +10,21 @@ version: 0.1.0
 
 Turn repeated logic, stable data structures, test harnesses, and UI state models into small, stable, tested reusable components. AI-assisted coding often creates similar code in multiple places; this skill stops that drift by requiring search, API design, migration planning, and tests when duplication becomes meaningful.
 
+## Minimal Implementation Discipline
+
+Iron rule: absolutely no unmaintainable pile-up code.
+
+- Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early.
+- Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
+- Do not add validation that only "looks safer" but is not required, such as filename allowlists, path validity checks, extra AST scans, or duplicate config rule checks.
+- In most cases, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
+- Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
+- Prefer expressing defaults through function or constructor parameters; do not promote simple paths, filenames, or one-off defaults to module-level constants.
+- Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
+- Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
+- Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
+- Refactoring should delete code, reduce branches, and shrink the public surface, not move logic into more small functions.
+
 ## Reuse Discovery
 
 Before adding a new abstraction, search:
