@@ -10,12 +10,13 @@ This repository uses the cx documentation-set BDD/TDD workflow: the `docs/` root
 4. Do not create orphan `spec.md`, `plan.md`, `tasks.md`, or loose design notes. Use `docs/<feature-group>/` documentation sets for multiple feature groups.
 5. Merge new requirements, BDD scenarios, architecture notes, task breakdowns, test mappings, and verification evidence into the target documentation set's `ENGINEERING_SPEC.md`.
 6. Use the target documentation set's `CHANGELOG.md` only as a historical log. Every `CHANGE-*` entry must link back to the same documentation set's engineering spec.
-7. Start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
-8. Prefer reusable components and common modules over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Common Module Registry.
-9. Every feature group must use its own branch. Merge completed feature-group branches into `dev`; do not merge them directly into `main`.
-10. Only after the user confirms the version is complete may `dev` be merged into `main`; only `main` may be used for version commits, release tags, and release-tag pushes. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.
-11. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
-12. When adding or editing code, add beginner-friendly explanatory comments for code files, classes, functions, and important statements. Explain code intent line by line by default, except for pure formatting or repeated structural lines.
+7. After BDD, engineering spec, implementation plan, or changelog updates are complete, stop, report the document result and next implementation plan to the user, and wait for explicit user confirmation. Do not write tests, edit implementation, or enter TDD before confirmation.
+8. After user confirmation, start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
+9. Prefer reusable components and common modules over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Common Module Registry.
+10. Every feature group must use its own branch. Merge completed feature-group branches into `dev`; do not merge them directly into `main`.
+11. Only after the user confirms the version is complete may `dev` be merged into `main`; only `main` may be used for version commits, release tags, and release-tag pushes. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.
+12. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
+13. When adding or editing code, add beginner-friendly explanatory comments for code files, classes, functions, and important statements. Explain code intent line by line by default, except for pure formatting or repeated structural lines.
 
 ## Prompt contract
 
@@ -58,6 +59,12 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 - Keep training tests tiny: CPU-first, tiny batches, tiny models, `fast_dev_run`, or limited batches.
 - Prefer real, small unit-test data. For database behavior, use a reduced SQLite database or fixture when practical, and use mocks sparingly only for boundaries such as external services, time, or randomness that cannot be controlled realistically.
 
+## Windows Toolchain Rules
+
+- On Windows, when a task explicitly requires the `ng` command and it is not installed locally, install the project-required `ng` CLI before continuing. Do not replace `ng` with PowerShell scripts, the `ps` alias, or ad hoc substitute commands.
+- Prefer the package manager locked by the project: use `npm` when `package-lock.json` exists, `pnpm` when `pnpm-lock.yaml` exists, and `yarn` when `yarn.lock` exists. If the project gives no constraint, state the assumption and install Angular CLI.
+- After installation, run `ng version` or the project's equivalent version command to confirm the CLI works before running generation, build, or test commands.
+
 ## Rust / GPUI rules
 
 - Use Rust's built-in unit test mechanism and `cargo test`; do not introduce an extra test framework unless the repository already explicitly uses it.
@@ -89,9 +96,20 @@ docs/1.Configuration System/CHANGELOG.md
 
 Additional generated docs are temporary unless the user explicitly approves them. If you need a plan, write it into the target documentation set's `ENGINEERING_SPEC.md` Task Queue section.
 
-When producing Chinese-language documentation, use Simplified Chinese. Long-lived documentation must live under the project's `docs/` directory.
+When the Chinese cx package is installed, every cx-generated or cx-maintained document must be Simplified Chinese. Long-lived documentation must live under the project's `docs/` directory. Code identifiers, commands, API names, and quoted external names may remain in their source language.
 
 BDD scenarios, test matrices, implementation plans, and verification evidence must be written in the target documentation set under the project's `docs/` directory.
+
+## Git Commit Rules
+
+- When the user asks to commit, deliver, open a PR, or release, treat the current working tree as one change set. Do not analyze which files were changed by the assistant, which were changed by the user, or which files are untracked.
+- Run `git status --short` before committing only to confirm the working tree contents and spot obvious risk, not to split files by ownership.
+- By default, stage all tracked and untracked files and create one commit. Do not split one task into multiple commits unless the user explicitly asks.
+- Stop and ask the user first only when obvious secrets, credentials, local environment files, build artifacts, dependency directories, or unrelated large files are present.
+- The commit message should describe the overall user-requested result, not file ownership.
+- After work is complete, merge the feature branch into `dev`, then delete the local feature branch.
+- Push the feature branch to the remote only when the user explicitly asks; do not push feature branches by default.
+- Push only `dev` by default. Merge and push `main` only when the user explicitly asks for a release handoff or a merge to `main`.
 
 ## Recommended validation commands
 

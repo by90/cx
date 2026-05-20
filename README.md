@@ -4,7 +4,7 @@ cx is a Codex skill package for disciplined human-AI software development. Its c
 
 cx is not a component library. Implementation domains such as progress UI widgets, ragged tensor utilities, or Rust UI components should live in their own project/component directories with their own README, API docs, and tests. They are not core cx skills.
 
-Current package version: `0.0.1`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
+Current package version: `0.1.0`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
 
 For Chinese documentation, see [README.zh-CN.md](README.zh-CN.md).
 
@@ -51,9 +51,10 @@ For Chinese, change `--subpath en` to `--subpath zh`.
 
 1. `$cx-workflow` classifies the request and selects the smallest necessary set of skills.
 2. `$cx-bdd` creates or updates the ordered feature folder and BDD scenarios.
-3. `$cx-tdd` maps BDD scenarios to failing tests, runs red/green/refactor, and records evidence.
-4. Specialist skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, or `$cx-common-module` add language or design constraints.
-5. `$cx-changelog`, `$cx-version`, and `$cx-evidence` keep the work auditable before release or delivery.
+3. After `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md` are complete, the agent must stop, report the document result and next implementation plan, and wait for explicit user confirmation.
+4. After confirmation, `$cx-tdd` maps BDD scenarios to failing tests, runs red/green/refactor, and records evidence.
+5. Specialist skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, or `$cx-common-module` add language or design constraints.
+6. `$cx-changelog`, `$cx-version`, and `$cx-evidence` keep the work auditable before release or delivery.
 
 ## Branch And Release Gates
 
@@ -83,9 +84,11 @@ Verification:
 Deliverables:
 ```
 
-The prompt should name the target feature folder when known, the cx skills to use, commands that must pass, and what evidence should be left behind. If the prompt is missing acceptance criteria, target environment, or verification requirements, `$cx-workflow` should ask the smallest clarifying question before implementation.
+The prompt should name the target feature folder when known, the cx skills to use, commands that must pass, and what evidence should be left behind. If the prompt is missing acceptance criteria, target environment, or verification requirements, `$cx-workflow` should ask the smallest clarifying question. For development tasks that need a documentation set, the agent must wait for user confirmation after documents are complete and before tests or implementation.
 
 For projects that also use Claude Code, keep `AGENTS.md` as the shared source of repository rules and have `CLAUDE.md` import or point to it. Do not maintain two divergent instruction files.
+
+When the Chinese cx package is installed, every cx-generated or cx-maintained document must be Simplified Chinese. When the user asks to commit, deliver, open a PR, or release, the AGENTS template treats the current working tree as one commit and does not split files by who changed them or whether they are untracked.
 
 Feature documentation folders should be ordered and named by business capability:
 
@@ -147,7 +150,7 @@ Version numbers use `MAJOR.MINOR.PATCH`:
 - `1.0.0` means the first stable public workflow/API contract after the project is complete and explicitly declared stable.
 - After `1.0.0`, compatible public additions use minor versions such as `1.1.0`, and incompatible public contract changes use major versions such as `2.0.0`.
 
-For cx specifically, the current split from `$cx-bdd-tdd` into `$cx-bdd` and `$cx-tdd` still belongs to the pre-1.0 experimental line, so the package is `0.0.1` rather than `2.0.0`.
+For cx specifically, the split from `$cx-bdd-tdd` into `$cx-bdd` and `$cx-tdd` remains in the pre-1.0 experimental line. The branch/release-gate feature group is released as `0.1.0`; it is not a `1.0.0` stability declaration or a `2.0.0` breaking release.
 
 Useful commands:
 

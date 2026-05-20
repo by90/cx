@@ -1,7 +1,7 @@
 ---
 name: cx-pytorch-tdd
 description: Use for Python, PyTorch, Lightning, tensor utilities, model training, data modules, metrics, ML tests, project-level uv environments, Python/PyTorch/CUDA stable-version checks, and test data strategy. Enforces unittest-first, tiny tests, sparse mocks, and current API verification.
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx Python / PyTorch / Lightning TDD
@@ -12,15 +12,16 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 
 ## Required workflow
 
-1. Read the related BDD IDs and Common Module Registry entries in the target documentation set's `ENGINEERING_SPEC.md`.
-2. Use the project-level `uv` virtual environment. Prefer `uv sync`, `uv run`, or the repository's existing `uv` workflow for dependency installation and test execution.
-3. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
-4. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
-5. Write Python `unittest` tests first. Do not introduce `pytest` unless the repository has an explicit exception.
-6. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
-7. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
-8. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable components.
-9. Use Black-compatible formatting and avoid changing unrelated user code.
+1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
+2. Read the related BDD IDs and Common Module Registry entries in the target documentation set's `ENGINEERING_SPEC.md`.
+3. Use the project-level `uv` virtual environment. Prefer `uv sync`, `uv run`, or the repository's existing `uv` workflow for dependency installation and test execution.
+4. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
+5. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
+6. Write Python `unittest` tests first. Do not introduce `pytest` unless the repository has an explicit exception.
+7. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
+8. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
+9. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable components.
+10. Use Black-compatible formatting and avoid changing unrelated user code.
 
 ## Python Design Rules
 

@@ -11,6 +11,10 @@ packages/zh
 
 The skill names and agent names must be identical in both packages and must start with `cx-`. The language changes only human-facing content: descriptions, instructions, templates, guides, and examples.
 
+## Documentation Language Constraint
+
+A target project installs only one language package. When the Chinese package is installed, every long-lived document generated or maintained by cx must be Simplified Chinese, including BDD, engineering specs, changelogs, indexes, implementation plans, test matrices, and verification evidence. Code identifiers, commands, API names, and quoted external names may remain in their source language.
+
 ## Why not install both languages into one target project
 
 Codex discovers skills by scanning `.agents/skills` from the current working directory up to the repository root. If two skills share the same `name`, they are not merged; both may appear. That creates ambiguity and wastes context. Install only one language pack into the target repository.

@@ -1,7 +1,7 @@
 ---
 name: cx-version
 description: Use for cx package release version management, SemVer bump decisions, Keep a Changelog release notes, annotated Git tags, GitHub Releases, and release validation evidence.
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx Release Version Management

@@ -1,7 +1,7 @@
 ---
 name: cx-changelog
 description: Use when updating changelogs, release notes, change IDs, audit trails, or ensuring CHANGE entries map back to the target documentation set's engineering specification.
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx Changelog Curator

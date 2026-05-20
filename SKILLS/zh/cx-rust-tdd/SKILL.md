@@ -1,7 +1,7 @@
 ---
 name: cx-rust-tdd
 description: 用于 Rust 代码实现和 TDD，包括 ownership-aware design、struct/enum/trait、Result 错误、cargo test、rustfmt、clippy 和高质量非 UI Rust 代码。
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx Rust 编码与 TDD
@@ -12,16 +12,17 @@ version: 0.0.1
 
 ## 必须执行的流程
 
-1. 阅读 `BDD.md`、`ENGINEERING_SPEC.md`、`CHANGELOG.md` 和相关 Rust 模块。
-2. 将一个 BDD ID 映射到一个最窄 Rust 测试。
-3. 先写失败测试：可以使用 `#[test]`、`tests/` 下的集成测试，或用于公共 API 文档的 doc test。
-4. 运行 `cargo test <filter>` 或项目中最窄命令，并记录 red failure。
-5. 实现最小 Rust 改动。
-6. 先运行最窄测试，再运行 `cargo test`。
-7. 运行 `cargo fmt --check` 或 `cargo fmt`。
-8. 可行时运行 `cargo clippy --all-targets --all-features`。
-9. 只有测试 green 后才重构。
-10. 记录验证证据。
+1. 先确认用户已经在文档更新后明确同意进入测试和实现阶段；没有确认时停止并请求确认。
+2. 阅读 `BDD.md`、`ENGINEERING_SPEC.md`、`CHANGELOG.md` 和相关 Rust 模块。
+3. 将一个 BDD ID 映射到一个最窄 Rust 测试。
+4. 先写失败测试：可以使用 `#[test]`、`tests/` 下的集成测试，或用于公共 API 文档的 doc test。
+5. 运行 `cargo test <filter>` 或项目中最窄命令，并记录 red failure。
+6. 实现最小 Rust 改动。
+7. 先运行最窄测试，再运行 `cargo test`。
+8. 运行 `cargo fmt --check` 或 `cargo fmt`。
+9. 可行时运行 `cargo clippy --all-targets --all-features`。
+10. 只有测试 green 后才重构。
+11. 记录验证证据。
 
 ## Rust 设计规则
 

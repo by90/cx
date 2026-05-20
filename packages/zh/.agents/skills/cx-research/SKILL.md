@@ -1,7 +1,7 @@
 ---
 name: cx-research
 description: 用于模型选择研究、AI 论文综述、模型原理研究、最近六个月 AI 文献扫描、来源筛选、博客解读和带引用的综合分析。
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx 研究工作流

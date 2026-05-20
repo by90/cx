@@ -1,7 +1,7 @@
 ---
 name: cx-version
 description: 用于 cx 包发布版本管理、SemVer 升级判断、Keep a Changelog 发布说明、带注释 Git tag、GitHub Release 和发布验证证据。
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx 发布版本管理

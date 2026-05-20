@@ -1,7 +1,7 @@
 ---
 name: cx-bdd
 description: Use for BDD discovery, feature-folder naming, business rules, Gherkin-style examples, acceptance criteria, main/alternate/exception scenarios, and mapping behavior to later tests.
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx BDD Discovery And Scenario Documentation
@@ -50,7 +50,9 @@ The folder name, BDD heading, and `Feature:` name must match exactly. This keeps
 7. Map each BDD scenario to a stable BDD ID and later test target.
 8. Keep implementation mechanics out of `Given` and `When` unless the business behavior is explicitly technical.
 9. Update the same folder's `ENGINEERING_SPEC.md` with links back to BDD IDs and rules.
-10. Hand off to `$cx-tdd` only after BDD scenarios are clear enough to produce expected failing tests.
+10. Update the same folder's `CHANGELOG.md` so the document change is auditable.
+11. After BDD, engineering spec, and changelog updates are complete, stop and report the document result and next implementation plan to the user.
+12. Hand off to `$cx-tdd` only after the user explicitly confirms continuation and the BDD scenarios are clear enough to produce expected failing tests.
 
 ## BDD Format
 
@@ -93,3 +95,4 @@ Every BDD update should leave:
 - Main, alternate, and exception scenarios.
 - Business rules and open questions.
 - Links from `ENGINEERING_SPEC.md` to the BDD IDs.
+- The next TDD plan, waiting for user confirmation before execution.

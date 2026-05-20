@@ -1,7 +1,7 @@
 ---
 name: cx-rust-tdd
 description: Use for Rust code implementation and TDD, including ownership-aware design, structs/enums/traits, Result-based errors, cargo test, rustfmt, clippy, and high-quality non-UI Rust code.
-version: 0.0.1
+version: 0.1.0
 ---
 
 # cx Rust Code And TDD
@@ -12,16 +12,17 @@ Use this skill for Rust implementation work after behavior is defined by `$cx-bd
 
 ## Required Workflow
 
-1. Read `BDD.md`, `ENGINEERING_SPEC.md`, `CHANGELOG.md`, and the relevant Rust modules.
-2. Map one BDD ID to one narrow Rust test.
-3. Write the failing test first using `#[test]`, integration tests under `tests/`, or doc tests when the behavior is public API documentation.
-4. Run `cargo test <filter>` or the narrowest project command and record the red failure.
-5. Implement the smallest Rust change.
-6. Run the narrow test, then `cargo test`.
-7. Run `cargo fmt --check` or `cargo fmt`.
-8. Run `cargo clippy --all-targets --all-features` when practical.
-9. Refactor only after tests are green.
-10. Record verification evidence.
+1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
+2. Read `BDD.md`, `ENGINEERING_SPEC.md`, `CHANGELOG.md`, and the relevant Rust modules.
+3. Map one BDD ID to one narrow Rust test.
+4. Write the failing test first using `#[test]`, integration tests under `tests/`, or doc tests when the behavior is public API documentation.
+5. Run `cargo test <filter>` or the narrowest project command and record the red failure.
+6. Implement the smallest Rust change.
+7. Run the narrow test, then `cargo test`.
+8. Run `cargo fmt --check` or `cargo fmt`.
+9. Run `cargo clippy --all-targets --all-features` when practical.
+10. Refactor only after tests are green.
+11. Record verification evidence.
 
 ## Rust Design Rules
 
