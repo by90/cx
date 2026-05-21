@@ -30,7 +30,7 @@ If the target project does not have the tool yet, copy this skill directory's `s
 4. `docs/VERSIONS.md` is the human-facing version record. Headings use `## vX.Y.Z - Title`.
 5. Git release tags use `vX.Y.Z`. The tag has the `v` prefix; the `VERSION` value does not.
 6. Use annotated Git tags for releases, for example `git tag -a v0.1.0 -m "Release 0.1.0"`; normally create them with `python tools/semver.py tag --root .`.
-7. Release commits and release tags are allowed only on `main`. Feature branches and `dev` may still be pushed, but they must not receive formal release commits or release tags.
+7. Release commits and release tags are allowed only on `main`. Work branches stay local by default and must not be pushed unless the user explicitly overrides the main-only remote policy; the remote should keep only `main` and version tags.
 8. The cx package itself may still use the repository-root `tools/cx_version.py` and `tools/validate_release.py`; target project releases must prefer the target project's `tools/semver.py`.
 
 ## Version Bump Rules
@@ -47,17 +47,16 @@ If the target project does not have the tool yet, copy this skill directory's `s
 
 ## Release Checklist
 
-1. Confirm the feature group or change work happened on its own branch.
-2. Merge the completed work branch into `dev`; do not merge it directly into `main`.
-3. Decide the release type: use `next feature-group` for a new feature group; use `next patch` for existing feature-group changes, bug fixes, or adjustments.
-4. Ask the user to confirm that this version is complete and ready for release.
-5. After confirmation, merge `dev` into `main`.
-6. On `main`, run `python tools/semver.py check --root .`.
-7. On `main`, run `python tools/semver.py prepare <version> "<title>" --root . --feature-group <group> --summary "<summary>" --evidence "<evidence>"`.
-8. On `main`, rerun project tests and `python tools/semver.py check --root .`.
-9. On `main`, commit release files such as `VERSION`, `pyproject.toml`, and `docs/VERSIONS.md`.
-10. On `main`, run `python tools/semver.py tag --root .` to create the annotated tag.
-11. Push `main` and the release tag.
-12. Create a GitHub Release when a public release page or downloadable archive is needed.
+1. Confirm the feature group or change work happened on its own local branch.
+2. Decide the release type: use `next feature-group` for a new feature group; use `next patch` for existing feature-group changes, bug fixes, or adjustments.
+3. Ask the user to confirm that this version is complete and ready for release.
+4. After confirmation, merge the completed local work branch into `main` and delete the local branch.
+5. On `main`, run `python tools/semver.py check --root .`.
+6. On `main`, run `python tools/semver.py prepare <version> "<title>" --root . --feature-group <group> --summary "<summary>" --evidence "<evidence>"`.
+7. On `main`, rerun project tests and `python tools/semver.py check --root .`.
+8. On `main`, commit release files such as `VERSION`, `pyproject.toml`, and `docs/VERSIONS.md`.
+9. On `main`, run `python tools/semver.py tag --root .` to create the annotated tag.
+10. Push `main` and the release tag.
+11. Create a GitHub Release when a public release page or downloadable archive is needed.
 
-Never create release commits or release tags on feature branches or on `dev`; this does not forbid pushing those branches for collaboration, backup, or CI.
+Never create release commits or release tags on work branches. Do not push work branches unless the user explicitly overrides the main-only remote policy in the current conversation.

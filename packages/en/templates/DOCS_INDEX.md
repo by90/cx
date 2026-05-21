@@ -23,7 +23,7 @@ docs/002_next_feature/GUIDE.md
 
 ## Version Index
 
-After a feature group is complete and merged into `dev`, use the project-local `tools/semver.py` to append a release entry to `docs/VERSIONS.md`, for example `v0.0.1 "Create project template"`.
+After a feature group is complete and merged into `main`, use the project-local `tools/semver.py` to append a release entry to `docs/VERSIONS.md`, for example `v0.0.1 "Create project template"`.
 
 During `0.x.x`, new feature groups bump minor only: `python tools/semver.py next feature-group --root .`. Changes, bug fixes, or adjustments inside an existing feature group bump patch only: `python tools/semver.py next patch --root .`.
 
@@ -32,5 +32,5 @@ During `0.x.x`, new feature groups bump minor only: `python tools/semver.py next
 - Each feature-group directory must use a three-digit order prefix, lowercase words, and underscores, and maintain its own `ENGINEERING_SPEC.md`, `CHANGELOG.md`, and `GUIDE.md`.
 - Concrete change IDs belong only in the same feature group's `CHANGELOG.md`; do not copy them into BDD or the engineering spec.
 - Do not create BDD automatically for ordinary non-programming tasks; ask the user first when behavior discovery is unclear.
-- In principle, each feature group or change uses its own work branch, then merges into `dev` and deletes the work branch after completion.
+- In principle, each feature group or change uses its own local work branch, then merges into `main` and deletes the work branch after completion. Keep the remote limited to `main` and version tags.
 - Register reusable features, classes, or components first in the owning feature group's Reusable Capability Registry; also mark cross-feature reuse in this index.

@@ -33,7 +33,7 @@ uv tool install shskills
 
 ## Install Or Update
 
-Local Codex skills must be installed or updated only from the repository's default `main` branch. Do not pass `--ref`, and do not update local skills from `dev` or feature branches.
+Local Codex skills must be installed or updated only from the repository's default `main` branch. Do not pass `--ref`, and do not update local skills from work branches.
 
 Install the English cx skills into the global Codex skills directory:
 
@@ -60,18 +60,18 @@ For Chinese, change `--subpath en` to `--subpath zh`.
 
 ## Branch And Release Gates
 
-Every feature group must be developed on its own branch. When the feature group is complete, merge that branch into `dev`; do not merge feature branches directly into `main`.
+Every feature group should be developed on a short-lived local work branch. When the feature group is complete and the user has confirmed the work, merge that branch into `main`, delete the local work branch, and push only `main`.
 
 When a feature group is added and completed during pre-1.0 development, bump only the minor version, such as `0.1.3` to `0.2.0`. Changes, bug fixes, or adjustments inside an existing feature group bump only the patch version, such as `0.1.3` to `0.1.4`. Confirm the completed version with the user before creating a release.
 
 Release order is strict:
 
-1. Finish the feature group branch and merge it into `dev`.
-2. After the user confirms the version is complete, merge `dev` into `main`.
+1. Finish the local feature-group branch.
+2. After the user confirms the version is complete, merge that branch into `main` and delete the local branch.
 3. Only on `main`, create the version commit, create the annotated `vX.Y.Z` tag, then push `main` and the release tag.
 
-Do not create release commits or tags on feature branches or `dev`.
-This gate does not forbid pushing feature branches or `dev` for collaboration, backup, or CI; it only restricts release-version actions to `main`.
+Do not create release commits or tags on work branches.
+The remote repository should keep only `main` and version tags. Do not push work branches unless the user explicitly overrides this main-only remote policy in the current conversation.
 
 ## Prompt Contract
 

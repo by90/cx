@@ -23,7 +23,7 @@ docs/002_next_feature/GUIDE.md
 
 ## 版本索引
 
-完成一组功能并合并到 `dev` 后，使用项目内 `tools/semver.py` 在 `docs/VERSIONS.md` 中追加版本条目，例如 `v0.0.1 "创建项目模板"`。
+完成一组功能并合并到 `main` 后，使用项目内 `tools/semver.py` 在 `docs/VERSIONS.md` 中追加版本条目，例如 `v0.0.1 "创建项目模板"`。
 
 `0.x.x` 阶段新增功能组只更新 minor：`python tools/semver.py next feature-group --root .`。既有功能组内修改、bug 修复或调整只更新 patch：`python tools/semver.py next patch --root .`。
 
@@ -32,5 +32,5 @@ docs/002_next_feature/GUIDE.md
 - 每个功能组目录都必须使用三位序号、小写、下划线分隔的名字，并维护自己的 `ENGINEERING_SPEC.md`、`CHANGELOG.md` 和 `GUIDE.md`。
 - 具体变更编号只写入同一功能组的 `CHANGELOG.md`，不要复制进 BDD 或研发主文档。
 - 普通、非编程任务不要自行创建 BDD；不确定是否需要行为发现时先询问用户。
-- 理论上一个功能组或一次变更使用单独工作分支，完成后合并到 `dev` 并删除工作分支。
+- 理论上一个功能组或一次变更使用单独本地工作分支，完成后合并到 `main` 并删除工作分支。远端只保留 `main` 和版本 tag。
 - 可复用功能、类或组件先登记到所在功能组的 Reusable Capability Registry；跨功能组复用时，也在本索引中标注。

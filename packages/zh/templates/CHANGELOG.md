@@ -10,7 +10,7 @@
 - Type: docs
 - Status: done
 - Branch: codex/install-cx-workflow
-- Base branch: dev
+- Base branch: main
 - Feature group: 001_project_template
 - Task order: 1
 - Summary: 安装 cx 文档集 BDD/TDD 工作流包。

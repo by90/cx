@@ -1,6 +1,6 @@
 # VERSIONS.md
 
-This file records releases after a feature group is complete. Version entries are appended by the project-local `tools/semver.py`, usually after the feature group is merged into `dev`.
+This file records releases after a feature group is complete. Version entries are appended by the project-local `tools/semver.py`, usually after the feature group is merged into `main`.
 
 ## Versions
 

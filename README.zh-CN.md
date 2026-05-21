@@ -33,7 +33,7 @@ uv tool install shskills
 
 ## 安装或更新
 
-本地 Codex skills 只能从仓库默认的 `main` 分支安装或更新。不要传 `--ref`，也不要从 `dev` 或功能分支更新本机 skills。
+本地 Codex skills 只能从仓库默认的 `main` 分支安装或更新。不要传 `--ref`，也不要从工作分支更新本机 skills。
 
 安装中文 cx skills 到全局 Codex skills 目录：
 
@@ -60,18 +60,18 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CO
 
 ## 分支与发布门禁
 
-任何功能组都必须在独立分支上开发。功能组完成后，先合并到 `dev`；不要把功能分支直接合并到 `main`。
+任何功能组都应该在短生命周期本地工作分支上开发。功能组完成并经过用户确认后，把该分支合并到 `main`，删除本地工作分支，并且只 push `main`。
 
 pre-1.0 阶段新增并完成一个功能组后，只更新 minor，例如 `0.1.3` 到 `0.2.0`。既有功能组内的修改、bug 修复或调整只更新 patch，例如 `0.1.3` 到 `0.1.4`。创建发布前必须先和用户确认该版本已经完成。
 
 发布顺序是强制的：
 
-1. 完成功能组分支，并合并到 `dev`。
-2. 用户确认版本完成后，将 `dev` 合并到 `main`。
+1. 完成本地功能组分支。
+2. 用户确认版本完成后，将该分支合并到 `main` 并删除本地分支。
 3. 只有在 `main` 上，才允许创建版本提交、创建带注释的 `vX.Y.Z` tag，然后 push `main` 和发布 tag。
 
-禁止在功能分支或 `dev` 上创建 release commit 或 tag。
-这条门禁不禁止为了协作、备份或 CI push 功能分支或 `dev`；它只限制版本发布动作必须发生在 `main`。
+禁止在工作分支上创建 release commit 或 tag。
+远端仓库应该只保留 `main` 和版本 tag。不要 push 工作分支，除非用户在当前对话中明确覆盖这条 main-only 远端策略。
 
 ## 提示词契约
 

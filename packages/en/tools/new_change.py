@@ -86,7 +86,7 @@ def append_change(
     doc_set: str | None = None,
     today: str | None = None,
     branch: str = "TODO",
-    base_branch: str = "dev",
+    base_branch: str = "main",
 ) -> str:
     """Create a CHANGE ID and write it to the target changelog."""
 
@@ -112,7 +112,7 @@ def main() -> int:
     parser.add_argument("--root", default=".")  # Read repository root.
     parser.add_argument("--doc-set", default=None)  # Read target documentation set.
     parser.add_argument("--branch", default="TODO")  # Read work branch.
-    parser.add_argument("--base-branch", default="dev")  # Read merge target branch.
+    parser.add_argument("--base-branch", default="main")  # Read merge target branch.
     parser.add_argument("--date", default=None)  # Let automation pass a fixed date.
     args = parser.parse_args()  # Parse every argument.
 

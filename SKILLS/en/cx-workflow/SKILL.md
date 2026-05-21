@@ -13,7 +13,7 @@ Use this skill as the cx workflow entry point. It classifies the user's request,
 ## Entry Flow
 
 1. Classify the task: requirements discussion, feature implementation, bug fix, refactor, specialist technical work, documentation update, evidence review, or installation/use question.
-2. For any feature-group work, require a dedicated feature branch before changing files. Feature branches merge to `dev`, not directly to `main`.
+2. For any feature-group work, require a short-lived local work branch before changing files. Completed work branches merge into `main`, then are deleted locally; the remote keeps only `main` and version tags.
 3. Check whether the project already has `docs/INDEX.md` or `docs/README.md`, one or more documentation sets, and `AGENTS.md`.
 4. Decide whether the request changes behavior, public APIs, data structures, user workflows, release mechanics, or research conclusions.
 5. Select the smallest necessary set of cx skills. Do not apply every skill by default.
@@ -26,7 +26,7 @@ Use this skill as the cx workflow entry point. It classifies the user's request,
 1. For development work that needs BDD, an engineering spec, an implementation plan, or a changelog entry, stop after updating the documents, report the document result to the user, and wait for explicit user confirmation. Do not write tests, edit implementation, or enter TDD before that confirmation.
 2. When the target project has the Chinese cx package installed, every cx-generated or cx-maintained document must be Simplified Chinese, including `BDD.md`, `ENGINEERING_SPEC.md`, `CHANGELOG.md`, `docs/INDEX.md`, plans, test matrices, and verification evidence. Code identifiers, commands, API names, and quoted external names may remain in their source language.
 3. When the user asks to commit, deliver, open a PR, or release, treat the working tree as one change set: stage tracked and untracked files and make one commit. Do not analyze which files were changed by the assistant versus the user, and do not split commits by ownership; stop first only for obvious secrets, build artifacts, or unrelated large files.
-4. After work is complete, merge the related feature branch into `dev` and delete the local feature branch. Push the feature branch to the remote only when the user explicitly asks; by default, push only `dev`, and push `main` only when the user explicitly asks for a release handoff.
+4. After work is complete and user-confirmed, merge the related work branch into `main` and delete the local branch. Do not push work branches to the remote unless the user explicitly overrides the main-only remote policy in the current conversation; by default, push only `main` and version tags.
 5. Use "verified basis" or "verification evidence" for information backed by documents, tests, command output, or cited sources. Do not use the unclear phrase "engineering facts."
 6. Any implementation, fix, refactor, generic capability, reusable feature, reusable class, or reusable-capability extraction task must follow the corresponding implementation skill's `## Minimal Implementation Discipline`: absolutely no unmaintainable pile-up code, and default to the least code that satisfies the current need.
 7. Before implementing a generic capability, reusable feature, or reusable class, first define the calling model; until that model is written into BDD/ENGINEERING_SPEC, do not write internal loading, validation, conversion, caching, or persistence code.
@@ -69,7 +69,7 @@ Deliverables:
 
 - Goal must describe observable behavior or a concrete research/release outcome.
 - Context should identify target docs, files, branch, environment, and relevant prior decisions.
-- Branch should name the feature-group branch, confirm the integration target is `dev`, and say whether a release handoff to `main` is requested.
+- Branch should name the local feature-group branch, confirm the integration target is `main`, and state that the remote keeps only `main` and version tags.
 - Constraints should include public APIs, language rules, compatibility, performance, security, or style limits.
 - Required workflow names the smallest necessary cx skills.
 - Verification lists the commands, checks, screenshots, or evidence expected.
@@ -97,14 +97,14 @@ Ask a clarifying question only when a missing field would likely cause wrong beh
 2. Then use `$cx-bdd`, choose or create the target ordered feature folder, such as `docs/001_config_system/`, and update `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md`.
 3. After the document update is complete, stop, report the document changes and next implementation plan to the user, and wait for explicit user confirmation.
 4. After user confirmation, use `$cx-tdd` and any specialist skill to write the failing test, record the red failure, implement the smallest change, and validate it.
-5. When a feature group is complete, merge its branch into `dev`; never merge a feature branch directly into `main`.
+5. When a feature group is complete and user-confirmed, merge its local branch into `main`, delete the local branch, and do not push the work branch to the remote.
 6. For finishing work around an existing implementation, check docs and test evidence before using `$cx-evidence`.
 7. For ordinary non-programming tasks, such as installation, updates, language switching, shskills usage, read-only research organization, small wording edits, or maintenance documentation updates, answer or make the update directly and do not start BDD/TDD; if the task boundary may affect business behavior, ask whether BDD is required.
 8. For read-only analysis or code review, read the relevant files and list risks before making changes, unless the user asks for fixes.
 9. For every project, record multiple feature groups, order, dependencies, and status in `docs/INDEX.md`; never place concrete engineering documents in the `docs/` root as a single-feature documentation set.
 10. For potentially reusable features, classes, components, data structures, test harnesses, or UI state models, use `$cx-common-module` first to search existing implementations and registries before adding a new abstraction.
 11. For component domains such as progress UI or ragged tensor utilities, do not invent a new cx skill. Treat them as project components with their own README and tests.
-12. For release work, use `$cx-version`: after the user confirms the version is complete, merge `dev` into `main`; only `main` may be used for the version commit, annotated release tag, and release-tag push. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.
+12. For release work, use `$cx-version`: after the user confirms the version is complete, merge the completed local work branch into `main`; only `main` may be used for the version commit, annotated release tag, and release-tag push. The remote should retain only `main` and version tags.
 
 ## Stop Conditions
 

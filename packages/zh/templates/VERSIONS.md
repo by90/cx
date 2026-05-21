@@ -1,6 +1,6 @@
 # VERSIONS.md
 
-本文件记录完成一组功能后的版本发布。版本条目由项目内 `tools/semver.py` 追加，通常在功能组合并到 `dev` 后创建。
+本文件记录完成一组功能后的版本发布。版本条目由项目内 `tools/semver.py` 追加，通常在功能组合并到 `main` 后创建。
 
 ## Versions
 

@@ -79,7 +79,7 @@ Rust：
 发布：
 
 ```text
-请使用 $cx-version。功能组工作必须在独立分支完成并合并到 dev。功能分支和 dev 仍可为了协作或 CI 正常 push。用户确认版本完成后，再将 dev 合并到 main；只有在 main 上才更新 VERSION/manifests/CHANGELOG、验证、创建带注释 vX.Y.Z tag，然后 push main 和发布 tag。
+请使用 $cx-version。功能组工作必须在短生命周期本地分支完成，并且只在用户确认后合并到 main。不要 push 工作分支；远端只保留 main 和版本 tag。只有在 main 上才更新 VERSION/manifests/CHANGELOG、验证、创建带注释 vX.Y.Z tag，然后 push main 和发布 tag。
 
 目标项目必须使用项目内 `tools/semver.py`；如果项目还没有该工具，从 `$cx-version` 的 `scripts/semver.py` 复制过去。`0.x.x` 阶段新增功能组用 `python tools/semver.py next feature-group --root .` 计算下一个 minor；既有功能组内修改、bug 修复或调整用 `python tools/semver.py next patch --root .` 计算下一个 patch。准备发布时用 `python tools/semver.py prepare <version> "<标题>" --root .` 更新 `VERSION`、可选的 `pyproject.toml` 和 `docs/VERSIONS.md`。
 ```

@@ -10,7 +10,7 @@ This file is the current documentation set's only ordered record of changes and 
 - Type: docs
 - Status: done
 - Branch: codex/install-cx-workflow
-- Base branch: dev
+- Base branch: main
 - Feature group: 001_project_template
 - Task order: 1
 - Summary: Install the cx documentation-set BDD/TDD workflow package.

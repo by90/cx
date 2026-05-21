@@ -79,7 +79,7 @@ Use $cx-research. Define the research question, search window, inclusion/exclusi
 Release:
 
 ```text
-Use $cx-version. Feature-group work must happen on its own branch and merge to dev. Feature branches and dev may still be pushed for collaboration or CI. After the user confirms the version is complete, merge dev to main; only on main update VERSION/manifests/CHANGELOG, validate, create the annotated vX.Y.Z tag, then push main and the release tag.
+Use $cx-version. Feature-group work must happen on its own short-lived local branch and merge to main only after user confirmation. Do not push work branches; the remote keeps only main and version tags. Only on main update VERSION/manifests/CHANGELOG, validate, create the annotated vX.Y.Z tag, then push main and the release tag.
 
 Target projects must use their project-local `tools/semver.py`; if the project does not have the tool yet, copy it from `$cx-version`'s `scripts/semver.py`. During `0.x.x`, use `python tools/semver.py next feature-group --root .` to compute the next minor for a new feature group; use `python tools/semver.py next patch --root .` to compute the next patch for changes, bug fixes, or adjustments inside an existing feature group. When preparing a release, use `python tools/semver.py prepare <version> "<title>" --root .` to update `VERSION`, optional `pyproject.toml`, and `docs/VERSIONS.md`.
 ```

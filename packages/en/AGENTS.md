@@ -26,8 +26,8 @@ This repository uses the cx documentation-set BDD/TDD workflow: every project is
 7. After BDD, engineering spec, implementation plan, or changelog updates are complete, stop, report the document result and next implementation plan to the user, and wait for explicit user confirmation. Do not write tests, edit implementation, or enter TDD before confirmation.
 8. After user confirmation, start from BDD behavior, then write failing tests, then implement the smallest change, then refactor.
 9. Prefer reusable features, classes, components, and public capability entrypoints over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Reusable Capability Registry.
-10. Every feature group must use its own branch. Merge completed feature-group branches into `dev`; do not merge them directly into `main`.
-11. Only after the user confirms the version is complete may `dev` be merged into `main`; only `main` may be used for version commits, release tags, and release-tag pushes. Feature branches and `dev` may still be pushed for collaboration, backup, or CI.
+10. Every feature group must use its own short-lived local branch. Merge completed and user-confirmed feature-group branches into `main`, then delete the local branch.
+11. The remote repository must keep only `main` and version tags unless the user explicitly overrides this policy in the current conversation. Only `main` may be used for version commits, release tags, and release-tag pushes.
 12. Target-project releases must use the project-local `tools/semver.py`: during `0.x.x`, use `python tools/semver.py next feature-group --root .` to compute the next minor for a new feature group, and use `python tools/semver.py next patch --root .` to compute the next patch for changes, bug fixes, or adjustments inside an existing feature group.
 13. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
 14. When adding or editing code or tests, add beginner-friendly explanatory comments for files, classes, functions, test methods, and every line of business code. Code files must have a file-level purpose explanation naming the main classes, functions, or test targets; classes and functions must describe responsibilities; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; code intent must be explained line by line by default except for pure formatting, blank lines, or repeated structural lines.
@@ -42,7 +42,7 @@ Coding-agent prompts should specify:
 - Required workflow: cx skills to use and whether BDD, TDD, research, versioning, or evidence review is required.
 - Verification: exact commands, tests, screenshots, or checks expected.
 - Deliverables: code, docs, changelog entries, evidence, or final summary.
-- Branching: feature-group branch name, merge target `dev`, and whether a release handoff to `main` is requested.
+- Branching: local feature-group branch name, merge target `main`, and confirmation that the remote keeps only `main` and version tags.
 
 If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rule source and have `CLAUDE.md` import or reference it instead of duplicating the rules.
 
@@ -120,9 +120,9 @@ BDD scenarios, test matrices, implementation plans, and verification evidence mu
 - By default, stage all tracked and untracked files and create one commit. Do not split one task into multiple commits unless the user explicitly asks.
 - Stop and ask the user first only when obvious secrets, credentials, local environment files, build artifacts, dependency directories, or unrelated large files are present.
 - The commit message should describe the overall user-requested result, not file ownership.
-- After work is complete, merge the feature branch into `dev`, then delete the local feature branch.
-- Push the feature branch to the remote only when the user explicitly asks; do not push feature branches by default.
-- Push only `dev` by default. Merge and push `main` only when the user explicitly asks for a release handoff or a merge to `main`.
+- After work is complete and user-confirmed, merge the local work branch into `main`, then delete the local work branch.
+- Do not push work branches to the remote unless the user explicitly overrides the main-only remote policy in the current conversation.
+- Push only `main` and version tags by default.
 
 ## Recommended validation commands
 

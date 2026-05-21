@@ -86,7 +86,7 @@ def append_change(
     doc_set: str | None = None,
     today: str | None = None,
     branch: str = "TODO",
-    base_branch: str = "dev",
+    base_branch: str = "main",
 ) -> str:
     """创建 CHANGE 编号，并写入目标文档集的 changelog。"""
 
@@ -112,7 +112,7 @@ def main() -> int:
     parser.add_argument("--root", default=".")  # 读取目标仓库根目录。
     parser.add_argument("--doc-set", default=None)  # 读取目标文档集名称。
     parser.add_argument("--branch", default="TODO")  # 读取当前工作分支。
-    parser.add_argument("--base-branch", default="dev")  # 读取合并目标分支。
+    parser.add_argument("--base-branch", default="main")  # 读取合并目标分支。
     parser.add_argument("--date", default=None)  # 允许自动化传入固定日期。
     args = parser.parse_args()  # 解析所有命令行参数。
 
