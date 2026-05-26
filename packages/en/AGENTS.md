@@ -1,5 +1,87 @@
 # AGENTS.md
 
+## Decision Prompts
+
+When facing architecture tradeoffs, API design, dependency choices, implementation paths, performance and compatibility tradeoffs, release strategy, recurring defects, or project risk, start by putting the question into one of these 7 prompt frames so the agent can challenge assumptions, reason through the decision, and return concrete next actions.
+
+1. **First-Principles Thinking**
+
+   ```text
+   I need to examine an engineering problem from first principles. Do not start from convention, framework defaults, or common implementation habits. Break the situation down into the most basic verifiable facts and constraints, then rebuild possible solutions from that foundation.
+
+   At each step, inspect my assumptions. If I am treating an assumption as a fact, point it out and ask me to provide evidence or redefine it.
+
+   Problem: [describe the technical problem, design constraints, and target behavior]
+   ```
+
+2. **Inversion**
+
+   ```text
+   Help me analyze this engineering goal through inversion. Do not begin with "how do we make this succeed?" Begin with "how would this definitely fail?"
+
+   List the actions, decisions, assumptions, and conditions that would cause implementation failure, test failure, maintenance failure, or production risk. Then invert each failure factor into a specific action I should take or avoid now.
+
+   Goal: [describe the feature, fix, refactor, or release outcome]
+   ```
+
+3. **Five Whys**
+
+   ```text
+   I have a recurring engineering problem and need to find the root cause, not just treat the visible symptom. Use the Five Whys method, starting from my problem statement, and ask "why is this happening?" at least 5 levels deep.
+
+   Each level should move closer to a structural cause. Do not accept vague answers; if my explanation is unclear, keep asking until we reach a cause that can actually be fixed.
+
+   Problem: [describe the recurring defect, build failure, performance bottleneck, flaky test, or maintenance problem]
+   ```
+
+4. **Second-Order Thinking**
+
+   ```text
+   I need to make an engineering decision. Use second-order thinking to analyze the consequences. Do not stop at the immediate result. Break the analysis into:
+
+   - First-order result: what happens immediately?
+   - Second-order result: what chain reactions follow?
+   - Third-order result: what effects may remain 6 to 12 months later?
+
+   Analyze both paths: "we do this" and "we do not do this." Be direct and honest about downstream effects.
+
+   Decision: [describe the architecture, API, dependency, data model, migration, scheduling, or release decision]
+   ```
+
+5. **Regret Minimization Framework**
+
+   ```text
+   I am stuck on an important engineering choice. Use a long-term maintenance version of the regret minimization framework: assume the team is maintaining this code, interface, or architecture 6 to 12 months from now, and help me judge today's choice from that perspective.
+
+   Help me identify which option we are more likely to regret not taking, which migration, refactor, or compatibility risks may look manageable in hindsight, and which "safe" option may become persistent technical debt.
+
+   Do not only compare the options in a table. Push me to be honest about maintenance cost, testing cost, extension boundaries, and team cognitive load.
+
+   Engineering choice: [describe the technical option, architecture path, or implementation choice]
+   ```
+
+6. **Opportunity Cost Analysis**
+
+   ```text
+   Use opportunity cost analysis to help me evaluate this engineering commitment. Every time I say "yes" to a feature, refactor, dependency, tool, or release action, I am also saying "no" to other engineering work that could use the same time, energy, or risk budget.
+
+   Make the hidden tradeoffs concrete: which bug fixes, tests, performance work, documentation, or technical debt cleanup would this delay or displace? What are the highest-value alternative uses of the same resources? If I can choose only one, which option creates more long-term engineering value?
+
+   Frame this as “this option versus that option,” not as a simple yes-or-no question.
+
+   Engineering commitment: [describe the feature, refactor, dependency adoption, tooling work, or release action under consideration]
+   ```
+
+7. **Premortem Analysis**
+
+   ```text
+   I am about to start a development project, refactor, migration, or release. Run a premortem before I begin. Assume it has completely failed 6 months from now, then work backward and list the possible reasons it failed.
+
+   Give concrete engineering scenarios, not generic risks. Explain what went wrong, when it went wrong, why tests, reviews, monitoring, or release process did not catch it at the time, and one preventive action I can take now for each failure scenario.
+
+   Engineering project: [describe the feature, refactor, migration, infrastructure work, or release about to start]
+   ```
+
 ## Non-Negotiable Rules
 
 These rules override every other rule in this file, all cx skills, templates, examples, and temporary task instructions. Follow a different path only when the user explicitly overrides a specific rule in the current conversation.
