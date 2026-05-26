@@ -12,4 +12,4 @@ python tools/semver.py next patch --root .
 python tools/semver.py prepare 0.1.0 "创建项目模板" --root .
 ```
 
-`0.x.x` 阶段新增功能组只更新 minor；既有功能组内修改、bug 修复或调整只更新 patch。
+用户只要求更新版本号时默认更新 patch。`0.x.x` 阶段新增功能组只更新 minor；既有功能组内修改、bug 修复或调整只更新 patch。

@@ -61,7 +61,7 @@ Git 提交：
 Python / PyTorch / Lightning：
 
 ```text
-请使用 $cx-bdd、$cx-tdd 和 $cx-pytorch-tdd。对状态和不变量使用明确 OOP 设计，先写 unittest，使用确定性小数据，禁止默认使用 getattr/setattr 等动态反射。
+请使用 $cx-bdd、$cx-tdd 和 $cx-pytorch-tdd。Python 使用 uv 安装管理的解释器和项目 uv 工作流。对状态和不变量使用明确 OOP 设计，先写 unittest，使用确定性小数据，禁止默认使用 getattr/setattr 等动态反射。
 ```
 
 Rust：
@@ -81,7 +81,7 @@ Rust：
 ```text
 请使用 $cx-version。功能组工作必须在短生命周期本地分支完成，并且只在用户确认后合并到 main。不要 push 工作分支；远端只保留 main 和版本 tag。只有在 main 上才更新 VERSION/manifests/CHANGELOG、验证、创建带注释 vX.Y.Z tag，然后 push main 和发布 tag。
 
-目标项目必须使用项目内 `tools/semver.py`；如果项目还没有该工具，从 `$cx-version` 的 `scripts/semver.py` 复制过去。`0.x.x` 阶段新增功能组用 `python tools/semver.py next feature-group --root .` 计算下一个 minor；既有功能组内修改、bug 修复或调整用 `python tools/semver.py next patch --root .` 计算下一个 patch。准备发布时用 `python tools/semver.py prepare <version> "<标题>" --root .` 更新 `VERSION`、可选的 `pyproject.toml` 和 `docs/VERSIONS.md`。
+目标项目必须使用项目内 `tools/semver.py`；如果项目还没有该工具，从 `$cx-version` 的 `scripts/semver.py` 复制过去。用户只要求更新版本号时默认更新 patch；只有明确要求新增功能组、minor、major、稳定版或不兼容发布时才更新前面的版本号。`0.x.x` 阶段新增功能组用 `python tools/semver.py next feature-group --root .` 计算下一个 minor；既有功能组内修改、bug 修复或调整用 `python tools/semver.py next patch --root .` 计算下一个 patch。准备发布时用 `python tools/semver.py prepare <version> "<标题>" --root .` 更新 `VERSION`、可选的 `pyproject.toml` 和 `docs/VERSIONS.md`。
 ```
 
 ## Skill 对照表

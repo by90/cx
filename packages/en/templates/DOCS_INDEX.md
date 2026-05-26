@@ -25,7 +25,7 @@ docs/002_next_feature/GUIDE.md
 
 After a feature group is complete and merged into `main`, use the project-local `tools/semver.py` to append a release entry to `docs/VERSIONS.md`, for example `v0.0.1 "Create project template"`.
 
-During `0.x.x`, new feature groups bump minor only: `python tools/semver.py next feature-group --root .`. Changes, bug fixes, or adjustments inside an existing feature group bump patch only: `python tools/semver.py next patch --root .`.
+When the user only asks to bump the version, default to patch. During `0.x.x`, new feature groups bump minor only: `python tools/semver.py next feature-group --root .`. Changes, bug fixes, or adjustments inside an existing feature group bump patch only: `python tools/semver.py next patch --root .`.
 
 ## Notes
 

@@ -14,7 +14,7 @@ version: 0.1.0
 
 1. 先确认用户已经在文档更新后明确同意进入测试和实现阶段；没有确认时停止并请求确认。
 2. 阅读目标文档集 `ENGINEERING_SPEC.md` 中相关 BDD ID 和 Reusable Capability Registry 条目。
-3. 使用项目级 `uv` 虚拟环境；优先通过 `uv sync`、`uv run` 或项目已有 `uv` 工作流安装依赖和运行测试。
+3. 使用项目级 `uv` 虚拟环境；Python 解释器优先使用 `uv` 安装和管理的版本，并通过 `uv sync`、`uv run`、`uv run --python <version>` 或项目已有 `uv` 工作流安装依赖和运行测试。
 4. 创建或重建环境前，访问 Python 官网下载页和 PyTorch 官网 Start Locally 页，确认 Python、PyTorch、CUDA 选择的是当前官方稳定组合；不要默认使用 nightly、预发布或非官方轮子。
 5. API 行为可能受版本影响时，查询 PyTorch 和 Lightning 官方最新文档。
 6. 默认先写 Python `unittest` 测试；不要引入 `pytest`，除非项目已有明确例外。
@@ -53,6 +53,7 @@ version: 0.1.0
 ## 环境规则
 
 - 使用项目根目录的 `uv` 环境，例如 `.venv`、`uv.lock` 和 `pyproject.toml` 所定义的环境。
+- Python 解释器必须优先来自 `uv` 管理的安装；系统自带 `python` / `python3` 只能用于确认环境，不应代替项目 `uv` Python 运行测试、构建或工具命令。
 - 如果必须新建环境，先核对 https://www.python.org/downloads/ 与 https://pytorch.org/get-started/locally/。
 - 选择 PyTorch Stable 构建，并按官网矩阵选择 CPU 或 CUDA 轮子；CUDA 版本以 PyTorch 稳定版支持矩阵为准。
 - 用 `uv run python -m unittest ...` 运行 Python 单元测试。

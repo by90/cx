@@ -36,6 +36,7 @@ If the target project does not have the tool yet, copy this skill directory's `s
 ## Version Bump Rules
 
 - Default start: new or unproven projects start at `0.0.1` unless the user explicitly says the project has reached `1.0.0`.
+- Default bump: when the user only asks to update, bump, or prepare the version without explicitly saying minor, major, new feature group, stable release, or incompatible release, bump only the final patch segment.
 - Major `0`: the project is not formally stable; public interface and workflow-contract changes are normal.
 - Adding a feature group during `0.x.x`: bump only the minor version. For example, adding a real feature group at `0.1.3` should produce `0.2.0`. Verify with `python tools/semver.py next feature-group --root .`.
 - Changes, bug fixes, documentation adjustments, implementation fixes, or small refactors inside an existing feature group during `0.x.x`: bump only the patch version. For example, fixing `002_config` at `0.1.3` should produce `0.1.4`. Verify with `python tools/semver.py next patch --root .`.
@@ -48,7 +49,7 @@ If the target project does not have the tool yet, copy this skill directory's `s
 ## Release Checklist
 
 1. Confirm the feature group or change work happened on its own local branch.
-2. Decide the release type: use `next feature-group` for a new feature group; use `next patch` for existing feature-group changes, bug fixes, or adjustments.
+2. Decide the release type: default to `next patch` unless an earlier version segment was explicitly requested; use `next feature-group` only for a new feature group or explicit minor request; use `next patch` for existing feature-group changes, bug fixes, or adjustments.
 3. Ask the user to confirm that this version is complete and ready for release.
 4. After confirmation, merge the completed local work branch into `main` and delete the local branch.
 5. On `main`, run `python tools/semver.py check --root .`.

@@ -51,18 +51,20 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CO
 
 ## 核心工作流
 
-1. `$cx-workflow` 判断请求类型，并选择最小必要 skills。
+1. `$cx-workflow` 判断请求类型，先在对话中创建可见待办事项列表，并选择最小必要 skills。
 2. `$cx-bdd` 在需要行为发现时创建或更新编号功能文件夹和 BDD 场景；普通、非编程任务不要自行创建 BDD。
 3. 完成 `BDD.md`、`ENGINEERING_SPEC.md` 和 `CHANGELOG.md` 后必须停止，向用户汇报文档结果和下一步实现计划，等待明确确认。
-4. 用户确认后，`$cx-tdd` 将 BDD 场景映射到失败测试，执行 red/green/refactor，并记录证据。
+4. 用户确认后，继续逐项更新待办事项；`$cx-tdd` 将 BDD 场景映射到失败测试，执行 red/green/refactor，并记录证据。
 5. `$cx-pytorch-tdd`、`$cx-rust-tdd`、`$cx-common-module` 等专项 skills 补充语言和设计约束。
-6. `$cx-changelog`、`$cx-version`、`$cx-evidence` 保证交付或发布前可审计。
+6. `$cx-changelog`、`$cx-version`、`$cx-evidence` 保证交付或发布前可审计；收尾前所有待办事项都必须完成、取消或明确阻塞。
 
 ## 分支与发布门禁
 
 任何功能组都应该在短生命周期本地工作分支上开发。功能组完成并经过用户确认后，把该分支合并到 `main`，删除本地工作分支，并且只 push `main`。
 
 pre-1.0 阶段新增并完成一个功能组后，只更新 minor，例如 `0.1.3` 到 `0.2.0`。既有功能组内的修改、bug 修复或调整只更新 patch，例如 `0.1.3` 到 `0.1.4`。创建发布前必须先和用户确认该版本已经完成。
+
+用户只要求更新、递增或准备版本号时，默认只更新 patch；只有用户明确要求新增功能组、minor、major、稳定版或不兼容发布时，才更新前面的版本号。
 
 发布顺序是强制的：
 
@@ -72,6 +74,12 @@ pre-1.0 阶段新增并完成一个功能组后，只更新 minor，例如 `0.1.
 
 禁止在工作分支上创建 release commit 或 tag。
 远端仓库应该只保留 `main` 和版本 tag。不要 push 工作分支，除非用户在当前对话中明确覆盖这条 main-only 远端策略。
+
+## 运行环境与 UI 检查
+
+长时间构建、测试、安装或 UI 实机检查前，agent 应先查找并启动项目提供的当前平台防睡眠或会话保持机制，并在结束、阻塞或交接前恢复。macOS 桌面或 GUI 项目完成 UI 修改后，必须先按项目方式打包、安装或启动真实应用，再用 Computer Use 或项目指定方式完成实机观察，并把命令、结果和剩余风险记录为验证证据。
+
+Python 命令优先使用项目 `uv` 工作流或 `uv` 安装管理的解释器，例如 `uv run python ...` 或 `uv run --python <version> ...`；系统自带 Python 只用于确认环境，不作为测试、构建或工具命令的默认运行时。
 
 ## 提示词契约
 

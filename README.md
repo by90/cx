@@ -51,18 +51,20 @@ For Chinese, change `--subpath en` to `--subpath zh`.
 
 ## Core Workflow
 
-1. `$cx-workflow` classifies the request and selects the smallest necessary set of skills.
+1. `$cx-workflow` classifies the request, creates a visible todo list in the conversation, and selects the smallest necessary set of skills.
 2. `$cx-bdd` creates or updates the ordered feature folder and BDD scenarios when behavior discovery is needed; ordinary non-programming tasks do not create BDD automatically.
 3. After `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md` are complete, the agent must stop, report the document result and next implementation plan, and wait for explicit user confirmation.
-4. After confirmation, `$cx-tdd` maps BDD scenarios to failing tests, runs red/green/refactor, and records evidence.
+4. After confirmation, the agent keeps updating the todo list while `$cx-tdd` maps BDD scenarios to failing tests, runs red/green/refactor, and records evidence.
 5. Specialist skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, or `$cx-common-module` add language or design constraints.
-6. `$cx-changelog`, `$cx-version`, and `$cx-evidence` keep the work auditable before release or delivery.
+6. `$cx-changelog`, `$cx-version`, and `$cx-evidence` keep the work auditable before release or delivery; before finalizing, every todo item must be completed, canceled, or explicitly blocked.
 
 ## Branch And Release Gates
 
 Every feature group should be developed on a short-lived local work branch. When the feature group is complete and the user has confirmed the work, merge that branch into `main`, delete the local work branch, and push only `main`.
 
 When a feature group is added and completed during pre-1.0 development, bump only the minor version, such as `0.1.3` to `0.2.0`. Changes, bug fixes, or adjustments inside an existing feature group bump only the patch version, such as `0.1.3` to `0.1.4`. Confirm the completed version with the user before creating a release.
+
+When the user only asks to update, bump, or prepare the version, default to bumping patch only; bump earlier version segments only when the user explicitly asks for a new feature group, minor, major, stable, or incompatible release.
 
 Release order is strict:
 
@@ -72,6 +74,12 @@ Release order is strict:
 
 Do not create release commits or tags on work branches.
 The remote repository should keep only `main` and version tags. Do not push work branches unless the user explicitly overrides this main-only remote policy in the current conversation.
+
+## Runtime Environment And UI Checks
+
+Before long builds, tests, installation, or UI real-device checks, the agent should find and start the project-provided keep-awake or session-preservation mechanism for the current platform, then restore it before ending, blocking, or handing off. After UI changes in a macOS desktop or GUI project, the agent must package, install, or launch the real app using the project workflow, then use Computer Use or the project-required real-device check to observe the result and record commands, results, and residual risk as verification evidence.
+
+Python commands should prefer the project `uv` workflow or a Python interpreter installed and managed by `uv`, such as `uv run python ...` or `uv run --python <version> ...`; system Python is for environment inspection, not the default runtime for tests, builds, or tooling commands.
 
 ## Prompt Contract
 

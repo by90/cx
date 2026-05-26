@@ -12,4 +12,4 @@ python tools/semver.py next patch --root .
 python tools/semver.py prepare 0.1.0 "Create project template" --root .
 ```
 
-During `0.x.x`, new feature groups bump minor only; changes, bug fixes, or adjustments inside an existing feature group bump patch only.
+When the user only asks to bump the version, default to patch. During `0.x.x`, new feature groups bump minor only; changes, bug fixes, or adjustments inside an existing feature group bump patch only.

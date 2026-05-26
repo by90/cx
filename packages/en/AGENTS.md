@@ -94,6 +94,7 @@ These rules override every other rule in this file, all cx skills, templates, ex
 6. **Default parameters first**: constructors and functions should express defaults with clear type annotations and default parameters; do not build long `__init__` branches for parameter cases, and move complex default construction into dataclasses, config objects, factories, or small dedicated methods.
 7. **Minimal code and OOP access**: do not create bloated, long, hard-to-maintain code. Any reusable feature, class, or logic must first go through `$cx-common-module` search and public-entrypoint design. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default; allow them only when no static OOP API works, and then document the reason, isolate the implementation, and test it.
 8. **No automatic BDD for non-programming work**: do not create BDD automatically for ordinary non-programming tasks; if it is unclear whether behavior discovery or acceptance scenarios are needed, ask the user one minimal clarification question first.
+9. **Visible todo list**: when starting any multi-step task, create a todo list in the conversation first; update item status as work proceeds, and do not finish the turn until every item is completed, canceled, or explicitly blocked with the reason stated.
 
 ## Repository working agreement
 
@@ -110,7 +111,7 @@ This repository uses the cx documentation-set BDD/TDD workflow: every project is
 9. Prefer reusable features, classes, components, and public capability entrypoints over duplicated logic. Before adding a utility, data structure, test harness, or UI state model, search existing implementation, related skills, and the Reusable Capability Registry.
 10. Every feature group must use its own short-lived local branch. Merge completed and user-confirmed feature-group branches into `main`, then delete the local branch.
 11. The remote repository must keep only `main` and version tags unless the user explicitly overrides this policy in the current conversation. Only `main` may be used for version commits, release tags, and release-tag pushes.
-12. Target-project releases must use the project-local `tools/semver.py`: during `0.x.x`, use `python tools/semver.py next feature-group --root .` to compute the next minor for a new feature group, and use `python tools/semver.py next patch --root .` to compute the next patch for changes, bug fixes, or adjustments inside an existing feature group.
+12. Target-project releases must use the project-local `tools/semver.py`: when the user only asks to update or bump the version, default to bumping the final patch segment; bump earlier segments only when the user explicitly asks for a new feature group, minor, major, stable, or incompatible release. During `0.x.x`, use `python tools/semver.py next feature-group --root .` to compute the next minor for a new feature group, and use `python tools/semver.py next patch --root .` to compute the next patch for changes, bug fixes, or adjustments inside an existing feature group.
 13. After changes, run the narrowest meaningful tests first, then broader validation when practical. Record commands and results.
 14. When adding or editing code or tests, add beginner-friendly explanatory comments for files, classes, functions, test methods, and every line of business code. Code files must have a file-level purpose explanation naming the main classes, functions, or test targets; classes and functions must describe responsibilities; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; code intent must be explained line by line by default except for pure formatting, blank lines, or repeated structural lines.
 
@@ -145,6 +146,7 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 
 - Subsystem source code must live under `src/<subsystem>/`; for example, the config subsystem lives under `src/config/`, and CNN configuration belongs in its own file, `src/config/cnn_config.py`.
 - Use the project-level `uv` virtual environment. Install dependencies and run Python commands with `uv sync`, `uv run`, or the repository's existing `uv` workflow.
+- Python interpreters must preferably be installed and managed by `uv`; system `python` / `python3` may be used to inspect the environment, but should not replace the project `uv` Python for tests, builds, or tooling commands.
 - Before creating or rebuilding a Python / PyTorch environment, visit the official Python and PyTorch websites and choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
 - Use functions for stateless logic by default; use object-oriented design for state, lifecycle, invariants, and domain collaborations.
 - Use object-oriented design for state, lifecycle, invariants, and domain collaborations.
@@ -205,6 +207,13 @@ BDD scenarios, test matrices, implementation plans, and verification evidence mu
 - After work is complete and user-confirmed, merge the local work branch into `main`, then delete the local work branch.
 - Do not push work branches to the remote unless the user explicitly overrides the main-only remote policy in the current conversation.
 - Push only `main` and version tags by default.
+
+## Runtime Environment And UI Checks
+
+- Before long-running execution, builds, tests, installation, or UI real-device checks, read the project `AGENTS.md`, README, or scripts directory for the current platform's anti-sleep, anti-lock, or keep-awake mechanism; prefer the project-provided script when one exists.
+- The keep-awake mechanism must be temporary and reversible, and it must be stopped before ending, blocking, or handing off the turn; do not permanently change the user's power, lock-screen, or display settings.
+- After UI-related changes in a macOS desktop or GUI project, package, install, or launch the real app using the project workflow, then use Computer Use or the project's required real-device check to run and observe the result; do not declare UI work complete using only unit tests, static checks, or imagined screenshots.
+- Record UI real-device checks, install or packaging commands, observations, and residual risk in the target documentation set's verification evidence; when there is no target documentation set, report them in the final summary.
 
 ## Recommended validation commands
 

@@ -14,7 +14,7 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 
 1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
 2. Read the related BDD IDs and Reusable Capability Registry entries in the target documentation set's `ENGINEERING_SPEC.md`.
-3. Use the project-level `uv` virtual environment. Prefer `uv sync`, `uv run`, or the repository's existing `uv` workflow for dependency installation and test execution.
+3. Use the project-level `uv` virtual environment. Prefer Python interpreters installed and managed by `uv`, and use `uv sync`, `uv run`, `uv run --python <version>`, or the repository's existing `uv` workflow for dependency installation and test execution.
 4. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
 5. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
 6. Write Python `unittest` tests first. Do not introduce `pytest` unless the repository has an explicit exception.
@@ -53,6 +53,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 ## Environment rules
 
 - Use the project-root `uv` environment, such as the environment defined by `.venv`, `uv.lock`, and `pyproject.toml`.
+- Python interpreters must preferably come from `uv` management; system `python` / `python3` may be used to inspect the environment, but should not replace the project `uv` Python for tests, builds, or tooling commands.
 - If a new environment is required, check https://www.python.org/downloads/ and https://pytorch.org/get-started/locally/ first.
 - Choose the PyTorch Stable build and select CPU or CUDA wheels from the official matrix. Treat the CUDA version supported by the PyTorch stable installer as authoritative.
 - Run Python unit tests with `uv run python -m unittest ...`.

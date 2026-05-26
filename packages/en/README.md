@@ -61,7 +61,7 @@ When committing, follow AGENTS.md: treat the current working tree as one change 
 Python / PyTorch / Lightning:
 
 ```text
-Use $cx-bdd, $cx-tdd, and $cx-pytorch-tdd. Use explicit OOP design for state and invariants, unittest-first tests, deterministic tiny data, and avoid dynamic reflection such as getattr/setattr unless no static API works.
+Use $cx-bdd, $cx-tdd, and $cx-pytorch-tdd. Use a uv-installed and uv-managed Python interpreter through the project uv workflow. Use explicit OOP design for state and invariants, unittest-first tests, deterministic tiny data, and avoid dynamic reflection such as getattr/setattr unless no static API works.
 ```
 
 Rust:
@@ -81,7 +81,7 @@ Release:
 ```text
 Use $cx-version. Feature-group work must happen on its own short-lived local branch and merge to main only after user confirmation. Do not push work branches; the remote keeps only main and version tags. Only on main update VERSION/manifests/CHANGELOG, validate, create the annotated vX.Y.Z tag, then push main and the release tag.
 
-Target projects must use their project-local `tools/semver.py`; if the project does not have the tool yet, copy it from `$cx-version`'s `scripts/semver.py`. During `0.x.x`, use `python tools/semver.py next feature-group --root .` to compute the next minor for a new feature group; use `python tools/semver.py next patch --root .` to compute the next patch for changes, bug fixes, or adjustments inside an existing feature group. When preparing a release, use `python tools/semver.py prepare <version> "<title>" --root .` to update `VERSION`, optional `pyproject.toml`, and `docs/VERSIONS.md`.
+Target projects must use their project-local `tools/semver.py`; if the project does not have the tool yet, copy it from `$cx-version`'s `scripts/semver.py`. When the user only asks to bump the version, default to patch; bump earlier segments only for an explicit new feature group, minor, major, stable, or incompatible release. During `0.x.x`, use `python tools/semver.py next feature-group --root .` to compute the next minor for a new feature group; use `python tools/semver.py next patch --root .` to compute the next patch for changes, bug fixes, or adjustments inside an existing feature group. When preparing a release, use `python tools/semver.py prepare <version> "<title>" --root .` to update `VERSION`, optional `pyproject.toml`, and `docs/VERSIONS.md`.
 ```
 
 ## Skill Map
