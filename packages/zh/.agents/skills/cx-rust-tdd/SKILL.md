@@ -1,6 +1,6 @@
 ---
 name: cx-rust-tdd
-description: 用于 Rust 代码实现和 TDD，包括 ownership-aware design、struct/enum/trait、Result 错误、cargo test、rustfmt、clippy 和高质量非 UI Rust 代码。
+description: 用于 Rust 代码实现和 TDD，包括 ownership-aware design、struct/enum/trait、Result 错误、cargo test、rustfmt、clippy、GPUI/macOS 实机检查和高质量 Rust 代码。
 version: 0.1.0
 ---
 
@@ -8,7 +8,7 @@ version: 0.1.0
 
 ## 目的
 
-在 `$cx-bdd` 已经定义行为后，用本 skill 处理 Rust 实现。它是通用 Rust 代码质量和 TDD skill，不是 UI 组件 skill。
+在 `$cx-bdd` 已经定义行为后，用本 skill 处理 Rust 实现。它是通用 Rust 代码质量和 TDD skill；涉及 GPUI/macOS 桌面 UI 时，只补充实机验证纪律，不替代专门 UI 组件设计。
 
 ## 必须执行的流程
 
@@ -62,6 +62,42 @@ version: 0.1.0
 - 测试必须确定、快速。
 - 优先真实小 fixture，只有外部边界才使用 test double。
 
+## GPUI/macOS 实机检查
+
+- 修改 Rust/GPUI 桌面 UI 后，除单元测试、`cargo fmt` 和 `cargo clippy` 外，还必须按项目方式打包、安装或启动真实应用，并用截图或 Computer Use 观察结果。
+- macOS 辅助功能授权要覆盖发起自动化的宿主和被测应用；常见需要启用 `Codex`、`Codex Computer Use`、被测 `.app`，以及实际发起脚本的终端或运行宿主。修改权限后优先重启自动化宿主和被测应用。
+- GPUI 内部按钮通常不会完整暴露为 Accessibility 树中的 `AXButton`；`System Events` 可优先用于菜单栏、窗口按钮和页面菜单动作，不要假设它能定位每个内容区按钮。
+- 点击 GPUI 内容区时先截图到项目 `temp/`，确认窗口逻辑坐标、显示器 bounds 和 Retina 缩放；截图像素坐标不能直接当成 `CGEvent` 逻辑点。
+- `osascript click at {x, y}` 对 GPUI 内容区不稳定时，改用 CoreGraphics HID 事件：先 `CGWarpMouseCursorPosition(point)`，再投递 `mouseMoved`、`leftMouseDown`、`leftMouseUp` 到 `.cghidEventTap`。
+- `postToPid(pid)` 只能作为“事件能到达进程”的辅助探针；最终是否点中，以全局 HID 点击后的截图变化和 UI 行为为准。
+- 所有坐标都只是当前窗口、屏幕和缩放状态下的临时值；窗口大小、系统缩放、多显示器位置、通知横幅或侧边栏状态变化后必须重新截图校准。
+- 临时截图、坐标标定图、安装包和 UI 验证产物必须放入项目 `temp/` 或项目约定临时目录，并确保不会进入源码库。
+
+HID 点击最小模板如下，使用前把 `point` 替换成当前截图校准后的全局逻辑点：
+
+```bash
+swift - <<'SWIFT'
+import CoreGraphics
+import Foundation
+
+let point = CGPoint(x: 247, y: 134)
+CGWarpMouseCursorPosition(point)
+Thread.sleep(forTimeInterval: 0.12)
+
+let source = CGEventSource(stateID: .combinedSessionState)
+for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+    let event = CGEvent(
+        mouseEventSource: source,
+        mouseType: type,
+        mouseCursorPosition: point,
+        mouseButton: .left
+    )
+    event?.post(tap: .cghidEventTap)
+    Thread.sleep(forTimeInterval: 0.08)
+}
+SWIFT
+```
+
 ## 输出
 
 - BDD ID 到 Rust 测试的映射。
@@ -69,3 +105,4 @@ version: 0.1.0
 - 最小 Rust 实现。
 - `cargo test` 结果。
 - 格式化和 clippy 结果，或未运行原因。
+- 涉及 GPUI/macOS UI 时，真实应用启动方式、辅助功能授权状态、点击方式、截图路径和观察结论。

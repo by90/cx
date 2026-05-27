@@ -177,6 +177,38 @@ coding-agent 提示词应说明：
 - 新增可复用 UI state、组件 API 或 reducer 前，先搜索 Reusable Capability Registry 和已有实现。
 - 尽可能使用无状态 gpui-component 元素，由 view 持有状态。
 - UI 组件 API 保持小而可复用。
+- 修改 Rust/GPUI 桌面 UI 后，必须打包、安装或启动真实应用进行实机观察；不能只依赖单元测试、静态检查或想象中的截图宣布 UI 完成。
+- macOS 辅助功能授权必须覆盖发起自动化的宿主和被测应用；通常需要启用 `Codex`、`Codex Computer Use`、被测 `.app`，以及实际运行点击脚本的终端或运行宿主。权限变更后优先重启自动化宿主和被测应用。
+- GPUI 内容区控件通常不会完整暴露为 macOS Accessibility 树中的按钮；`System Events` 优先用于菜单栏、窗口按钮和页面菜单动作，不要假设它能定位每个 GPUI 内部按钮。
+- 点击 GPUI 内容区前先把截图保存到项目 `temp/`，确认显示器 bounds、窗口位置、窗口尺寸和 Retina 缩放；截图像素坐标不能直接当成 `CGEvent` 全局逻辑点。
+- `osascript click at {x, y}` 对 GPUI 内容区不稳定时，使用 CoreGraphics HID 点击：先移动鼠标到校准点，再向 `.cghidEventTap` 投递 `mouseMoved`、`leftMouseDown`、`leftMouseUp`；`postToPid(pid)` 只能作为事件到达进程的辅助探针，最终以全局 HID 点击后的截图变化为准。
+- 所有坐标都是当前窗口、屏幕和缩放状态下的临时值；窗口大小、多显示器排列、系统缩放、通知横幅或侧边栏状态变化后必须重新截图校准。
+- 临时截图、坐标标定图、安装包和 UI 验证产物必须放入项目 `temp/` 或项目约定临时目录，并确保不会进入源码库。
+
+GPUI/macOS 内容区点击模板：
+
+```bash
+swift - <<'SWIFT'
+import CoreGraphics
+import Foundation
+
+let point = CGPoint(x: 247, y: 134)
+CGWarpMouseCursorPosition(point)
+Thread.sleep(forTimeInterval: 0.12)
+
+let source = CGEventSource(stateID: .combinedSessionState)
+for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+    let event = CGEvent(
+        mouseEventSource: source,
+        mouseType: type,
+        mouseCursorPosition: point,
+        mouseButton: .left
+    )
+    event?.post(tap: .cghidEventTap)
+    Thread.sleep(forTimeInterval: 0.08)
+}
+SWIFT
+```
 
 ## 文档策略
 

@@ -4,7 +4,7 @@ cx 是用于规范人类与 AI 协作研发的 Codex skill 包。它的核心目
 
 cx 不是组件库。Progress UI 组件、ragged tensor 工具、Rust UI 组件这类实现域，应该在各自项目或组件目录中维护 README、API 文档和测试，不应该作为 cx 核心 skills 发布。
 
-当前包版本：`0.1.0`。cx 仍处于实验阶段，尚未经过验证成为稳定的 1.0 工作流。
+当前包版本：`0.1.2`。cx 仍处于实验阶段，尚未经过验证成为稳定的 1.0 工作流。
 
 英文说明见 [README.md](README.md)。
 

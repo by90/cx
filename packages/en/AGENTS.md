@@ -177,6 +177,38 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 - Before adding reusable UI state, component APIs, or reducers, search the Reusable Capability Registry and existing implementations.
 - Prefer stateless gpui-component elements where possible; let views own state.
 - Keep UI component APIs small and reusable.
+- After Rust/GPUI desktop UI changes, package, install, or launch the real app and observe it on the machine; do not declare UI work complete from unit tests, static checks, or imagined screenshots alone.
+- macOS Accessibility authorization must cover both the automation host and the tested app; common entries include `Codex`, `Codex Computer Use`, the tested `.app`, and the terminal or runtime host that launches click scripts. After changing permissions, restart the automation host and tested app first.
+- GPUI content controls are often not fully exposed as buttons in the macOS Accessibility tree; use `System Events` first for menu bar items, window controls, and page-menu actions, but do not assume it can locate every GPUI internal button.
+- Before clicking GPUI content, save a screenshot under project `temp/`, then confirm display bounds, window position, window size, and Retina scaling; screenshot pixel coordinates are not direct `CGEvent` global logical points.
+- When `osascript click at {x, y}` is unreliable for GPUI content, use CoreGraphics HID clicks: move the mouse to the calibrated point, then post `mouseMoved`, `leftMouseDown`, and `leftMouseUp` to `.cghidEventTap`; `postToPid(pid)` is only a supporting probe that events can reach the process, and the final judgment must come from screenshot changes after the global HID click.
+- Treat all coordinates as temporary values for the current window, screen, and scale state; recalibrate after window-size changes, multi-display layout changes, system-scale changes, notification banners, or sidebar state changes.
+- Temporary screenshots, coordinate calibration images, installers, and UI verification artifacts must live in project `temp/` or the project-defined temporary directory and must not enter source control.
+
+GPUI/macOS content-area click template:
+
+```bash
+swift - <<'SWIFT'
+import CoreGraphics
+import Foundation
+
+let point = CGPoint(x: 247, y: 134)
+CGWarpMouseCursorPosition(point)
+Thread.sleep(forTimeInterval: 0.12)
+
+let source = CGEventSource(stateID: .combinedSessionState)
+for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+    let event = CGEvent(
+        mouseEventSource: source,
+        mouseType: type,
+        mouseCursorPosition: point,
+        mouseButton: .left
+    )
+    event?.post(tap: .cghidEventTap)
+    Thread.sleep(forTimeInterval: 0.08)
+}
+SWIFT
+```
 
 ## Documentation policy
 

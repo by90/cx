@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-05-27
+
+### Changed
+
+- Added GPUI/macOS real-device verification guidance to `$cx-rust-tdd`, including Accessibility permission checks, screenshot-based coordinate calibration, and CoreGraphics HID click fallback for GPUI content controls.
+- Added the same GPUI/macOS click and temporary-artifact rules to the English and Chinese AGENTS templates so coding agents know how to test real desktop UI interactions.
+
 ## [0.1.1] - 2026-05-26
 
 ### Changed

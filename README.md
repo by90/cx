@@ -4,7 +4,7 @@ cx is a Codex skill package for disciplined human-AI software development. Its c
 
 cx is not a component library. Implementation domains such as progress UI widgets, ragged tensor utilities, or Rust UI components should live in their own project/component directories with their own README, API docs, and tests. They are not core cx skills.
 
-Current package version: `0.1.0`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
+Current package version: `0.1.2`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
 
 For Chinese documentation, see [README.zh-CN.md](README.zh-CN.md).
 

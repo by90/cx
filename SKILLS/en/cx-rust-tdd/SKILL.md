@@ -1,6 +1,6 @@
 ---
 name: cx-rust-tdd
-description: Use for Rust code implementation and TDD, including ownership-aware design, structs/enums/traits, Result-based errors, cargo test, rustfmt, clippy, and high-quality non-UI Rust code.
+description: Use for Rust code implementation and TDD, including ownership-aware design, structs/enums/traits, Result-based errors, cargo test, rustfmt, clippy, GPUI/macOS real-device checks, and high-quality Rust code.
 version: 0.1.0
 ---
 
@@ -8,7 +8,7 @@ version: 0.1.0
 
 ## Purpose
 
-Use this skill for Rust implementation work after behavior is defined by `$cx-bdd`. It is a general Rust code-quality and TDD skill, not a UI component skill.
+Use this skill for Rust implementation work after behavior is defined by `$cx-bdd`. It is a general Rust code-quality and TDD skill; for GPUI/macOS desktop UI work, it adds real-device verification discipline without replacing a dedicated UI component design process.
 
 ## Required Workflow
 
@@ -62,6 +62,42 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Keep tests deterministic and fast.
 - Prefer real small fixtures over mocks. Use test doubles only at external boundaries.
 
+## GPUI/macOS Real-Device Checks
+
+- After Rust/GPUI desktop UI changes, run unit tests, `cargo fmt`, and `cargo clippy` as usual, then package, install, or launch the real app with the project workflow and observe the result with screenshots or Computer Use.
+- macOS Accessibility authorization must cover both the automation host and the tested app; common entries include `Codex`, `Codex Computer Use`, the tested `.app`, and the terminal or runtime host that launches click scripts. After changing permissions, restart the automation host and tested app first.
+- GPUI content buttons are often not fully exposed as `AXButton` nodes in the Accessibility tree; use `System Events` first for menu bar items, window controls, and page-menu actions, but do not assume it can locate every GPUI content-area button.
+- Before clicking GPUI content, save a screenshot under the project `temp/` directory, then confirm window logical coordinates, display bounds, and Retina scaling; screenshot pixel coordinates are not direct `CGEvent` logical points.
+- When `osascript click at {x, y}` is unreliable for GPUI content, use CoreGraphics HID events instead: call `CGWarpMouseCursorPosition(point)`, then post `mouseMoved`, `leftMouseDown`, and `leftMouseUp` events to `.cghidEventTap`.
+- `postToPid(pid)` is only a supporting probe that events can reach the process; the final judgment must come from screenshot changes and UI behavior after a global HID click.
+- Treat all coordinates as temporary values for the current window, screen, and scale state; recalibrate after window-size changes, system-scale changes, multi-display layout changes, notification banners, or sidebar state changes.
+- Temporary screenshots, coordinate calibration images, installers, and UI verification artifacts must live in project `temp/` or the project-defined temporary directory and must not enter source control.
+
+Use this minimal HID click template only after replacing `point` with the current global logical point calibrated from screenshots:
+
+```bash
+swift - <<'SWIFT'
+import CoreGraphics
+import Foundation
+
+let point = CGPoint(x: 247, y: 134)
+CGWarpMouseCursorPosition(point)
+Thread.sleep(forTimeInterval: 0.12)
+
+let source = CGEventSource(stateID: .combinedSessionState)
+for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+    let event = CGEvent(
+        mouseEventSource: source,
+        mouseType: type,
+        mouseCursorPosition: point,
+        mouseButton: .left
+    )
+    event?.post(tap: .cghidEventTap)
+    Thread.sleep(forTimeInterval: 0.08)
+}
+SWIFT
+```
+
 ## Output
 
 - BDD ID to Rust test mapping.
@@ -69,3 +105,4 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Minimal Rust implementation.
 - `cargo test` result.
 - Formatting and clippy result or a recorded reason they were not run.
+- For GPUI/macOS UI work, real app launch method, Accessibility permission status, click method, screenshot path, and observation conclusion.
