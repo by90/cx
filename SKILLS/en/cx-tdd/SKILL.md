@@ -60,6 +60,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Subsystem code must not be flattened into the project root or mixed into unrelated directories. For the config subsystem, the source directory is `src/config/`, and CNN configuration must live in its own file, `src/config/cnn_config.py`.
 - Unit tests must live under `tests/`, mirror the `src` structure, and map one-to-one with source files by appending `_test.py`; do not use one broad test file for multiple source files, and do not split one source file across multiple arbitrarily named test files.
 - Constructors and functions should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`; move complex default construction into dataclasses, config objects, factories, or small dedicated methods.
+- Python scripts must not change behavior through command-line arguments. Do not add `argparse`, `click`, `typer`, `sys.argv`, or custom command-line parsers. When script behavior must be adjustable, define config-subsystem items with defaults, and use those defaults unless configuration is manually changed.
 - Code must stay minimal, small, and direct. Do not create bloated, long, hard-to-maintain code. Any potentially reusable feature, class, or logic must first invoke `$cx-common-module` to search existing implementation and design the public entrypoint.
 - Before final output, review the diff against the prompt contract: goal met, constraints honored, verification run, and residual risks stated.
 

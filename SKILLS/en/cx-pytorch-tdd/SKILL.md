@@ -17,12 +17,13 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 3. Use the project-level `uv` virtual environment. Prefer Python interpreters installed and managed by `uv`, and use `uv sync`, `uv run`, `uv run --python <version>`, or the repository's existing `uv` workflow for dependency installation and test execution.
 4. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
 5. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
-6. Write Python `unittest` tests first. Do not introduce `pytest` unless the repository has an explicit exception.
-7. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
-8. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
-9. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable features, classes, or components.
-10. Follow the source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`, tests mirror them under `tests/<subsystem>/`, and each source file maps to one `*_test.py`. Source files and unit tests must include file-level purpose notes, class notes, function parameter/return explanations, and line-by-line intent comments.
-11. After editing Python source or tests, run Black default-format checks, for example `python -m black --check src tests tools`, and avoid changing unrelated user code.
+6. Training, data-preparation, diagnostic, and migration scripts must not accept command-line arguments. When batch, device, path, seed, epoch, model variant, or diagnostic switches must be adjustable, define config-subsystem items with defaults, and let default runs use those defaults.
+7. Write Python `unittest` tests first. Do not introduce `pytest` unless the repository has an explicit exception.
+8. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
+9. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
+10. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable features, classes, or components.
+11. Follow the source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`, tests mirror them under `tests/<subsystem>/`, and each source file maps to one `*_test.py`. Source files and unit tests must include file-level purpose notes, class notes, function parameter/return explanations, and line-by-line intent comments.
+12. After editing Python source or tests, run Black default-format checks, for example `python -m black --check src tests tools`, and avoid changing unrelated user code.
 
 ## Minimal Implementation Discipline
 
@@ -46,6 +47,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Do not use `getattr`, `setattr`, `delattr`, monkey-patching, or dynamic method injection by default.
 - If reflection is unavoidable, first document why explicit methods, mappings, protocols, or dispatch tables do not work; isolate the reflection behind a tiny adapter and test it directly.
 - Do not build stringly typed training pipelines. Use typed config objects and explicit factories.
+- Do not add `argparse`, `click`, `typer`, `sys.argv`, or custom command-line parsing to scripts. Any adjustable behavior belongs in config-subsystem items, and each item must have a default value.
 - Keep tensor transformations small and pure where possible, but avoid dumping unrelated logic into utility files.
 - Keep Lightning orchestration thin; put domain logic in tested objects or pure functions.
 - Avoid broad mocks, global mutable state, catch-all exception handling, and hidden filesystem side effects.

@@ -17,12 +17,13 @@ version: 0.1.0
 3. 使用项目级 `uv` 虚拟环境；Python 解释器优先使用 `uv` 安装和管理的版本，并通过 `uv sync`、`uv run`、`uv run --python <version>` 或项目已有 `uv` 工作流安装依赖和运行测试。
 4. 创建或重建环境前，访问 Python 官网下载页和 PyTorch 官网 Start Locally 页，确认 Python、PyTorch、CUDA 选择的是当前官方稳定组合；不要默认使用 nightly、预发布或非官方轮子。
 5. API 行为可能受版本影响时，查询 PyTorch 和 Lightning 官方最新文档。
-6. 默认先写 Python `unittest` 测试；不要引入 `pytest`，除非项目已有明确例外。
-7. 测试必须确定性、小规模、CPU 优先，除非目标行为就是 GPU 行为。
-8. tensor 变换优先写成纯函数，Lightning orchestration 尽量保持很薄。
-9. 新增 dataset、tensor 容器、indexed series 或 test harness 前，先叠加 `$cx-common-module` 搜索已有可复用功能、类或组件。
-10. 遵循 `$cx-tdd` 的源码/测试布局和注释规则：源文件放在 `src/<subsystem>/`，测试镜像到 `tests/<subsystem>/`，源文件与 `*_test.py` 一一对应；源码和单元测试都必须有文件级作用说明、类说明、函数参数/返回说明和逐行意图注释。
-11. 修改 Python 源码或测试后必须运行 Black 默认规范检查，例如 `python -m black --check src tests tools`；不修改无关用户代码。
+6. 训练、数据准备、诊断和迁移脚本不得接收命令行参数；需要调整 batch、device、路径、seed、epoch、model variant 或诊断开关时，必须在 config 子系统定义带默认值的配置项，默认运行使用这些默认值。
+7. 默认先写 Python `unittest` 测试；不要引入 `pytest`，除非项目已有明确例外。
+8. 测试必须确定性、小规模、CPU 优先，除非目标行为就是 GPU 行为。
+9. tensor 变换优先写成纯函数，Lightning orchestration 尽量保持很薄。
+10. 新增 dataset、tensor 容器、indexed series 或 test harness 前，先叠加 `$cx-common-module` 搜索已有可复用功能、类或组件。
+11. 遵循 `$cx-tdd` 的源码/测试布局和注释规则：源文件放在 `src/<subsystem>/`，测试镜像到 `tests/<subsystem>/`，源文件与 `*_test.py` 一一对应；源码和单元测试都必须有文件级作用说明、类说明、函数参数/返回说明和逐行意图注释。
+12. 修改 Python 源码或测试后必须运行 Black 默认规范检查，例如 `python -m black --check src tests tools`；不修改无关用户代码。
 
 ## 最小实现纪律
 
@@ -46,6 +47,7 @@ version: 0.1.0
 - 默认禁止 `getattr`、`setattr`、`delattr`、monkey patch 或动态注入方法。
 - 如果反射不可避免，必须先记录为什么显式方法、mapping、protocol 或 dispatch table 不适用；把反射隔离在极小 adapter 中，并直接测试它。
 - 不要构造字符串驱动的训练流水线。使用带类型的配置对象和显式 factory。
+- 不要为脚本新增 `argparse`、`click`、`typer`、`sys.argv` 或自定义命令行解析；任何可调整行为都通过 config 子系统配置项表达，且每项都有默认值。
 - tensor 变换尽量小而纯，但不要把无关逻辑乱塞进 utility 文件。
 - Lightning orchestration 必须保持薄；领域逻辑放入经过测试的对象或纯函数。
 - 避免过度 mock、全局可变状态、兜底式异常吞噬和隐藏文件系统副作用。

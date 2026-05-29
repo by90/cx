@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Added a Python development iron rule requiring target-project scripts to avoid command-line arguments and route adjustable behavior through config-subsystem items with defaults.
+
 ## [0.1.2] - 2026-05-27
 
 ### Changed
