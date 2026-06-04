@@ -24,6 +24,14 @@ The BDD document heading and `Feature:` name must match the folder name. Do not 
 
 Local Codex skills must be installed or updated only from the repository's default `main` branch; do not pass `--ref` in the install command.
 
+Prefer the installer script from the repository root. It updates skills from remote `main` and automatically overwrites the global `AGENTS.md`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\install_cx_en.ps1
+```
+
+`shskills install` currently installs skills only; it does not overwrite `$env:USERPROFILE\.codex\AGENTS.md` or `$env:CODEX_HOME\AGENTS.md`. If you run the raw command, sync this package's `AGENTS.md` separately.
+
 ```powershell
 uv tool install shskills
 shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath en --force --clean
@@ -95,6 +103,8 @@ Target projects must use their project-local `tools/semver.py`; if the project d
 | `$cx-version` | Project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, release tags |
 | `$cx-research` | Model choice, model mechanisms, recent papers, sourced synthesis |
 | `$cx-pytorch-tdd` | Python/PyTorch/Lightning implementation and tests |
+| `$cx-pytorch-hpo` | Broad PyTorch automatic tuning, Optuna experiment design, and feature/label/model recipe search |
+| `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling, field semantics, covariates, leakage checks, and PyTorch Forecasting selection |
 | `$cx-rust-tdd` | Rust implementation, ownership-aware design, cargo test/fmt/clippy |
 | `$cx-common-module` | Generic capabilities, reusable features/classes, and API design |
 | `$cx-evidence` | Final evidence review |

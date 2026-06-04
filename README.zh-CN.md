@@ -35,6 +35,14 @@ uv tool install shskills
 
 本地 Codex skills 只能从仓库默认的 `main` 分支安装或更新。不要传 `--ref`，也不要从工作分支更新本机 skills。
 
+推荐在已 clone 本仓库的机器上使用安装脚本；它会从远端 `main` 更新 skills，并自动覆盖全局 `AGENTS.md`：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\install_cx_zh.ps1
+```
+
+`shskills install` 当前只负责安装 skills，不会自动覆盖 `$env:USERPROFILE\.codex\AGENTS.md` 或 `$env:CODEX_HOME\AGENTS.md`。如果只使用原始 `shskills` 命令，需要另行同步对应语言包的 `AGENTS.md`。
+
 安装中文 cx skills 到全局 Codex skills 目录：
 
 ```powershell
@@ -139,6 +147,8 @@ Feature: 001_configuration_system
 | `$cx-version` | 使用目标项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md`、带注释 `vX.Y.Z` Git tag 和 GitHub Release 管理发布版本。 |
 | `$cx-research` | 模型选择、模型原理研究、近期 AI 论文扫描、学术/博客综合分析和带引用建议。 |
 | `$cx-pytorch-tdd` | Python、PyTorch、Lightning、tensor 工具、ML 测试、确定性小测试数据，以及严格 Python OOP/TDD 质量规则。 |
+| `$cx-pytorch-hpo` | PyTorch 广义自动调参和实验设计：超参数、特征/标签 recipe、模型结构、模型选择、Optuna/Ray Tune/BoTorch 取舍和证据记录。 |
+| `$cx-timeseries-modeling` | 异构多变量时间序列建模：字段语义分层、协变量、泄漏检查、backtesting、PyTorch Forecasting 主参考和深度模型选择。 |
 | `$cx-rust-tdd` | Rust 实现和 TDD：struct/enum/trait、ownership、`Result` 错误、`cargo test`、`rustfmt`、`clippy` 和非 UI Rust 代码质量。 |
 | `$cx-common-module` | 通用功能、可复用功能、可复用类、稳定 API、迁移计划和重复逻辑控制。 |
 | `$cx-evidence` | 交付前审查 BDD/TDD 合规、测试输出、changelog/spec 一致性和缺失证据。 |

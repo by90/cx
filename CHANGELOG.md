@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Added a Python development iron rule requiring target-project scripts to avoid command-line arguments and route adjustable behavior through config-subsystem items with defaults.
+- Added PowerShell cx installers that update skills from remote `main` and overwrite the global Codex `AGENTS.md` with the matching language package template.
+- Added `$cx-pytorch-hpo` for broad PyTorch experiment tuning with Optuna as the default primary tool and Ray Tune/BoTorch as scoped alternatives.
+- Added `$cx-timeseries-modeling` for heterogeneous multivariate time-series design with PyTorch Forecasting as the primary reference framework.
+- Added a development-stage no-legacy-compatibility iron rule to AGENTS, `$cx-pytorch-tdd`, and `$cx-rust-tdd`.
 
 ## [0.1.2] - 2026-05-27
 

@@ -90,6 +90,8 @@ Ask a clarifying question only when a missing field would likely cause wrong beh
 - Release version decisions, SemVer bumps, tags, or release notes: use `$cx-version`.
 - Model selection, model mechanism research, recent AI papers, academic/blog synthesis, or research reports: use `$cx-research`.
 - Python, PyTorch, Lightning, tensor, or ML tests: add `$cx-pytorch-tdd`.
+- PyTorch automatic tuning, feature/label/model recipe search, or HPO evidence: add `$cx-pytorch-hpo`.
+- Heterogeneous multivariate time series, forecast horizons, covariates, backtesting, or time-series framework choice: add `$cx-timeseries-modeling`.
 - Rust implementation or Rust tests: add `$cx-rust-tdd`.
 - Generic capability, reusable feature, reusable class, shared tool, stable API, reusable component, or duplicated logic migration: add `$cx-common-module`.
 - Final delivery checks, test evidence, or documentation consistency: use `$cx-evidence`.

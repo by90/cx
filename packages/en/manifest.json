@@ -33,6 +33,14 @@
       "path": ".agents/skills/cx-pytorch-tdd/SKILL.md"
     },
     {
+      "name": "cx-pytorch-hpo",
+      "path": ".agents/skills/cx-pytorch-hpo/SKILL.md"
+    },
+    {
+      "name": "cx-timeseries-modeling",
+      "path": ".agents/skills/cx-timeseries-modeling/SKILL.md"
+    },
+    {
       "name": "cx-rust-tdd",
       "path": ".agents/skills/cx-rust-tdd/SKILL.md"
     },

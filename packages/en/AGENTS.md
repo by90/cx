@@ -94,8 +94,9 @@ These rules override every other rule in this file, all cx skills, templates, ex
 6. **Default parameters first**: constructors and functions should express defaults with clear type annotations and default parameters; do not build long `__init__` branches for parameter cases, and move complex default construction into dataclasses, config objects, factories, or small dedicated methods.
 7. **Minimal code and OOP access**: do not create bloated, long, hard-to-maintain code. Any reusable feature, class, or logic must first go through `$cx-common-module` search and public-entrypoint design. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default; allow them only when no static OOP API works, and then document the reason, isolate the implementation, and test it.
 8. **Python scripts accept no command-line arguments**: added or edited target-project Python business scripts, training scripts, diagnostic scripts, migration scripts, and one-off scripts must not change behavior through command-line arguments. When behavior must be adjustable, define the corresponding config item in the config subsystem, and give every config item a clear default. Unless the user manually changes configuration, scripts must run with defaults.
-9. **No automatic BDD for non-programming work**: do not create BDD automatically for ordinary non-programming tasks; if it is unclear whether behavior discovery or acceptance scenarios are needed, ask the user one minimal clarification question first.
-10. **Visible todo list**: when starting any multi-step task, create a todo list in the conversation first; update item status as work proceeds, and do not finish the turn until every item is completed, canceled, or explicitly blocked with the reason stated.
+9. **No legacy compatibility during development**: during project development, never keep compatibility interfaces, old entrypoints, aliases, adapter layers, bridge functions, or new/old coexistence branches for old code. Do not optimize for old/new code compatibility. After a change, remove all unused code, old paths, obsolete tests, and stale documents.
+10. **No automatic BDD for non-programming work**: do not create BDD automatically for ordinary non-programming tasks; if it is unclear whether behavior discovery or acceptance scenarios are needed, ask the user one minimal clarification question first.
+11. **Visible todo list**: when starting any multi-step task, create a todo list in the conversation first; update item status as work proceeds, and do not finish the turn until every item is completed, canceled, or explicitly blocked with the reason stated.
 
 ## Repository working agreement
 
@@ -139,6 +140,8 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 - `$cx-version`: target-project release versioning with project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and annotated tags.
 - `$cx-research`: model selection, AI paper research, source screening, and cited synthesis.
 - `$cx-pytorch-tdd`: Python, PyTorch, Lightning, tensors, training, and ML tests.
+- `$cx-pytorch-hpo`: broad PyTorch automatic tuning, experiment design, feature/label/model recipes, and Optuna-backed evidence.
+- `$cx-timeseries-modeling`: heterogeneous multivariate time-series modeling, field-role classification, covariates, leakage checks, and PyTorch Forecasting selection.
 - `$cx-rust-tdd`: Rust implementation, ownership-aware design, and cargo test/fmt/clippy.
 - `$cx-common-module`: generic capabilities, reusable features, reusable classes, reusable-capability extraction, and common API design.
 - `$cx-evidence`: final review before merge or delivery.

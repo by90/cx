@@ -35,6 +35,14 @@ uv tool install shskills
 
 Local Codex skills must be installed or updated only from the repository's default `main` branch. Do not pass `--ref`, and do not update local skills from work branches.
 
+On machines with this repository cloned, prefer the installer script. It updates skills from remote `main` and automatically overwrites the global `AGENTS.md`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\install_cx_en.ps1
+```
+
+`shskills install` currently installs skills only; it does not overwrite `$env:USERPROFILE\.codex\AGENTS.md` or `$env:CODEX_HOME\AGENTS.md`. If you use the raw `shskills` command, sync the matching package `AGENTS.md` separately.
+
 Install the English cx skills into the global Codex skills directory:
 
 ```powershell
@@ -139,6 +147,8 @@ The `docs/` root is reserved for `INDEX.md`, `README.md`, and `VERSIONS.md`; con
 | `$cx-version` | Release version management using the target project's `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, annotated `vX.Y.Z` Git tags, and GitHub Releases. |
 | `$cx-research` | Model selection, model mechanism research, recent AI paper scans, academic/blog synthesis, and citation-backed recommendations. |
 | `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensor utilities, ML tests, deterministic small test data, and strict Python OOP/TDD quality rules. |
+| `$cx-pytorch-hpo` | Broad PyTorch automatic tuning and experiment design: hyperparameters, feature/label recipes, model structure, model choice, Optuna/Ray Tune/BoTorch tradeoffs, and evidence recording. |
+| `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling: field-role classification, covariates, leakage checks, backtesting, PyTorch Forecasting as the primary reference, and deep model selection. |
 | `$cx-rust-tdd` | Rust implementation and TDD: structs/enums/traits, ownership, `Result` errors, `cargo test`, `rustfmt`, `clippy`, and non-UI Rust code quality. |
 | `$cx-common-module` | Generic capabilities, reusable features, reusable classes, stable APIs, migration plans, and duplicate logic control. |
 | `$cx-evidence` | Final delivery review for BDD/TDD compliance, test output, changelog/spec consistency, and missing evidence. |
