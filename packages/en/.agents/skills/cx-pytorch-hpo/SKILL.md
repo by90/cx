@@ -10,6 +10,14 @@ version: 0.1.0
 
 Treat tuning as auditable experiment design, not only learning-rate, batch-size, or optimizer search. Use this for PyTorch/Lightning training, feature recipes, label recipes, model structure, and model selection.
 
+## Iron Rules
+
+1. Automatic tuning starts with about one tenth of the data, but the sampling unit must be a complete entity. Do not keep only partial records for an entity. For example, with daily data for 2,000 stocks, randomly select about 200 stocks and keep the full daily history for those 200 stocks.
+2. This one-tenth complete-entity dataset is used to quickly determine hyperparameters, model-capacity parameters, feature bucket arrays, suspension-handling strategy, optimizer choice, and scheduler choice. Fragmented samples must not replace complete entity samples.
+3. Tuning training normally runs for a fixed 60 epochs. Make sure training is not stopped early within those 60 epochs.
+4. Early-stopping patience is normally 8, but it is only an observation signal during the 60-epoch tuning run and must not actually stop training within those 60 epochs.
+5. If business constraints or compute limits require deviating from one-tenth complete data, 60 epochs, or patience 8, record the reason, risk, and alternative validation path in the target documentation set first.
+
 ## Required Workflow
 
 1. Confirm the target documentation set already defines the business objective, metric, data boundary, and user approval. If not, return to `$cx-bdd` or `$cx-research`.

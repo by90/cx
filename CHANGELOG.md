@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added `$cx-pytorch-hpo` for broad PyTorch experiment tuning with Optuna as the default primary tool and Ray Tune/BoTorch as scoped alternatives.
 - Added `$cx-timeseries-modeling` for heterogeneous multivariate time-series design with PyTorch Forecasting as the primary reference framework.
 - Added a development-stage no-legacy-compatibility iron rule to AGENTS, `$cx-pytorch-tdd`, and `$cx-rust-tdd`.
+- Added automatic-tuning iron rules requiring one-tenth complete-entity data, fixed 60-epoch tuning runs, and patience 8 as an observation signal in `$cx-pytorch-hpo`.
 
 ## [0.1.2] - 2026-05-27
 
