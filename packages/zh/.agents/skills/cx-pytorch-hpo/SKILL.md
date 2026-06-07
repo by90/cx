@@ -14,9 +14,11 @@ version: 0.1.0
 
 1. 自动调参先使用约十分之一的数据，但抽样单位必须是完整实体，不允许只截取实体的一部分记录。比如 2000 只股票的日线数据，应随机选择约 200 只股票，并保留这 200 只股票的完整日线。
 2. 这份十分之一完整数据用于快速确定超参数、模型容量参数、特征分级数组、停牌处理策略、optimizer 选择和 scheduler 选择；不能用破碎样本替代完整实体样本。
-3. 调参训练一般固定 60 个 epochs；必须确保 60 个 epochs 内不会被早停截断。
-4. Early stopping 的 patience 一般设为 8，但这只是记录观察信号，不允许在 60 个 epochs 内真正停止训练。
-5. 如果业务或算力必须偏离十分之一完整数据、60 epochs 或 patience=8，必须先在目标文档集记录理由、风险和替代验证方式。
+3. 十分之一数据调参的计划上限是 60 个 epochs，并启用 early stopping 监控 `val_loss`，patience 一般设为 8；如果连续 8 个 epoch `val_loss` 没有改善，必须早停，不得为了“跑满 60”强行继续。
+4. 十分之一数据调参的成功候选，应能在不触发 early stopping 的情况下自然跑完 60 个 epochs；如果 trial 在 60 个 epochs 前早停，应记录为早停 trial、容量不足、调度不稳或特征/标签 recipe 不合适的信号，而不是继续训练到 60。
+5. 全量调参使用完整数据，计划上限是 600 个 epochs，并启用 early stopping 监控 `val_loss`，patience 一般设为 20；触发早停时同样必须停止，不得强行跑满 600。
+6. 分类任务默认把 `val_loss`/cross-entropy 作为训练 objective、调参和早停监控指标；accuracy、precision、recall、F1、AUC 等作为业务评估指标按类别分布和错误成本选择并同时记录。如果要用 accuracy 或 precision 作为 HPO 主目标，必须在目标文档集说明类别分布、阈值策略和业务理由。
+7. 如果业务或算力必须偏离十分之一完整数据、60 epochs、patience=8、全量 600 epochs 或 patience=20，必须先在目标文档集记录理由、风险和替代验证方式。
 
 ## 必须执行的流程
 
@@ -52,6 +54,8 @@ version: 0.1.0
 - Baseline recipe 和指标。
 - Search space 的 config schema、默认值和候选值。
 - Optuna study 名称、storage、sampler、pruner、trial 数量和 best trial。
+- 十分之一数据调参是否自然跑满 60 epochs；早停 trial 的 epoch、best `val_loss` 和早停原因。
+- 全量调参是否按 600 epochs / patience=20 执行；早停触发时的 epoch、best `val_loss` 和后续处理。
 - Best recipe 复跑命令和结果。
 - 特征、标签、模型结构变更的业务解释和泄漏检查。
 - 跳过 Ray Tune、BoTorch/Ax 或 Lightning Tuner 的理由。

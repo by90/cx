@@ -14,9 +14,11 @@ Treat tuning as auditable experiment design, not only learning-rate, batch-size,
 
 1. Automatic tuning starts with about one tenth of the data, but the sampling unit must be a complete entity. Do not keep only partial records for an entity. For example, with daily data for 2,000 stocks, randomly select about 200 stocks and keep the full daily history for those 200 stocks.
 2. This one-tenth complete-entity dataset is used to quickly determine hyperparameters, model-capacity parameters, feature bucket arrays, suspension-handling strategy, optimizer choice, and scheduler choice. Fragmented samples must not replace complete entity samples.
-3. Tuning training normally runs for a fixed 60 epochs. Make sure training is not stopped early within those 60 epochs.
-4. Early-stopping patience is normally 8, but it is only an observation signal during the 60-epoch tuning run and must not actually stop training within those 60 epochs.
-5. If business constraints or compute limits require deviating from one-tenth complete data, 60 epochs, or patience 8, record the reason, risk, and alternative validation path in the target documentation set first.
+3. One-tenth-data tuning has a planned cap of 60 epochs and uses early stopping on `val_loss` with patience normally set to 8. If `val_loss` does not improve for 8 consecutive epochs, stop early; do not force training to continue just to "reach 60".
+4. A successful one-tenth-data tuning candidate should naturally complete 60 epochs without triggering early stopping. If a trial stops before 60 epochs, record it as an early-stopped trial and as a signal of insufficient capacity, unstable scheduling, or an unsuitable feature/label recipe instead of continuing it to 60.
+5. Full-data tuning uses the complete dataset, has a planned cap of 600 epochs, and uses early stopping on `val_loss` with patience normally set to 20. When early stopping triggers, stop training; do not force training to reach 600.
+6. For classification tasks, use `val_loss`/cross-entropy as the default training objective, tuning monitor, and early-stopping monitor. Record accuracy, precision, recall, F1, AUC, and similar business evaluation metrics according to class balance and error costs. If accuracy or precision is used as the HPO primary objective, document the class distribution, threshold policy, and business reason in the target documentation set.
+7. If business constraints or compute limits require deviating from one-tenth complete data, 60 epochs, patience 8, full-data 600 epochs, or patience 20, record the reason, risk, and alternative validation path in the target documentation set first.
 
 ## Required Workflow
 
@@ -52,6 +54,8 @@ Treat tuning as auditable experiment design, not only learning-rate, batch-size,
 - Baseline recipe and metrics.
 - Search-space config schema, defaults, and candidate values.
 - Optuna study name, storage, sampler, pruner, trial count, and best trial.
+- Whether one-tenth-data tuning naturally completed 60 epochs; for early-stopped trials, record the epoch, best `val_loss`, and stopping reason.
+- Whether full-data tuning followed 600 epochs / patience 20; when early stopping triggers, record the epoch, best `val_loss`, and follow-up handling.
 - Best-recipe rerun command and result.
 - Business explanation and leakage check for feature, label, and model-structure changes.
 - Reason for skipping Ray Tune, BoTorch/Ax, or Lightning Tuner.
