@@ -133,7 +133,7 @@ coding-agent 提示词应说明：
 
 ## Skill 路由
 
-- `$cx-workflow`：流程处理、任务分流和多个 cx skills 的编排入口。
+- `$cx-workflow`：流程处理、任务分流和多个 cx skills 的编排入口；作为 skills 命令官，必须先分析用户任务并推荐最小合适的 skills 组合和执行顺序。
 - `$cx-bdd`：BDD 发现、编号功能文件夹、业务规则和场景。
 - `$cx-tdd`：测试先行实现、red-green-refactor 和测试矩阵证据。
 - `$cx-changelog`：变更记录、发布说明、`CHANGE-*` 一致性。

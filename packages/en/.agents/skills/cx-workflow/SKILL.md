@@ -8,16 +8,16 @@ version: 0.1.0
 
 ## Purpose
 
-Use this skill as the cx workflow entry point. It classifies the user's request, selects the cx skills that need to be combined, orders the work, and asks for clarification when missing requirements would make implementation unsafe.
+Use this skill as the cx workflow entry point and skills command officer. It must analyze the user's request, recommend the smallest suitable cx skill combination, order the work, and ask for clarification when missing requirements would make implementation unsafe.
 
 ## Entry Flow
 
-1. Classify the task: requirements discussion, feature implementation, bug fix, refactor, specialist technical work, documentation update, evidence review, or installation/use question.
+1. As the skills command officer, classify the task: requirements discussion, feature implementation, bug fix, refactor, specialist technical work, documentation update, evidence review, or installation/use question.
 2. For any multi-step task, create a todo list in the conversation first; during execution, update each item until it is completed, canceled, or explicitly blocked.
 3. For any feature-group work, require a short-lived local work branch before changing files. Completed work branches merge into `main`, then are deleted locally; the remote keeps only `main` and version tags.
 4. Check whether the project already has `docs/INDEX.md` or `docs/README.md`, one or more documentation sets, and `AGENTS.md`.
 5. Decide whether the request changes behavior, public APIs, data structures, user workflows, release mechanics, or research conclusions.
-6. Select the smallest necessary set of cx skills. Do not apply every skill by default.
+6. Based on task type, impact scope, user-named skills, and existing project rules, recommend the smallest necessary cx skill combination and execution order. Do not apply every skill by default.
 7. Select the target documentation set. Every project is organized as multiple feature groups, and concrete engineering documents must live under numbered lowercase underscore folders such as `docs/001_feature_name/`.
 8. If the task involves a generic capability, reusable feature, reusable class, shared tool, configuration, logging, paths, cache, environment probing, or data-access entrypoint, enter the "generic/reusable capability gate" before BDD/TDD or implementation.
 9. State the current step or execute directly. Ask first only when a missing requirement would likely cause the wrong implementation.
@@ -25,14 +25,15 @@ Use this skill as the cx workflow entry point. It classifies the user's request,
 ## Hard Constraints
 
 1. For development work that needs BDD, an engineering spec, an implementation plan, or a changelog entry, stop after updating the documents, report the document result to the user, and wait for explicit user confirmation. Do not write tests, edit implementation, or enter TDD before that confirmation.
-2. When the target project has the Chinese cx package installed, every cx-generated or cx-maintained document must be Simplified Chinese, including `BDD.md`, `ENGINEERING_SPEC.md`, `CHANGELOG.md`, `docs/INDEX.md`, plans, test matrices, and verification evidence. Code identifiers, commands, API names, and quoted external names may remain in their source language.
-3. When the user asks to commit, deliver, open a PR, or release, treat the working tree as one change set: stage tracked and untracked files and make one commit. Do not analyze which files were changed by the assistant versus the user, and do not split commits by ownership; stop first only for obvious secrets, build artifacts, or unrelated large files.
-4. After work is complete and user-confirmed, merge the related work branch into `main` and delete the local branch. Do not push work branches to the remote unless the user explicitly overrides the main-only remote policy in the current conversation; by default, push only `main` and version tags.
-5. Use "verified basis" or "verification evidence" for information backed by documents, tests, command output, or cited sources. Do not use the unclear phrase "engineering facts."
-6. Any implementation, fix, refactor, generic capability, reusable feature, reusable class, or reusable-capability extraction task must follow the corresponding implementation skill's `## Minimal Implementation Discipline`: absolutely no unmaintainable pile-up code, and default to the least code that satisfies the current need.
-7. Before implementing a generic capability, reusable feature, or reusable class, first define the calling model; until that model is written into BDD/ENGINEERING_SPEC, do not write internal loading, validation, conversion, caching, or persistence code.
-8. Before long-running execution, builds, tests, installation, or UI real-device checks, find and start the project-provided keep-awake or session-preservation mechanism for the current platform; it must be temporary and reversible, and must be stopped before ending, blocking, or handing off the turn.
-9. When running Python tests, builds, or tooling commands, prefer the project `uv` workflow or a Python interpreter installed and managed by `uv`, such as `uv run python ...` or `uv run --python <version> ...`; do not default to the system Python as a substitute.
+2. Any task that needs cx skills must first use `$cx-workflow` as the skills command officer to analyze the user's task and recommend the smallest suitable skill combination and execution order in the conversation. If the user explicitly names a skill, include that skill in the combination and add only the necessary cooperating skills.
+3. When the target project has the Chinese cx package installed, every cx-generated or cx-maintained document must be Simplified Chinese, including `BDD.md`, `ENGINEERING_SPEC.md`, `CHANGELOG.md`, `docs/INDEX.md`, plans, test matrices, and verification evidence. Code identifiers, commands, API names, and quoted external names may remain in their source language.
+4. When the user asks to commit, deliver, open a PR, or release, treat the working tree as one change set: stage tracked and untracked files and make one commit. Do not analyze which files were changed by the assistant versus the user, and do not split commits by ownership; stop first only for obvious secrets, build artifacts, or unrelated large files.
+5. After work is complete and user-confirmed, merge the related work branch into `main` and delete the local branch. Do not push work branches to the remote unless the user explicitly overrides the main-only remote policy in the current conversation; by default, push only `main` and version tags.
+6. Use "verified basis" or "verification evidence" for information backed by documents, tests, command output, or cited sources. Do not use the unclear phrase "engineering facts."
+7. Any implementation, fix, refactor, generic capability, reusable feature, reusable class, or reusable-capability extraction task must follow the corresponding implementation skill's `## Minimal Implementation Discipline`: absolutely no unmaintainable pile-up code, and default to the least code that satisfies the current need.
+8. Before implementing a generic capability, reusable feature, or reusable class, first define the calling model; until that model is written into BDD/ENGINEERING_SPEC, do not write internal loading, validation, conversion, caching, or persistence code.
+9. Before long-running execution, builds, tests, installation, or UI real-device checks, find and start the project-provided keep-awake or session-preservation mechanism for the current platform; it must be temporary and reversible, and must be stopped before ending, blocking, or handing off the turn.
+10. When running Python tests, builds, or tooling commands, prefer the project `uv` workflow or a Python interpreter installed and managed by `uv`, such as `uv run python ...` or `uv run --python <version> ...`; do not default to the system Python as a substitute.
 
 ## Generic/Reusable Capability Gate
 

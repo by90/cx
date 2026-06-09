@@ -133,7 +133,7 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 
 ## Skill routing
 
-- `$cx-workflow`: entry point for workflow handling, task routing, and orchestration across multiple cx skills.
+- `$cx-workflow`: entry point for workflow handling, task routing, and orchestration across multiple cx skills; as the skills command officer, it must analyze the user's task and recommend the smallest suitable skill combination and execution order first.
 - `$cx-bdd`: BDD discovery, ordered feature folders, business rules, and scenarios.
 - `$cx-tdd`: test-first implementation, red-green-refactor, and test matrix evidence.
 - `$cx-changelog`: changelog entries, release notes, and `CHANGE-*` consistency.
