@@ -103,7 +103,8 @@ Target projects must use their project-local `tools/semver.py`; if the project d
 | `$cx-version` | Project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, release tags |
 | `$cx-research` | Model choice, model mechanisms, recent papers, sourced synthesis |
 | `$cx-pytorch-tdd` | Python/PyTorch/Lightning implementation and tests |
-| `$cx-pytorch-hpo` | Broad PyTorch automatic tuning, Optuna experiment design, and feature/label/model recipe search |
+| `$cx-pytorch-quick-hpo` | PyTorch quick tuning, field-contribution research, feature sets, window length, labels, training hyperparameters, and model-capacity screening |
+| `$cx-pytorch-full-hpo` | PyTorch full-data tuning, complete-data training, test-set evaluation, backtesting, top-3 candidate comparison, and release-candidate model selection |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling, field semantics, covariates, leakage checks, and PyTorch Forecasting selection |
 | `$cx-rust-tdd` | Rust implementation, ownership-aware design, cargo test/fmt/clippy |
 | `$cx-common-module` | Generic capabilities, reusable features/classes, and API design |

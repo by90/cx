@@ -33,8 +33,12 @@
       "path": ".agents/skills/cx-pytorch-tdd/SKILL.md"
     },
     {
-      "name": "cx-pytorch-hpo",
-      "path": ".agents/skills/cx-pytorch-hpo/SKILL.md"
+      "name": "cx-pytorch-quick-hpo",
+      "path": ".agents/skills/cx-pytorch-quick-hpo/SKILL.md"
+    },
+    {
+      "name": "cx-pytorch-full-hpo",
+      "path": ".agents/skills/cx-pytorch-full-hpo/SKILL.md"
     },
     {
       "name": "cx-timeseries-modeling",

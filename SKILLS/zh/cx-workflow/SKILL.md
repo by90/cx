@@ -91,7 +91,8 @@ version: 0.1.0
 - 发布版本判断、SemVer 升级、tag 或 release notes：使用 `$cx-version`。
 - 模型选择、模型原理、近期 AI 论文、学术/博客综合研究或研究报告：使用 `$cx-research`。
 - Python、PyTorch、Lightning、tensor 或 ML 测试：叠加 `$cx-pytorch-tdd`。
-- PyTorch 自动调参、特征/标签/模型 recipe 搜索、HPO 试验证据：叠加 `$cx-pytorch-hpo`。
+- PyTorch 快速调参、字段贡献研究、特征组合、窗口长度、标签、训练超参、optimizer/scheduler 或模型容量初筛：叠加 `$cx-pytorch-quick-hpo`，并按需叠加 `$cx-pytorch-tdd`、`$cx-timeseries-modeling`、`$cx-research` 和 `$cx-common-module`。
+- PyTorch 全量调参、完整数据训练、测试集评估、回测、top 3 候选比较或 release 候选模型选择：叠加 `$cx-pytorch-full-hpo`，并按需叠加 `$cx-pytorch-tdd`、`$cx-evidence` 和 `$cx-version`。
 - 异构多变量时间序列、预测 horizon、协变量、backtesting 或时间序列框架选型：叠加 `$cx-timeseries-modeling`。
 - Rust 实现或 Rust 测试：叠加 `$cx-rust-tdd`。
 - 抽取或设计通用功能、可复用功能、可复用类、共享工具、稳定 API、复用组件、迁移重复逻辑：叠加 `$cx-common-module`。

@@ -21,7 +21,7 @@ version: 0.1.0
 7. 多变量字段的注意力权重不能直接当作特征重要性；变量重要性需要结合变量选择网络、ablation、permutation 和业务审查。
 8. 切分必须按时间或 rolling origin backtesting；禁止随机行切分导致未来信息泄漏。
 9. 指标必须匹配业务目标：point forecast 可用 MAE/RMSE/SMAPE/MASE，分位数或概率预测必须记录 quantile loss、coverage 或 calibration。
-10. 需要调特征、标签、模型结构或模型选择时，叠加 `$cx-pytorch-hpo`，并把搜索空间写成 config recipe。
+10. 需要快速调字段、标签、窗口、模型结构或模型选择时，叠加 `$cx-pytorch-quick-hpo`；需要完整数据训练、测试、回测和 release 候选模型选择时，叠加 `$cx-pytorch-full-hpo`，并把搜索空间写成 config recipe。
 11. 单元测试只验证数据窗口、字段角色、泄漏检查、指标和模型输入输出形状；不要在单元测试里跑长训练。
 
 ## 框架选择
@@ -39,7 +39,7 @@ version: 0.1.0
 - Rolling-origin 或时间切分说明。
 - 协变量是否在预测时可用的证明。
 - 选择 PyTorch Forecasting、NeuralForecast、Darts 或其他框架的理由。
-- 与 `$cx-pytorch-hpo` 共享的搜索空间、best recipe 和复跑结果。
+- 与 `$cx-pytorch-quick-hpo` / `$cx-pytorch-full-hpo` 共享的搜索空间、best recipe、全量训练、测试、回测和复跑结果。
 
 ## 研究提醒
 

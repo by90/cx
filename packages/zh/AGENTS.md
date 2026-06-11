@@ -140,7 +140,8 @@ coding-agent 提示词应说明：
 - `$cx-version`：用项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md` 和带注释 tag 管理目标项目发布版本。
 - `$cx-research`：模型选择、AI 论文研究、来源筛选和带引用综合分析。
 - `$cx-pytorch-tdd`：Python、PyTorch、Lightning、tensor、训练与 ML 测试。
-- `$cx-pytorch-hpo`：PyTorch 广义自动调参、实验设计、特征/标签/model recipe 搜索和 Optuna 试验证据。
+- `$cx-pytorch-quick-hpo`：PyTorch 快速调参，覆盖十分之一完整实体样本、字段贡献研究、特征组合、窗口长度、标签、训练超参、optimizer/scheduler 和模型容量初筛。
+- `$cx-pytorch-full-hpo`：PyTorch 全量调参，覆盖完整数据训练、测试集评估、回测、top 3 候选比较和 release 候选模型选择。
 - `$cx-timeseries-modeling`：异构多变量时间序列建模、字段语义分层、协变量、泄漏检查和 PyTorch Forecasting 选型。
 - `$cx-rust-tdd`：Rust 实现、所有权设计和 cargo test/fmt/clippy。
 - `$cx-common-module`：通用功能、可复用功能、可复用类、可复用能力抽取和公共 API 设计。

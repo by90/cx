@@ -147,7 +147,8 @@ The `docs/` root is reserved for `INDEX.md`, `README.md`, and `VERSIONS.md`; con
 | `$cx-version` | Release version management using the target project's `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, annotated `vX.Y.Z` Git tags, and GitHub Releases. |
 | `$cx-research` | Model selection, model mechanism research, recent AI paper scans, academic/blog synthesis, and citation-backed recommendations. |
 | `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensor utilities, ML tests, deterministic small test data, and strict Python OOP/TDD quality rules. |
-| `$cx-pytorch-hpo` | Broad PyTorch automatic tuning and experiment design: hyperparameters, feature/label recipes, model structure, model choice, Optuna/Ray Tune/BoTorch tradeoffs, and evidence recording. |
+| `$cx-pytorch-quick-hpo` | PyTorch quick tuning: one-tenth complete-entity samples, field-contribution research, feature sets, window length, labels, training hyperparameters, optimizer/scheduler choices, model-capacity screening, and convergence evidence. |
+| `$cx-pytorch-full-hpo` | PyTorch full-data tuning: complete-data training, test-set evaluation, backtesting, top-3 candidate comparison, release-candidate model selection, and evidence recording. |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling: field-role classification, covariates, leakage checks, backtesting, PyTorch Forecasting as the primary reference, and deep model selection. |
 | `$cx-rust-tdd` | Rust implementation and TDD: structs/enums/traits, ownership, `Result` errors, `cargo test`, `rustfmt`, `clippy`, and non-UI Rust code quality. |
 | `$cx-common-module` | Generic capabilities, reusable features, reusable classes, stable APIs, migration plans, and duplicate logic control. |

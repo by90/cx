@@ -140,7 +140,8 @@ If the repository also uses Claude Code, keep this `AGENTS.md` as the shared rul
 - `$cx-version`: target-project release versioning with project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and annotated tags.
 - `$cx-research`: model selection, AI paper research, source screening, and cited synthesis.
 - `$cx-pytorch-tdd`: Python, PyTorch, Lightning, tensors, training, and ML tests.
-- `$cx-pytorch-hpo`: broad PyTorch automatic tuning, experiment design, feature/label/model recipes, and Optuna-backed evidence.
+- `$cx-pytorch-quick-hpo`: PyTorch quick tuning for one-tenth complete-entity samples, field-contribution research, feature sets, window length, labels, training hyperparameters, optimizer/scheduler choices, and model-capacity screening.
+- `$cx-pytorch-full-hpo`: PyTorch full-data tuning for complete-data training, test-set evaluation, backtesting, top-3 candidate comparison, and release-candidate model selection.
 - `$cx-timeseries-modeling`: heterogeneous multivariate time-series modeling, field-role classification, covariates, leakage checks, and PyTorch Forecasting selection.
 - `$cx-rust-tdd`: Rust implementation, ownership-aware design, and cargo test/fmt/clippy.
 - `$cx-common-module`: generic capabilities, reusable features, reusable classes, reusable-capability extraction, and common API design.

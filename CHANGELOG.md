@@ -10,11 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added a Python development iron rule requiring target-project scripts to avoid command-line arguments and route adjustable behavior through config-subsystem items with defaults.
 - Added PowerShell cx installers that update skills from remote `main` and overwrite the global Codex `AGENTS.md` with the matching language package template.
-- Added `$cx-pytorch-hpo` for broad PyTorch experiment tuning with Optuna as the default primary tool and Ray Tune/BoTorch as scoped alternatives.
+- Added `$cx-pytorch-quick-hpo` and `$cx-pytorch-full-hpo` for staged PyTorch tuning: quick sample tuning, field-contribution study, full-data training, testing, backtesting, and release-candidate selection.
+- Added multi-model HPO selection rules: keep per-model best candidates, choose a global best for default inference, and keep terminal-menu release selection in the root `main` and each model `main`.
 - Added `$cx-timeseries-modeling` for heterogeneous multivariate time-series design with PyTorch Forecasting as the primary reference framework.
 - Added a development-stage no-legacy-compatibility iron rule to AGENTS, `$cx-pytorch-tdd`, and `$cx-rust-tdd`.
-- Added automatic-tuning iron rules requiring one-tenth complete-entity data, fixed 60-epoch tuning runs, and patience 8 as an observation signal in `$cx-pytorch-hpo`.
-- Clarified `$cx-pytorch-hpo` early stopping rules: one-tenth-data tuning stops when patience 8 triggers, successful candidates should naturally reach 60 epochs, and full-data tuning uses 600 epochs with patience 20.
 - Added a `$cx-workflow` skills command officer rule requiring task analysis and a recommended minimal cx skill combination before execution.
 
 ## [0.1.2] - 2026-05-27

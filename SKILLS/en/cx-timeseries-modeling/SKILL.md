@@ -21,7 +21,7 @@ Handle multivariate time series where each field has a different meaning. Do not
 7. Attention weights over time or variables are not direct feature importance. Combine variable-selection outputs with ablation, permutation, and business review.
 8. Splits must be temporal or rolling-origin backtests. Random row splits are forbidden when they can leak future information.
 9. Metrics must match the business objective: point forecasts can use MAE/RMSE/SMAPE/MASE; quantile or probabilistic forecasts must record quantile loss, coverage, or calibration.
-10. When tuning features, labels, model structure, or model choice, add `$cx-pytorch-hpo` and express the search space as config recipes.
+10. When quickly tuning fields, labels, windows, model structure, or model choice, add `$cx-pytorch-quick-hpo`; when complete-data training, testing, backtesting, and release-candidate selection are required, add `$cx-pytorch-full-hpo`, and express the search space as config recipes.
 11. Unit tests only verify windows, field roles, leakage checks, metrics, and model input/output shapes. Do not run long training in unit tests.
 
 ## Framework Selection
@@ -39,7 +39,7 @@ Handle multivariate time series where each field has a different meaning. Do not
 - Rolling-origin or temporal split description.
 - Proof that covariates are available at prediction time.
 - Reason for choosing PyTorch Forecasting, NeuralForecast, Darts, or another framework.
-- Shared search space, best recipe, and rerun result when `$cx-pytorch-hpo` is used.
+- Shared search space, best recipe, full-data training, test, backtest, and rerun result when `$cx-pytorch-quick-hpo` / `$cx-pytorch-full-hpo` are used.
 
 ## Research Reminders
 

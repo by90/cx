@@ -103,7 +103,8 @@ Rust：
 | `$cx-version` | 项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md`、发布 tag |
 | `$cx-research` | 模型选择、模型原理、近期论文、带来源综合分析 |
 | `$cx-pytorch-tdd` | Python/PyTorch/Lightning 实现和测试 |
-| `$cx-pytorch-hpo` | PyTorch 广义自动调参、Optuna 试验设计、特征/标签/model recipe 搜索 |
+| `$cx-pytorch-quick-hpo` | PyTorch 快速调参、字段贡献研究、特征组合、窗口长度、标签、训练超参和模型容量初筛 |
+| `$cx-pytorch-full-hpo` | PyTorch 全量调参、完整数据训练、测试集评估、回测、top 3 候选比较和 release 候选模型选择 |
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模、字段语义、协变量、泄漏检查和 PyTorch Forecasting 选型 |
 | `$cx-rust-tdd` | Rust 实现、所有权设计、cargo test/fmt/clippy |
 | `$cx-common-module` | 通用功能、可复用功能、可复用类和 API 设计 |
