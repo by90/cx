@@ -12,9 +12,9 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 
 ## Iron Rules
 
-1. The training script must run by itself with default configuration. The tuning script may only clone and modify typed config in memory through a config hook, then pass that config object into the training entrypoint.
-2. The backtest script must run by itself with default configuration. The tuning script may only call the backtest entrypoint with an in-memory config object and must not edit the current backtest config file.
-3. When saving results, the tuning script may only persist trial configs, best recipes, metrics, and backtest configs into the output directory. Never rewrite the current project config, default config, or user-maintained config files.
+1. The training, inference, and backtest entrypoints must run by themselves with default configuration; menus and tuning orchestrators may only call those scripts or stable entrypoints.
+2. A tuning run must initialize from the target model's default config, then let the shared tuning facility clone and mutate typed config objects in memory before passing them to training, inference, or backtest entrypoints. Every trial behavior change must affect only the in-memory config object, including fields, labels, window length, batch size, learning rate, optimizer, scheduler, model structure, output directory, and saved snapshots. Do not create temporary YAML files or temporary config directories as a trial fact source, do not rewrite current config files for trial behavior, and do not implement separate config-rewrite flows inside individual model directories.
+3. When saving checkpoints or weights, persist the complete config snapshot associated with the in-memory recipe alongside that artifact. The tuning script may persist trial configs, best recipes, metrics, and backtest configs into the output directory, but must never rewrite the current project config, default config, or user-maintained config files.
 4. Quick tuning uses about one tenth of the data, but the sampling unit must be a complete entity. For daily data from 2,000 stocks, randomly select about 200 stocks and keep each selected stock's full daily history.
 5. Before quick tuning, study every field in the field combination for every candidate model against the label: positive contribution, negative contribution, and noise suspicion. Identify important fields, secondary fields, duplicated fields, and likely redundant fields.
 6. Field research must be documented in the target documentation set's data-processing area. If the project already has a `series` data-processing directory, prefer `docs/<feature_group>/series/`.
@@ -44,7 +44,7 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 ## Verification Evidence
 
 - Training and backtest scripts run independently with default config.
-- The tuning script only changes config in memory; the output directory contains saved trial config and best recipe; current config files are unchanged.
+- Per-trial field enablement, field order, feature mode, per-field level counts, expanded per-field bins, label contract, and the complete config snapshot associated one-to-one with each checkpoint or weight artifact.
 - Complete-entity one-tenth sample unit, entity count, coverage, and random seed.
 - Field contribution, negative contribution, noise suspicion, duplicated fields, and redundant-field conclusions.
 - Field-combination recommendation and fixed-model validation results.

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Strengthened `$cx-pytorch-quick-hpo` so all trial behavior config changes are owned by shared tuning facilities, happen only on in-memory typed config objects, and save checkpoint-linked config snapshots without temporary YAML/config directories.
 - Added a Python development iron rule requiring target-project scripts to avoid command-line arguments and route adjustable behavior through config-subsystem items with defaults.
 - Added PowerShell cx installers that update skills from remote `main` and overwrite the global Codex `AGENTS.md` with the matching language package template.
 - Added `$cx-pytorch-quick-hpo` and `$cx-pytorch-full-hpo` for staged PyTorch tuning: quick sample tuning, field-contribution study, full-data training, testing, backtesting, and release-candidate selection.
