@@ -22,10 +22,12 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 8. Ranking fields need a dedicated check. They usually correspond to base fields, so determine whether using base and ranking fields together is harmful, whether ranking fields alone are sufficient, and whether ranking plus position fields works.
 9. Before tuning, give explicit recommendations for enabled fields/features. Use one fixed model to validate different field combinations and document the recommendation in the field-research document.
 10. Search in this order: field combinations, window length, and label definitions; training hyperparameters, optimizer, and scheduler; model structure, capacity, and complexity.
-11. Quick training has a planned cap of 60 epochs, monitors `val_loss`, and normally uses early-stopping patience 8. Stop when early stopping triggers, but naturally completing 60 epochs with stable improvement is the better candidate signal.
-12. Record the ratio of `val_loss` improvement count to epoch count. A low ratio indicates questionable convergence quality, even when the final `val_loss` is acceptable.
-13. For classification tasks, use `val_loss`/cross-entropy as the default training objective, tuning monitor, and early-stopping monitor. Record accuracy, precision, recall, F1, and AUC only as business evaluation metrics.
-14. In multi-model projects, each model may have its own unique best field set, window length, label, and capacity configuration. Quick tuning must keep each model's per-model best candidate instead of prematurely keeping only one cross-model global ranking.
+11. Window length and batch size must be searched together. Longer windows increase memory and compute cost, and attention-like or pairwise representations can grow close to quadratically with window length.
+12. On high-memory hardware such as two NVIDIA RTX 5090 GPUs with 32 GB VRAM per card, treat VRAM use, GPU utilization, and training throughput as first-class constraints. For each window/field recipe, prefer the largest stable batch: start at `8192` when plausible, then fall back to `4096`, `2048`, `1024`, and `512` only when OOM, long windows, wide fields, or model structure require it. Do not keep tiny batches just because they are conservative.
+13. Quick training has a planned cap of 60 epochs, monitors `val_loss`, and normally uses early-stopping patience 8. Stop when early stopping triggers, but naturally completing 60 epochs with stable improvement is the better candidate signal.
+14. Record the ratio of `val_loss` improvement count to epoch count. A low ratio indicates questionable convergence quality, even when the final `val_loss` is acceptable.
+15. For classification tasks, use `val_loss`/cross-entropy as the default training objective, tuning monitor, and early-stopping monitor. Record accuracy, precision, recall, F1, and AUC only as business evaluation metrics.
+16. In multi-model projects, each model may have its own unique best field set, window length, label, and capacity configuration. Quick tuning must keep each model's per-model best candidate instead of prematurely keeping only one cross-model global ranking.
 
 ## Required Workflow
 
@@ -34,9 +36,10 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 3. Use `$cx-pytorch-tdd` to verify standalone training, standalone backtesting, config clone/override hooks, trial-to-config mapping, and output persistence paths.
 4. Run field contribution research and small experiments before field candidates are tuned. Do not search model capacity while field semantics are still unclear.
 5. Use one fixed model to validate field combinations, window length, and label definitions, then produce data recipe candidates.
-6. Once data recipes are stable, search batch size, learning rate, weight decay, optimizer, and scheduler.
-7. Search model-structure parameters last, such as hidden size, layers, dropout, encoder length, capacity, and complexity.
-8. Rerun the best recipe and record best trial, top candidates, each model's per-model best recipe, failed trials, pruned trials, random seed, data version, field recommendations, and convergence evidence in the target documentation set.
+6. Once data recipes are stable, search window length and batch size together. On dual 32 GB RTX 5090 hardware, try `8192`, `4096`, `2048`, `1024`, and `512` in descending order for each candidate window, and keep the fastest non-OOM setting with strong VRAM and GPU utilization.
+7. Search learning rate, weight decay, optimizer, and scheduler after the window/batch budget is fixed; when batch size changes, retune learning rate with it.
+8. Search model-structure parameters last, such as hidden size, layers, dropout, encoder length, capacity, and complexity.
+9. Rerun the best recipe and record best trial, top candidates, each model's per-model best recipe, failed trials, pruned trials, random seed, data version, field recommendations, and convergence evidence in the target documentation set.
 
 ## Verification Evidence
 
@@ -45,6 +48,6 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 - Complete-entity one-tenth sample unit, entity count, coverage, and random seed.
 - Field contribution, negative contribution, noise suspicion, duplicated fields, and redundant-field conclusions.
 - Field-combination recommendation and fixed-model validation results.
-- Window length, label definition, training hyperparameter, optimizer, scheduler, and model-structure search spaces.
+- Window length, batch size, peak VRAM, remaining VRAM, GPU utilization, OOM status, sample throughput, epoch seconds, label definition, training hyperparameter, optimizer, scheduler, and model-structure search spaces.
 - 60 epochs / patience 8 execution, early-stop epoch, best `val_loss`, `val_loss` improvement count, and improvement ratio.
 - Each model's per-model best candidate, candidate configurations recommended for full-data tuning, and reasons rejected candidates are excluded.

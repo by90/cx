@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added PowerShell cx installers that update skills from remote `main` and overwrite the global Codex `AGENTS.md` with the matching language package template.
 - Added `$cx-pytorch-quick-hpo` and `$cx-pytorch-full-hpo` for staged PyTorch tuning: quick sample tuning, field-contribution study, full-data training, testing, backtesting, and release-candidate selection.
 - Added multi-model HPO selection rules: keep per-model best candidates, choose a global best for default inference, and keep terminal-menu release selection in the root `main` and each model `main`.
+- Strengthened `$cx-pytorch-quick-hpo` window/batch tuning rules to prioritize high-throughput GPU use on dual 32 GB RTX 5090 hardware, descending from `8192`/`4096` batches only when OOM or throughput requires it.
 - Added `$cx-timeseries-modeling` for heterogeneous multivariate time-series design with PyTorch Forecasting as the primary reference framework.
 - Added a development-stage no-legacy-compatibility iron rule to AGENTS, `$cx-pytorch-tdd`, and `$cx-rust-tdd`.
 - Added a `$cx-workflow` skills command officer rule requiring task analysis and a recommended minimal cx skill combination before execution.
