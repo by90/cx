@@ -33,8 +33,11 @@ Iron rule: absolutely no unmaintainable pile-up code.
 
 - Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early.
 - Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
+- Unless business rules explicitly require it, do not hide exceptions, silently fall back, or turn errors that would harm the product into defaults, empty results, skipped records, fake successful retries, or warnings; during development, let these errors stop execution.
+- Use a simple test: if the same bug shipped to the product would cause a problem, it must surface as a failure. Only add explicit handling when the business requires degradation, recovery, or user-visible guidance, and cover that path with tests.
 - Do not add validation that only "looks safer" but is not required, such as filename allowlists, path validity checks, extra AST scans, or duplicate config rule checks.
-- In most cases, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
+- Do not put per-item data-validity checks inside large loops, training loops, hot paths, or batch processing to fall back or slow the system down. Handle data validity at entrypoints, data preparation, test fixtures, or separate diagnostic tasks, and never use those checks to replace real failures.
+- By default, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
 - Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
 - Prefer expressing defaults through function or constructor parameters; do not promote simple paths, filenames, or one-off defaults to module-level constants.
 - Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.

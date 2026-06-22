@@ -34,18 +34,20 @@ Review whether the work is actually supported by tests and the target documentat
 20. Does Python express default behavior through default parameters, config objects, dataclasses, factories, or small methods instead of long branch stacks inside `__init__`?
 21. Did Python scripts avoid new command-line argument parsing, and is every adjustable behavior represented by config-subsystem items with defaults?
 22. Does the work follow the corresponding implementation skill's `## Minimal Implementation Discipline`: absolutely no unmaintainable pile-up code, no premature frameworkization, generalization, abstraction, or requirement-external validation?
-23. Is the code minimal, small, and direct, and were reusable features, classes, or logic first searched and registered through `$cx-common-module`?
-24. Does the code avoid non-OOP dynamic access such as `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch; if unavoidable, is the reason documented, implementation isolated, and behavior tested?
-25. For a generic capability, reusable feature, or reusable class, were the public entrypoint, normal call style, special-case entrypoint, instance or state lifecycle, state source, test coverage path for all source call sites, and non-goals defined first?
-26. Does GUIDE or README show a normal-call example, and do tests cover that example?
-27. Do tests cover the special entrypoint, lifecycle, state restoration, or test isolation path?
-28. Are there helpers, wrappers, validators, or constants with only one call site and no real complexity to isolate?
-29. Did the work avoid requirement-external validation, exception wrapping, dynamic construction, scanners, registries, or future extension entrypoints?
-30. When adding a peer capability, config section, field, or data source, does the design avoid hard-coded export logic or control-flow branches?
-31. Were Rust commands run when Rust code changed?
-32. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
-33. Did ordinary non-programming tasks avoid creating BDD automatically, and did unclear boundaries trigger a user question first?
-34. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
+23. Did the work avoid catching, swallowing, silently skipping, default-fallbacking, empty-result-fallbacking, fake successful retries, or wrapping any exception that would cause product problems; if handling exists, is there an explicit business requirement, user-visible path, and test coverage?
+24. Did the work avoid per-item data-validity checks inside large loops, training loops, hot paths, or batch processing to fall back, filter, or slow performance; are data-validity checks placed at entrypoints, data preparation, test fixtures, or separate diagnostic tasks?
+25. Is the code minimal, small, and direct, and were reusable features, classes, or logic first searched and registered through `$cx-common-module`?
+26. Does the code avoid non-OOP dynamic access such as `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch; if unavoidable, is the reason documented, implementation isolated, and behavior tested?
+27. For a generic capability, reusable feature, or reusable class, were the public entrypoint, normal call style, special-case entrypoint, instance or state lifecycle, state source, test coverage path for all source call sites, and non-goals defined first?
+28. Does GUIDE or README show a normal-call example, and do tests cover that example?
+29. Do tests cover the special entrypoint, lifecycle, state restoration, or test isolation path?
+30. Are there helpers, wrappers, validators, or constants with only one call site and no real complexity to isolate?
+31. Did the work avoid requirement-external validation, exception wrapping, dynamic construction, scanners, registries, or future extension entrypoints?
+32. When adding a peer capability, config section, field, or data source, does the design avoid hard-coded export logic or control-flow branches?
+33. Were Rust commands run when Rust code changed?
+34. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
+35. Did ordinary non-programming tasks avoid creating BDD automatically, and did unclear boundaries trigger a user question first?
+36. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
 
 ## Output format
 
