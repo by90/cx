@@ -28,18 +28,23 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 14. Record the ratio of `val_loss` improvement count to epoch count. A low ratio indicates questionable convergence quality, even when the final `val_loss` is acceptable.
 15. For classification tasks, use `val_loss`/cross-entropy as the default training objective, tuning monitor, and early-stopping monitor. Record accuracy, precision, recall, F1, and AUC only as business evaluation metrics.
 16. In multi-model projects, each model may have its own unique best field set, window length, label, and capacity configuration. Quick tuning must keep each model's per-model best candidate instead of prematurely keeping only one cross-model global ranking.
+17. Quick tuning must establish a five-minute tracking cadence: take a baseline sample immediately after startup, then report every 5 minutes with the current trial, current epoch, latest `val_loss`, current best `val_loss`, `val_loss` improvement count, elapsed trial time, average epoch time, estimated remaining trials/epochs, GPU utilization, VRAM usage, peak VRAM, system memory, and current process memory. If no epoch or artifact changes within a 5-minute window, report the stalled position, process id, and resource-log path being written.
+18. Every epoch and every trial must be written to a shared resource-monitoring artifact. Epoch records must include epoch index, start/end time, epoch duration, cumulative trial duration, training or validation `val_loss`, current best `val_loss`, GPU utilization, allocated/reserved/peak/free VRAM, total/available system memory, process memory, sample throughput, OOM status, and error reason. Trial-end records must include total trial duration, average epoch duration, completed epoch count, early-stop epoch, `val_loss` improvement count, best/final `val_loss`, `test_loss`, backtest metrics, and resource-log path.
+19. Quick candidate reports must include Top10 business metrics: Top10 hit rate, mean gain for hit candidates, mean gain for missed candidates, Top10 downside share, and mean loss among downside candidates. The top-10 candidate table must also include trial name, stage, key recipe, `val_loss`, `test_loss`, trained epochs, `val_loss` improvement count, trial duration, average epoch duration, and those Top10 metrics.
 
 ## Required Workflow
 
 1. Confirm the target documentation set defines the business objective, data boundary, label target, and validation path. If not, return to `$cx-workflow` to recommend `$cx-bdd`, `$cx-research`, or `$cx-timeseries-modeling`.
-2. Use `$cx-common-module` to check whether training entrypoints, backtest entrypoints, config hooks, recipes, and output persistence already have public entrypoints. If not, define the calling model first.
-3. Use `$cx-pytorch-tdd` to verify standalone training, standalone backtesting, config clone/override hooks, trial-to-config mapping, and output persistence paths.
-4. Run field contribution research and small experiments before field candidates are tuned. Do not search model capacity while field semantics are still unclear.
-5. Use one fixed model to validate field combinations, window length, and label definitions, then produce data recipe candidates.
-6. Once data recipes are stable, search window length and batch size together. On dual 32 GB RTX 5090 hardware, try `8192`, `4096`, `2048`, `1024`, and `512` in descending order for each candidate window, and keep the fastest non-OOM setting with strong VRAM and GPU utilization.
-7. Search learning rate, weight decay, optimizer, and scheduler after the window/batch budget is fixed; when batch size changes, retune learning rate with it.
-8. Search model-structure parameters last, such as hidden size, layers, dropout, encoder length, capacity, and complexity.
-9. Rerun the best recipe and record best trial, top candidates, each model's per-model best recipe, failed trials, pruned trials, random seed, data version, field recommendations, and convergence evidence in the target documentation set.
+2. Before startup or resume, confirm resource-monitor paths, the five-minute sampling method, and the top-10 candidate report fields. If the project lacks a shared resource monitor, add the public monitor and narrow tests first; do not replace structured artifacts with terminal spam.
+3. Use `$cx-common-module` to check whether training entrypoints, backtest entrypoints, config hooks, recipes, resource monitoring, metric aggregation, and output persistence already have public entrypoints. If not, define the calling model first.
+4. Use `$cx-pytorch-tdd` to verify standalone training, standalone backtesting, config clone/override hooks, trial-to-config mapping, resource monitoring, metric parsing, and output persistence paths.
+5. Run field contribution research and small experiments before field candidates are tuned. Do not search model capacity while field semantics are still unclear.
+6. Use one fixed model to validate field combinations, window length, and label definitions, then produce data recipe candidates.
+7. Once data recipes are stable, search window length and batch size together. On dual 32 GB RTX 5090 hardware, try `8192`, `4096`, `2048`, `1024`, and `512` in descending order for each candidate window, and keep the fastest non-OOM setting with strong VRAM and GPU utilization.
+8. Search learning rate, weight decay, optimizer, and scheduler after the window/batch budget is fixed; when batch size changes, retune learning rate with it.
+9. Search model-structure parameters last, such as hidden size, layers, dropout, encoder length, capacity, and complexity.
+10. Rerun the best recipe and record best trial, top candidates, each model's per-model best recipe, failed trials, pruned trials, five-minute tracking summaries, random seed, data version, field recommendations, and convergence evidence in the target documentation set.
+11. When the user requests business-first ranking, show the top-10 candidates by Top10 hit rate, missed-candidate mean gain, downside share, downside mean loss, and `val_loss`, while still preserving the `val_loss` diagnostic view.
 
 ## Verification Evidence
 
@@ -50,4 +55,7 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 - Field-combination recommendation and fixed-model validation results.
 - Window length, batch size, peak VRAM, remaining VRAM, GPU utilization, OOM status, sample throughput, epoch seconds, label definition, training hyperparameter, optimizer, scheduler, and model-structure search spaces.
 - 60 epochs / patience 8 execution, early-stop epoch, best `val_loss`, `val_loss` improvement count, and improvement ratio.
+- Five-minute tracking summaries with sample time, current trial, current epoch, latest `val_loss`, best `val_loss`, `val_loss` improvement count, elapsed trial time, average epoch seconds, estimated remaining work, GPU utilization, VRAM usage, peak VRAM, system memory, and process memory.
+- Per-trial total duration, average epoch duration, completed epochs, early-stop epoch, best/final `val_loss`, `test_loss`, resource-log path, and OOM or failure reason.
+- Top-10 candidate table with Top10 hit rate, hit-candidate mean gain, missed-candidate mean gain, Top10 downside share, downside mean loss, `val_loss`, `test_loss`, trained epochs, `val_loss` improvement count, trial duration, and average epoch duration.
 - Each model's per-model best candidate, candidate configurations recommended for full-data tuning, and reasons rejected candidates are excluded.

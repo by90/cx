@@ -24,19 +24,23 @@ Validate quick-HPO candidates on complete data, select the best through third-be
 10. When saving the best model as a release candidate, follow the existing `$cx-version` workflow, user-confirmation gate, version records, and release evidence requirements.
 11. Multi-model projects must first select each model's per-model best release candidate, then compare those per-model winners to choose the global best. The global best is the default release for inference.
 12. Inference must preserve the right to choose a different model release. The root `main` terminal menu and each model's `main` terminal menu must expose both the default global best release and selectable historical/candidate releases.
+13. Full tuning must keep the same five-minute tracking cadence as quick tuning: take a baseline sample immediately after startup, then report every 5 minutes with the current candidate, current trial, current epoch, latest `val_loss`, current best `val_loss`, `val_loss` improvement count, elapsed candidate time, average epoch time, estimated remaining epochs, GPU utilization, VRAM usage, peak VRAM, system memory, and current process memory. If no epoch or artifact changes within a 5-minute window, report the stalled position, process id, and resource-log path.
+14. Every full-tuning epoch, trial, and candidate must be written to a shared resource-monitoring artifact. Records must include start/end time, epoch duration, cumulative candidate duration, average epoch duration, GPU utilization, allocated/reserved/peak/free VRAM, total/available system memory, process memory, sample throughput, OOM status, best/final `val_loss`, `test_loss`, early-stop epoch, `val_loss` improvement count, and resource-log path.
+15. Full candidate comparison and release recommendations must include Top10 business metrics: Top10 hit rate, mean gain for hit candidates, mean gain for missed candidates, Top10 downside share, and mean loss among downside candidates. Candidate tables must also include `val_loss`, `test_loss`, trained epochs, `val_loss` improvement count, trial duration, average epoch duration, and those business metrics.
 
 ## Required Workflow
 
 1. Read the quick-HPO best recipe, top candidates, field recommendations, window length, label definition, training hyperparameters, and convergence evidence.
 2. Use `$cx-common-module` to check whether full-data recipes, model saving, test evaluation, and backtest calls already have public entrypoints. If not, define the calling model first.
 3. Use `$cx-pytorch-tdd` to verify full-data config construction, in-memory config overrides, training entrypoint, test-stage entrypoint, backtest entrypoint, and output persistence.
-4. Train the rank-1 candidate with complete data and run test-set evaluation inside the training workflow. Record `val_loss`, `test_loss`, and business metrics.
-5. After training, derive the backtest config from the same in-memory config, run backtesting, and save the backtest config and results into the output directory.
-6. If the rank-1 candidate meets the backtest target, stop and ask the user whether to train the rank-2 and rank-3 candidates. Do not spend that compute before confirmation.
-7. If the user confirms comparison, train and backtest rank-2 and rank-3 candidates in order, then rank all candidates by `val_loss`, `test_loss`, backtest results, and business risk.
-8. For multi-model projects, select each model's per-model best candidate first, then compare the per-model winners to choose the global best. Set the global best as the default inference release.
-9. Update, or require updating, the root `main` terminal menu and each model's `main` terminal menu so the global best release is selected by default while users can choose other model releases for inference.
-10. After selecting the best model, write model artifact, recipe, test results, backtest results, data version, random seed, global-best basis, default inference release, and release recommendation into target documentation-set evidence.
+4. Before starting the rank-1 candidate, confirm that resource monitoring, five-minute sampling, and candidate report fields can be written as structured artifacts. If missing, add the shared monitor and summary entrypoints first.
+5. Train the rank-1 candidate with complete data and run test-set evaluation inside the training workflow. Every 5 minutes, report current epoch, `val_loss`, improvement count, candidate duration, and resource usage. After training, record `val_loss`, `test_loss`, resource metrics, and business metrics.
+6. After training, derive the backtest config from the same in-memory config, run backtesting, and save the backtest config, Top10 hit rate, hit-candidate mean gain, missed-candidate mean gain, downside share, downside mean loss, and results into the output directory.
+7. If the rank-1 candidate meets the backtest target, stop and ask the user whether to train the rank-2 and rank-3 candidates. Do not spend that compute before confirmation.
+8. If the user confirms comparison, train and backtest rank-2 and rank-3 candidates in order, then rank all candidates by `val_loss`, `test_loss`, Top10 hit rate, missed-candidate mean gain, downside share, downside mean loss, and business risk.
+9. For multi-model projects, select each model's per-model best candidate first, then compare the per-model winners to choose the global best. Set the global best as the default inference release.
+10. Update, or require updating, the root `main` terminal menu and each model's `main` terminal menu so the global best release is selected by default while users can choose other model releases for inference.
+11. After selecting the best model, write model artifact, recipe, test results, backtest results, five-minute tracking summaries, resource monitoring, data version, random seed, global-best basis, default inference release, and release recommendation into target documentation-set evidence.
 
 ## Verification Evidence
 
@@ -44,9 +48,13 @@ Validate quick-HPO candidates on complete data, select the best through third-be
 - Training and backtest scripts run independently with default config.
 - The full-tuning script only changes config in memory; the output directory contains full-data recipe, test config, backtest config, and candidate results; current config files are unchanged.
 - Complete data boundary, train/validation/test split, data version, and random seed.
-- 600 epochs / patience 20 execution, early-stop epoch, best `val_loss`, and `test_loss`.
+- 600 epochs / patience 20 execution, early-stop epoch, best `val_loss`, final `val_loss`, `test_loss`, and `val_loss` improvement count.
+- Five-minute tracking summaries with sample time, current candidate, current epoch, latest `val_loss`, best `val_loss`, elapsed candidate time, average epoch seconds, estimated remaining epochs, GPU utilization, VRAM usage, peak VRAM, system memory, and process memory.
+- Per-candidate trial duration, average epoch duration, peak VRAM, remaining VRAM, GPU utilization, system memory, process memory, sample throughput, and OOM or failure reason.
+- Per-candidate Top10 hit rate, hit-candidate mean gain, missed-candidate mean gain, Top10 downside share, and downside mean loss.
 - Rank-1 training, test, and backtest result, including whether the user was asked to continue with rank-2 and rank-3.
 - Rank-2 and rank-3 comparison results; if skipped, record the user decision or stop reason.
+- Candidate comparison table showing `val_loss`, `test_loss`, trained epochs, `val_loss` improvement count, trial duration, average epoch duration, and Top10 business metrics.
 - Each model's per-model best release candidate, global-best selection basis, and default inference release.
 - Verification that the root `main` terminal menu and each model's `main` terminal menu can choose the default global best or another release.
 - Best model release-candidate path, recipe, metrics, backtest result, and `$cx-version` follow-up action.
