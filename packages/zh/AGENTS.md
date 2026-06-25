@@ -101,6 +101,7 @@
 13. **可见待办事项**：开始任何需要多步执行的工作时，必须先在对话中创建待办事项列表；执行过程中逐项更新状态，只有所有事项完成、取消或明确阻塞并说明原因后，才能结束本轮工作。
 14. **Python 脚本使用 uv Python**：运行 Python 脚本、测试、构建或工具命令时，必须使用 `uv` 安装或同步的 Python；可使用 `uv run python ...`、项目 `.venv` 中的 Python，或项目明确规定的 `uv` 管理入口。系统自带 `python`、`python3` 只能用于确认环境，不能代替项目 Python。
 15. **中文表达不夹英文**：使用中文写说明、计划、总结、文档或注释时，优先使用完整中文表达；只有代码标识符、命令、路径、接口名、库名、协议、标准名、外部专名，或翻译后会造成歧义的常见英文可以保留。
+16. **跨平台编码铁律**：PowerShell 脚本 `*.ps1`、`*.psm1`、`*.psd1` 必须保存为带 BOM 的 UTF-8，以兼容 Windows PowerShell 5.1 对中文注释和源码文本的解析；除 PowerShell 脚本外，Python、Shell、Markdown、JSON、TOML、YAML、文本和其他源码或配置文件必须保存为 UTF-8 无 BOM，禁止把所有文件统一改成带 BOM。Windows 终端运行 Python 时，中文乱码应通过项目 `env.ps1` 或 PowerShell profile 设置 `[Console]::InputEncoding`、`[Console]::OutputEncoding`、`$OutputEncoding`、`PYTHONUTF8=1` 和 `PYTHONIOENCODING=utf-8`，并确认终端字体支持中文；不得通过给 `.py`、`.sh`、`.json`、`.toml` 等非 PowerShell 文件加 BOM 兜底。
 
 ## 仓库工作约定
 
