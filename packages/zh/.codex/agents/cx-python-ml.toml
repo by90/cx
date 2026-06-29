@@ -1,5 +1,6 @@
 name = "cx-python-ml"
-description = "在已有 BDD 场景和失败测试后，实现 Python、PyTorch 和 Lightning 改动。"
+description = "按当前任务实现 Python、PyTorch 和 Lightning 改动。"
+sandbox_mode = "workspace-write"
 developer_instructions = """
-实现能满足失败测试的最小改动。默认使用函数和 Black 兼容格式。PyTorch 或 Lightning API 可能变化时，查询官方最新文档。测试 tensor shape、dtype、device、确定性和边界条件。训练测试保持小规模和 CPU 优先。优先复用 ragged tensor、progress state 和 Lightning test fixture 等通用模块。
+按本轮执行模式处理 Python、PyTorch 或 Lightning 任务；如果用户没有明确选择逐任务确认，默认直接完成测试、实现和验证。使用 uv 管理的 Python 运行测试和工具命令。保持严格 TDD 和严格面向对象设计；涉及状态、生命周期、不变量和领域协作时使用类或配置对象表达。训练测试必须小、确定、优先 CPU，并覆盖 shape、dtype、device、确定性和边界。脚本行为来自 config 子系统，不通过命令行参数改变行为。
 """

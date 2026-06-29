@@ -39,7 +39,7 @@ version: 0.1.0
 
 ## 推荐流程
 
-1. 先读项目 `AGENTS.md`、`docs/INDEX.md`、目标功能组 `ENGINEERING_SPEC.md`、`CHANGELOG.md` 和已有实验摘要；重新开始调参时从当前仓库配置和已保存结果出发，不继承旧线程里的临时判断。
+1. 先读项目 `AGENTS.md`、`docs/cx/00.项目说明.md`、当前主成功场景 `00.用例.md`、`00. 设计.md`、相关 `tasks/` 和 `changes/`，以及已有实验摘要；重新开始调参时从当前仓库配置和已保存结果出发，不继承旧线程里的临时判断。
 2. 检查是否有旧调参进程仍在运行；长时间 quick 必须按项目规则使用可见外部终端和临时防睡眠机制，并在结束、失败或交接前清理。
 3. 启动或续跑前确认监控产物路径、五分钟采样方式和候选前十汇报格式；如果项目没有统一资源监控器，先补公共监控入口和最窄测试，不要用终端刷屏替代结构化产物。
 4. 用 `$cx-common-module` 搜索现有训练入口、推理入口、回测入口、config hook、recipe 持久化、资源监控和指标汇总能力；已有公共入口优先复用。
@@ -51,7 +51,7 @@ version: 0.1.0
 10. 第二阶段固定数据 recipe，搜索窗口长度与 batch size。以当前最佳窗口为基准，同时覆盖 `20`、`40`、`60`；在双 RTX 5090 32GB 环境中，按 `8192`、`4096`、`2048`、`1024`、`512` 的顺序为每个窗口寻找最大稳定 batch，以不 OOM、显存利用率充分、GPU 占用率高和平均 epoch 秒数最低为准。长窗口、字段过多或模型结构导致 OOM 时才逐级下调，不要从低 batch 开始保守验证。
 11. 第三阶段固定数据 recipe 和窗口/batch 预算，搜索 learning rate、weight decay、optimizer、scheduler、risk penalty 等训练超参；batch 增大时同步尝试略高 learning rate。
 12. 第四阶段才搜索模型结构和容量，例如 hidden size、层数、heads、dropout、模板数、pattern 数、diffusion steps、encoder/decoder 深度。
-13. 每个阶段至少复跑当前 best recipe 一次，确认不是偶然随机结果；进入下一阶段前，把 top candidates、失败 trial、pruned trial、五分钟跟踪摘要和排除理由写入目标文档集或实验摘要。
+13. 每个阶段至少复跑当前 best recipe 一次，确认不是偶然随机结果；进入下一阶段前，把 top candidates、失败 trial、pruned trial、五分钟跟踪摘要和排除理由写入当前 `docs/cx` story 的任务文档、变更文档或实验摘要。
 14. 快速调参完成后，选择 3 个候选进入全量调参：优先 `val_loss` 最低且 `test_loss` 接近；loss 接近时优先改进次数更多、未早停且回测更稳的候选；当用户指定业务排序时，候选前十必须按 Top10 命中率、未命中平均涨幅、下跌占比、下跌平均跌幅和 `val_loss` 的顺序同时展示。
 
 ## 评价口径

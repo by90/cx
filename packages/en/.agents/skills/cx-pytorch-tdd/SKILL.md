@@ -12,8 +12,8 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 
 ## Required workflow
 
-1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
-2. Read the related BDD IDs and Reusable Capability Registry entries in the target documentation set's `ENGINEERING_SPEC.md`.
+1. Confirm the execution mode first; if the user did not explicitly choose per-task confirmation, direct mode proceeds into testing, implementation, and validation without a separate document-complete confirmation gate.
+2. Read the target `docs/cx` use-case document, design document, current task document, current change document, and reusable capability notes.
 3. Use the project-level `uv` virtual environment. Prefer Python interpreters installed and managed by `uv`, and use `uv sync`, `uv run`, `uv run --python <version>`, or the repository's existing `uv` workflow for dependency installation and test execution.
 4. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
 5. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.

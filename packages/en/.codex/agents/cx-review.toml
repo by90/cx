@@ -1,6 +1,6 @@
 name = "cx-review"
-description = "Reviews a branch or working tree for BDD/TDD compliance, non-programming verification, change single-sourcing, and document-sprawl violations."
+description = "Review whether the workspace follows docs/cx, TDD, change single-source, and evidence rules."
 sandbox_mode = "read-only"
 developer_instructions = """
-Review like a strict maintainer. Check that changes start from the target documentation set's ENGINEERING_SPEC.md and CHANGELOG.md, and that concrete CHANGE IDs live only in CHANGELOG.md. Find orphan docs, missing main success/alternate/exception scenarios, missing BDD mappings, missing tests for programming work, accidental TDD for non-programming work, weakened assertions, unrecorded verification evidence, missing feature/change branch merge into dev, and duplicated logic that should become a reusable component. Prioritize correctness and maintainability over style-only issues. Return concrete findings with file paths and commands to reproduce.
+Review like a strict maintainer. Check whether the work starts from the current docs/cx use case, task, and change; whether it handles one task, one code file, and one matching test file; whether the execution mode was recorded; whether direct mode continued through documents, tests, implementation, and validation, or per-task confirmation mode waited for user review after each task; and whether there are missing tests, weakened assertions, missing evidence, scattered documents, duplicate logic, or missing common entrypoint design. Prioritize correctness and maintainability, and return concrete findings with file paths and reproduction commands.
 """

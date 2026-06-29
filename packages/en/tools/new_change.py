@@ -1,132 +1,133 @@
 #!/usr/bin/env python3
-"""Append one CHANGE entry to the target documentation set changelog."""
+"""Create one change document under a docs/cx scenario changes directory."""
 
 from __future__ import annotations
 
-import argparse  # argparse turns command-line arguments into Python values.
-import datetime as dt  # datetime provides the default date.
-import re  # re finds existing CHANGE IDs with a regular expression.
-from pathlib import Path  # Path joins filesystem paths safely across platforms.
+import datetime as dt  # datetime provides default timestamps.
+import re  # re validates scenario names, task numbers, and filename fragments.
+from pathlib import Path  # Path builds cross-platform filesystem paths.
 
 
-CHANGE_ID_RE = re.compile(r"CHANGE-(\d{4})-(\d{3})")  # Match CHANGE-year-number IDs.
-FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # Match numbered lowercase feature folders.
-DEFAULT_CHANGELOG = "# CHANGELOG.md\n\n## Unreleased\n"  # Minimum text for a new changelog.
+SCENARIO_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # Scenario folders look like 01.create_user.
+TASK_NUMBER_RE = re.compile(r"\d{2}\Z")  # Task numbers are exactly two digits.
+SAFE_NAME_RE = re.compile(r'[\\/:*?"<>|\r\n\t]+')  # These characters are unsafe in Windows filenames.
 
 
-def next_change_id(changelog_text: str, year: int) -> str:
-    """Generate the next CHANGE ID for the given year and changelog text."""
+def normalize_scenario_name(scenario: str) -> str:
+    """Normalize a scenario path to a scenario folder name."""
 
-    numbers = [  # Collect numbers that already exist for this year.
-        int(match.group(2))  # The second group is the three-digit sequence number.
-        for match in CHANGE_ID_RE.finditer(changelog_text)  # Visit every CHANGE ID in the changelog.
-        if int(match.group(1)) == year  # Count only IDs from the target year.
-    ]
-    next_number = max(numbers, default=0) + 1  # Start at 1 or advance past the largest number.
-    return f"CHANGE-{year}-{next_number:03d}"  # Format the sequence as three digits.
-
-
-def changelog_path_for(root: Path, doc_set: str | None) -> Path:
-    """Return the changelog path for a numbered feature documentation set."""
-
-    normalized = (doc_set or "").strip().strip("/\\")  # Remove whitespace and edge separators.
-    if normalized.startswith("docs/") or normalized.startswith("docs\\"):  # Accept docs/<group> input.
-        normalized = normalized[5:]  # Strip docs/ so the path is not duplicated.
-    if not FEATURE_FOLDER_RE.fullmatch(normalized):  # Every project uses numbered feature folders.
-        raise ValueError("doc_set must look like 001_project_template")  # Tell callers how to fix the value.
-    return root / "docs" / normalized / "CHANGELOG.md"  # Return the feature-group changelog path.
+    normalized = scenario.strip().strip("/\\")  # Remove surrounding whitespace and separators.
+    normalized = normalized.replace("\\", "/")  # Normalize Windows separators.
+    if normalized.startswith("docs/cx/"):  # Accept a docs/cx-prefixed scenario path.
+        normalized = normalized[len("docs/cx/") :]  # Strip the fixed prefix.
+    if "/" in normalized:  # A scenario name cannot include nested paths.
+        raise ValueError("scenario must look like 01.create_user")  # Report the required format.
+    if not SCENARIO_FOLDER_RE.fullmatch(normalized):  # The name must be two digits plus a dot.
+        raise ValueError("scenario must look like 01.create_user")  # Report the required format.
+    return normalized  # Return the normalized scenario folder name.
 
 
-def build_entry(
-    change_id: str,
-    title: str,
-    change_type: str,
-    today: str,
-    branch: str,
-    base_branch: str,
-    feature_group: str,
-) -> str:
-    """Render one CHANGE entry as Markdown."""
+def normalize_task_number(task_number: int | str) -> str:
+    """Normalize a task number to two digits."""
 
-    return f"""
-### {change_id} - {title}
-
-- Date: {today}
-- Type: {change_type}
-- Status: planned
-- Branch: {branch}
-- Base branch: {base_branch}
-- Feature group: {feature_group}
-- Summary: TODO
-- Related scenarios: TODO
-- Related tests: TODO
-- Verification evidence: TODO
-""".strip()  # Trim template edges so insertion controls blank lines.
+    if isinstance(task_number, int):  # Integer task numbers need padding.
+        normalized = f"{task_number:02d}"  # Convert to two digits.
+    else:  # String task numbers are caller-provided identifiers.
+        normalized = task_number.strip()  # Remove surrounding whitespace.
+    if not TASK_NUMBER_RE.fullmatch(normalized):  # Task numbers must be exactly two digits.
+        raise ValueError("task_number must look like 01")  # Report the required format.
+    return normalized  # Return the normalized task number.
 
 
-def append_under_unreleased(text: str, entry: str) -> str:
-    """Append a new entry to the end of the Unreleased section."""
+def safe_filename_part(value: str) -> str:
+    """Convert a task name into a safe filename part."""
 
-    if "## Unreleased" not in text:  # Add the section when an older file lacks it.
-        return text.rstrip() + f"\n\n## Unreleased\n\n{entry}\n"  # Place the entry in the new section.
-    header_index = text.index("## Unreleased")  # Find the Unreleased heading.
-    search_start = header_index + len("## Unreleased")  # Start searching after the heading text.
-    next_header_index = text.find("\n## ", search_start)  # The next level-two heading ends the section.
-    if next_header_index == -1:  # No later release section means append to the file end.
-        return text.rstrip() + f"\n\n{entry}\n"  # Preserve existing order, then append the new entry.
-    before = text[:next_header_index].rstrip()  # Keep existing Unreleased content.
-    after = text[next_header_index:]  # Keep later release sections unchanged.
-    return before + f"\n\n{entry}\n" + after  # Insert at the end of Unreleased.
+    cleaned = SAFE_NAME_RE.sub("", value.strip())  # Remove unsafe path characters.
+    cleaned = re.sub(r"\s+", "_", cleaned)  # Convert whitespace to underscores.
+    if not cleaned:  # Empty names cannot create readable files.
+        raise ValueError("task_name must not be empty")  # Report the task-name requirement.
+    return cleaned  # Return the safe filename part.
 
 
-def append_change(
+def timestamp_text(timestamp: dt.datetime | str | None = None) -> str:
+    """Generate or normalize a timestamp as YYYYMMDDTHHMMSS."""
+
+    if timestamp is None:  # Use the current local time by default.
+        actual = dt.datetime.now()  # Read the current local time.
+        return actual.strftime("%Y%m%dT%H%M%S")  # Return a sortable timestamp.
+    if isinstance(timestamp, dt.datetime):  # Datetime values need formatting.
+        return timestamp.strftime("%Y%m%dT%H%M%S")  # Return a sortable timestamp.
+    compact = timestamp.strip().replace("-", "").replace(":", "")  # Remove common timestamp separators.
+    compact = compact.replace(" ", "T")  # Convert date-time space to the standard separator.
+    if not re.fullmatch(r"\d{8}T\d{6}", compact):  # The timestamp must be sortable.
+        raise ValueError("timestamp must look like 20260629T120000")  # Report the required timestamp format.
+    return compact  # Return the normalized timestamp.
+
+
+def change_path_for(
     root: Path,
-    title: str,
-    change_type: str,
-    doc_set: str | None = None,
-    today: str | None = None,
-    branch: str = "TODO",
-    base_branch: str = "main",
-) -> str:
-    """Create a CHANGE ID and write it to the target changelog."""
+    scenario: str,
+    task_number: int | str,
+    task_name: str,
+    timestamp: dt.datetime | str | None = None,
+) -> Path:
+    """Compute the change document path."""
 
-    changelog_path = changelog_path_for(root, doc_set)  # Choose the target changelog.
-    changelog_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the docs directory exists.
-    text = changelog_path.read_text(encoding="utf-8") if changelog_path.exists() else DEFAULT_CHANGELOG  # Read or create text.
-    actual_today = today or dt.date.today().isoformat()  # Use today's date when none is provided.
-    year = int(actual_today[:4])  # The year segment controls the CHANGE ID group.
-    change_id = next_change_id(text, year)  # Generate the next stable ID.
-    feature_group = changelog_path.parent.name  # Record which numbered feature group owns this change.
-    entry = build_entry(change_id, title, change_type, actual_today, branch, base_branch, feature_group)  # Build Markdown.
-    updated_text = append_under_unreleased(text, entry)  # Append to the Unreleased section.
-    changelog_path.write_text(updated_text, encoding="utf-8")  # Save the updated changelog as UTF-8.
-    return change_id  # Return the ID for scripts and tests.
+    scenario_name = normalize_scenario_name(scenario)  # Normalize the scenario folder name.
+    task_id = normalize_task_number(task_number)  # Normalize the task number.
+    safe_task_name = safe_filename_part(task_name)  # Normalize the task name for filenames.
+    stamp = timestamp_text(timestamp)  # Generate or normalize the timestamp.
+    filename = f"{stamp}-task{task_id}-{safe_task_name}.md"  # Build the change filename.
+    return root / "docs" / "cx" / scenario_name / "changes" / filename  # Return the full change path.
+
+
+def build_change_text(
+    timestamp: str,
+    task_number: str,
+    task_name: str,
+    previous: str,
+    current: str,
+    status: str = "open",
+) -> str:
+    """Render a change document as Markdown."""
+
+    return (  # Use fixed headings so AI can parse the handoff.
+        "# Change\n\n"
+        f"## Timestamp\n{timestamp}\n\n"
+        f"## Status\n{status}\n\n"
+        f"## Task\n{task_number}\n\n"
+        f"## Task Name\n{task_name}\n\n"
+        f"## What Was Done Before\n{previous}\n\n"
+        f"## What Should Happen Now\n{current}\n"
+    )  # Return the complete Markdown text.
+
+
+def create_change_document(
+    root: Path,
+    scenario: str,
+    task_number: int | str,
+    task_name: str,
+    previous: str,
+    current: str,
+    status: str = "open",
+    timestamp: dt.datetime | str | None = None,
+) -> Path:
+    """Create one change document and return its path."""
+
+    task_id = normalize_task_number(task_number)  # Normalize the task number.
+    stamp = timestamp_text(timestamp)  # Normalize the timestamp.
+    path = change_path_for(root, scenario, task_id, task_name, stamp)  # Compute the target path.
+    path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the changes directory exists.
+    text = build_change_text(stamp, task_id, task_name, previous, current, status)  # Render the change document.
+    path.write_text(text, encoding="utf-8")  # Write UTF-8 Markdown.
+    return path  # Return the generated path.
 
 
 def main() -> int:
-    """Append a CHANGE entry from the command line."""
+    """Reject command-line-parameter use for change creation."""
 
-    parser = argparse.ArgumentParser(description="Append a CHANGE-* entry to a target docs changelog.")  # Create parser.
-    parser.add_argument("title")  # Read the change title.
-    parser.add_argument("--type", default="feature", choices=["feature", "bugfix", "refactor", "test", "docs", "research"])  # Read type.
-    parser.add_argument("--root", default=".")  # Read repository root.
-    parser.add_argument("--doc-set", default=None)  # Read target documentation set.
-    parser.add_argument("--branch", default="TODO")  # Read work branch.
-    parser.add_argument("--base-branch", default="main")  # Read merge target branch.
-    parser.add_argument("--date", default=None)  # Let automation pass a fixed date.
-    args = parser.parse_args()  # Parse every argument.
-
-    change_id = append_change(  # Call the reusable helper.
-        Path(args.root).resolve(),  # Resolve the root path.
-        args.title,  # Pass the title.
-        args.type,  # Pass the change type.
-        doc_set=args.doc_set,  # Pass the target docs set.
-        today=args.date,  # Pass the optional date.
-        branch=args.branch,  # Pass the work branch.
-        base_branch=args.base_branch,  # Pass the merge target branch.
-    )
-    print(change_id)  # Print the new ID for the user or calling script.
-    return 0  # Return success.
+    print("Call create_change_document(...) from controlled automation; this script accepts no command-line parameters.")  # Explain the intended use.
+    return 1  # Return failure to avoid pretending a change was created.
 
 
 if __name__ == "__main__":

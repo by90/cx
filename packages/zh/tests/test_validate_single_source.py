@@ -1,143 +1,145 @@
 from __future__ import annotations
 
-import tempfile  # tempfile 创建自动清理的临时目录。
-import unittest  # unittest 是项目规定的 Python 单元测试框架。
-from pathlib import Path  # Path 让测试用面向对象方式创建文件路径。
+import tempfile  # tempfile 用于创建自动清理的临时仓库目录。
+import unittest  # unittest 是本项目规定的 Python 单元测试框架。
+from pathlib import Path  # Path 用于以面向对象方式构造测试文件路径。
 
-from tools.validate_single_source import validate_single_source  # 引入待测试的文档集校验函数。
+from tools.validate_single_source import validate_single_source  # 引入待测试的 docs/cx 校验入口。
 
 
 class TestValidateSingleSource(unittest.TestCase):
-    """覆盖编号功能组文档集和错误布局。"""
+    """覆盖 docs/cx 用例、任务和变更单一来源校验。"""
 
-    def test_root_doc_set_is_error(self) -> None:
-        """所有项目都必须使用编号功能组，不能把文档集放在 docs 根目录。"""
+    def test_valid_docs_cx_story_layout_passes(self) -> None:
+        """有效的主成功场景、任务和变更目录应通过校验。
 
-        with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
-            root = Path(tmpdir)  # 把临时目录转成 Path。
-            docs = root / "docs"  # 指向 docs 目录。
-            docs.mkdir()  # 创建 docs 目录。
-            (docs / "ENGINEERING_SPEC.md").write_text(  # 故意写入不允许的根主文档。
-                "# spec\n",
-                encoding="utf-8",
-            )
-            (docs / "CHANGELOG.md").write_text("# changelog\n", encoding="utf-8")  # 故意写入不允许的根变更记录。
-
-            report = validate_single_source(root)  # 执行校验。
-
-        self.assertFalse(report.ok)  # 根文档集必须失败。
-        self.assertIn(  # 错误应要求迁移到编号功能组目录。
-            "root docs must contain only indexes; move docs/ENGINEERING_SPEC.md into docs/001_feature_name/",
-            report.errors,
-        )
-
-    def test_valid_feature_folder_docs_pass(self) -> None:
-        """多功能组项目可以把文档集放到 docs 子目录。"""
+        本测试没有参数，也没有返回值；它验证最小合格 docs/cx 结构。
+        """
 
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
-            root = Path(tmpdir)  # 把临时目录转成 Path。
-            docs = root / "docs"  # 指向 docs 根目录。
-            feature = docs / "001_training"  # 指向编号小写下划线功能组文档目录。
-            feature.mkdir(parents=True)  # 创建 docs 和功能组目录。
-            (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # 写入根索引。
-            (docs / "VERSIONS.md").write_text("# versions\n", encoding="utf-8")  # 写入根版本索引。
-            (feature / "BDD.md").write_text(  # 写入功能组 BDD 文档。
-                "# BDD: 001_training\n\nFeature: 001_training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+            root = Path(tmpdir)  # 将临时目录包装为 Path。
+            scenario = root / "docs" / "cx" / "01.创建用户"  # 构造主成功场景目录。
+            task = scenario / "tasks" / "01.编写用户实体"  # 构造任务目录。
+            changes = scenario / "changes"  # 构造变更目录。
+            task.mkdir(parents=True)  # 创建任务目录及父目录。
+            changes.mkdir()  # 创建变更目录。
+            (root / "docs" / "cx" / "00.项目说明.md").write_text("# 项目说明\n", encoding="utf-8")  # 写入项目说明。
+            (scenario / "00.用例.md").write_text("# 用例\n\n## 主成功场景\n", encoding="utf-8")  # 写入用例文档。
+            (scenario / "00. 设计.md").write_text("# 设计\n\n## 公用代码\n", encoding="utf-8")  # 写入设计文档。
+            (task / "00.任务.md").write_text("# 任务\n\n## 类\nUser\n", encoding="utf-8")  # 写入任务文档。
+            (changes / "20260629T120000-任务01-编写用户实体.md").write_text(  # 写入变更文档。
+                "# 变更\n\n"
+                "## 时间戳\n2026-06-29T12:00:00\n\n"
+                "## 状态\n未完成\n\n"
+                "## 任务\n01\n\n"
+                "## 任务名称\n编写用户实体\n\n"
+                "## 之前做了什么\n尚未实现。\n\n"
+                "## 现在应该如何\n先写测试，再实现类。\n",
                 encoding="utf-8",
             )
-            (feature / "ENGINEERING_SPEC.md").write_text(  # 写入功能组主文档。
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # 写入功能组使用指南。
-            (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # 写入功能组变更记录。
 
-            report = validate_single_source(root)  # 执行校验。
+            report = validate_single_source(root)  # 执行 docs/cx 校验。
 
-        self.assertTrue(report.ok, report.errors)  # 多文档集布局应通过。
+        self.assertTrue(report.ok, report.errors)  # 合格结构必须通过。
 
-    def test_change_id_in_spec_is_error(self) -> None:
-        """CHANGE 只能在 changelog 中记录，不能写进研发主文档。"""
+    def test_missing_docs_cx_is_error(self) -> None:
+        """缺少 docs/cx 时应失败。
+
+        本测试没有参数，也没有返回值；它验证新 cx 根目录是强制入口。
+        """
 
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
-            root = Path(tmpdir)  # 把临时目录转成 Path。
-            docs = root / "docs"  # 指向 docs 目录。
-            feature = docs / "001_training"  # 指向功能组文档目录。
-            feature.mkdir(parents=True)  # 创建 docs 和功能组目录。
-            (docs / "INDEX.md").write_text("# index\n", encoding="utf-8")  # 写入根索引。
-            (feature / "ENGINEERING_SPEC.md").write_text(  # 主文档故意错误地写入 CHANGE。
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # 写入使用指南。
-            (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # 写入变更记录。
+            root = Path(tmpdir)  # 将临时目录包装为 Path。
 
-            report = validate_single_source(root)  # 执行校验。
+            report = validate_single_source(root)  # 对空仓库执行校验。
 
-        self.assertFalse(report.ok)  # 主文档出现 CHANGE 必须失败。
-        self.assertIn(  # 错误信息要指向同一文档集。
-            "CHANGE-2026-001 must be recorded in docs/001_training/CHANGELOG.md, not docs/001_training/ENGINEERING_SPEC.md",
-            report.errors,
-        )
+        self.assertFalse(report.ok)  # 缺少 docs/cx 必须失败。
+        self.assertIn("missing docs/cx directory", report.errors)  # 错误信息必须指向新根目录。
 
-    def test_bad_feature_folder_name_is_error(self) -> None:
-        """功能组目录必须带三位序号，并使用小写下划线。"""
+    def test_legacy_cx_documents_are_error(self) -> None:
+        """旧 cx 文档文件名应被拒绝。
+
+        本测试没有参数，也没有返回值；它验证旧文件不会继续作为单一来源。
+        """
 
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
-            root = Path(tmpdir)  # 把临时目录转成 Path。
-            docs = root / "docs"  # 指向 docs 根目录。
-            feature = docs / "1.Training"  # 故意使用旧的点号和大写命名。
-            feature.mkdir(parents=True)  # 创建 docs 和功能组目录。
-            (docs / "INDEX.md").write_text("# index\n", encoding="utf-8")  # 写入根索引。
-            (feature / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # 写入主文档。
-            (feature / "CHANGELOG.md").write_text("# changelog\n", encoding="utf-8")  # 写入变更记录。
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # 写入使用指南。
+            root = Path(tmpdir)  # 将临时目录包装为 Path。
+            legacy = root / "docs" / "001_user"  # 构造旧功能组目录。
+            legacy.mkdir(parents=True)  # 创建旧功能组目录。
+            old_name = "B" + "DD.md"  # 构造旧 cx 文件名，避免测试说明继续暴露旧流程入口。
+            (legacy / old_name).write_text("# old\n", encoding="utf-8")  # 写入旧 cx 文件。
+            (root / "docs" / "cx").mkdir()  # 创建新 cx 根目录，确保错误聚焦旧文件。
 
-            report = validate_single_source(root)  # 执行校验。
+            report = validate_single_source(root)  # 执行 docs/cx 校验。
 
-        self.assertFalse(report.ok)  # 旧命名必须失败。
-        self.assertIn(  # 错误信息要给出新命名示例。
-            "feature documentation folder must be named like docs/001_project_template: docs/1.Training",
-            report.errors,
-        )
+        self.assertFalse(report.ok)  # 旧文件残留必须失败。
+        expected_path = "docs/" + "001_user/" + "B" + "DD.md"  # 构造期望路径。
+        self.assertIn(f"legacy cx document is not allowed: {expected_path}", report.errors)  # 错误必须指出旧文件路径。
 
-    def test_extra_markdown_doc_is_error(self) -> None:
-        """docs 根目录不允许随意长期保存零散规划文档。"""
+    def test_bad_scenario_folder_name_is_error(self) -> None:
+        """主成功场景目录必须使用两位数字加点号命名。
 
-        with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
-            root = Path(tmpdir)  # 把临时目录转成 Path。
-            docs = root / "docs"  # 指向 docs 目录。
-            docs.mkdir()  # 创建 docs 目录。
-            (docs / "random_plan.md").write_text("# random\n", encoding="utf-8")  # 写入不允许的孤立文档。
-
-            report = validate_single_source(root)  # 执行校验。
-
-        self.assertFalse(report.ok)  # 孤立文档必须失败。
-        self.assertIn("unexpected long-lived docs file: docs/random_plan.md", report.errors)  # 确认错误明确。
-
-    def test_multi_doc_mode_requires_root_index(self) -> None:
-        """多功能组模式必须有 docs 根索引。"""
+        本测试没有参数，也没有返回值；它验证 `01.创建用户` 这类命名是强制规则。
+        """
 
         with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
-            root = Path(tmpdir)  # 把临时目录转成 Path。
-            feature = root / "docs" / "001_training"  # 指向编号功能组文档目录。
-            feature.mkdir(parents=True)  # 创建功能组目录。
-            (feature / "BDD.md").write_text(  # 写入必需的 BDD 文档。
-                "# BDD: 001_training\n\nFeature: 001_training\n\nScenario: BDD-TRAIN-001 - Train model\n",
-                encoding="utf-8",
-            )
-            (feature / "ENGINEERING_SPEC.md").write_text(  # 写入功能组主文档。
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # 写入使用指南。
-            (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # 写入功能组变更记录。
+            root = Path(tmpdir)  # 将临时目录包装为 Path。
+            scenario = root / "docs" / "cx" / "1_创建用户"  # 构造错误命名的场景目录。
+            (scenario / "tasks" / "01.编写用户实体").mkdir(parents=True)  # 创建任务目录。
+            (scenario / "changes").mkdir()  # 创建变更目录。
+            (scenario / "00.用例.md").write_text("# 用例\n", encoding="utf-8")  # 写入用例文档。
+            (scenario / "00. 设计.md").write_text("# 设计\n", encoding="utf-8")  # 写入设计文档。
+            (scenario / "tasks" / "01.编写用户实体" / "00.任务.md").write_text("# 任务\n", encoding="utf-8")  # 写入任务文档。
 
-            report = validate_single_source(root)  # 执行校验。
+            report = validate_single_source(root)  # 执行 docs/cx 校验。
 
-        self.assertFalse(report.ok)  # 缺少根索引必须失败。
-        self.assertIn("multi-doc-set mode requires docs/INDEX.md or docs/README.md", report.errors)  # 确认索引错误。
+        self.assertFalse(report.ok)  # 错误命名必须失败。
+        self.assertIn("scenario folder must be named like docs/cx/01.创建用户: docs/cx/1_创建用户", report.errors)  # 错误必须给出目标格式。
+
+    def test_task_document_must_be_inside_task_folder(self) -> None:
+        """任务文档不能直接散落在 tasks 根目录。
+
+        本测试没有参数，也没有返回值；它验证每个任务必须独占一个任务文件夹。
+        """
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
+            root = Path(tmpdir)  # 将临时目录包装为 Path。
+            scenario = root / "docs" / "cx" / "01.创建用户"  # 构造主成功场景目录。
+            tasks = scenario / "tasks"  # 构造 tasks 根目录。
+            tasks.mkdir(parents=True)  # 创建 tasks 目录。
+            (scenario / "changes").mkdir()  # 创建 changes 目录。
+            (scenario / "00.用例.md").write_text("# 用例\n", encoding="utf-8")  # 写入用例文档。
+            (scenario / "00. 设计.md").write_text("# 设计\n", encoding="utf-8")  # 写入设计文档。
+            (tasks / "00.任务.md").write_text("# 任务\n", encoding="utf-8")  # 故意写入散落任务文档。
+
+            report = validate_single_source(root)  # 执行 docs/cx 校验。
+
+        self.assertFalse(report.ok)  # 散落任务文档必须失败。
+        self.assertIn("task document must live under a task folder, not tasks/00.任务.md", report.errors)  # 错误必须指出散落文件。
+
+    def test_change_document_requires_working_headings(self) -> None:
+        """变更文档必须包含 AI 判断下一步所需章节。
+
+        本测试没有参数，也没有返回值；它验证变更文件不是普通流水账。
+        """
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # 创建临时仓库根目录。
+            root = Path(tmpdir)  # 将临时目录包装为 Path。
+            scenario = root / "docs" / "cx" / "01.创建用户"  # 构造主成功场景目录。
+            task = scenario / "tasks" / "01.编写用户实体"  # 构造任务目录。
+            changes = scenario / "changes"  # 构造变更目录。
+            task.mkdir(parents=True)  # 创建任务目录及父目录。
+            changes.mkdir()  # 创建变更目录。
+            (scenario / "00.用例.md").write_text("# 用例\n", encoding="utf-8")  # 写入用例文档。
+            (scenario / "00. 设计.md").write_text("# 设计\n", encoding="utf-8")  # 写入设计文档。
+            (task / "00.任务.md").write_text("# 任务\n", encoding="utf-8")  # 写入任务文档。
+            (changes / "20260629T120000-任务01-编写用户实体.md").write_text("# 变更\n", encoding="utf-8")  # 故意缺少必要章节。
+
+            report = validate_single_source(root)  # 执行 docs/cx 校验。
+
+        self.assertFalse(report.ok)  # 缺少章节必须失败。
+        self.assertIn("missing heading ## 现在应该如何 in docs/cx/01.创建用户/changes/20260629T120000-任务01-编写用户实体.md", report.errors)  # 错误必须指出缺失章节。
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main()  # 允许直接用 unittest 运行本文件。

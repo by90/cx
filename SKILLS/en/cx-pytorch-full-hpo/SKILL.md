@@ -12,7 +12,7 @@ Validate quick-HPO candidates on complete data, select the best through third-be
 
 ## Iron Rules
 
-1. Full tuning must use `$cx-pytorch-quick-hpo` best recipe and candidate list as input. If quick tuning is skipped, document the reason, risk, and replacement validation path in the target documentation set.
+1. Full tuning must use `$cx-pytorch-quick-hpo` best recipe and candidate list as input. If quick tuning is skipped, document the reason, risk, and replacement validation path in the target `docs/cx` task, change, or experiment summary.
 2. The training script must run by itself with default configuration. The full-tuning script may only clone and modify typed config in memory through a config hook, then pass that config object into the training entrypoint.
 3. The backtest script must run by itself with default configuration. The full-tuning script may only call the backtest entrypoint with an in-memory config object and must not edit the current backtest config file.
 4. When saving results, the tuning script may only persist trial configs, full-data recipes, test metrics, backtest configs, and model artifact paths into the output directory. Never rewrite the current project config, default config, or user-maintained config files.
@@ -40,7 +40,7 @@ Validate quick-HPO candidates on complete data, select the best through third-be
 8. If the user confirms comparison, train and backtest rank-2 and rank-3 candidates in order, then rank all candidates by `val_loss`, `test_loss`, Top10 hit rate, missed-candidate mean gain, downside share, downside mean loss, and business risk.
 9. For multi-model projects, select each model's per-model best candidate first, then compare the per-model winners to choose the global best. Set the global best as the default inference release.
 10. Update, or require updating, the root `main` terminal menu and each model's `main` terminal menu so the global best release is selected by default while users can choose other model releases for inference.
-11. After selecting the best model, write model artifact, recipe, test results, backtest results, five-minute tracking summaries, resource monitoring, data version, random seed, global-best basis, default inference release, and release recommendation into target documentation-set evidence.
+11. After selecting the best model, write model artifact, recipe, test results, backtest results, five-minute tracking summaries, resource monitoring, data version, random seed, global-best basis, default inference release, and release recommendation into the target `docs/cx` task, change, or experiment summary.
 
 ## Verification Evidence
 

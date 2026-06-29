@@ -1,189 +1,116 @@
-# cx Codex BDD/TDD Workflow Pack
+# cx Codex Use-Case-Driven TDD Workflow Pack
 
-cx is a Codex skill package for disciplined human-AI software development. Its core goal is to make AI-assisted work follow a durable BDD/TDD collaboration workflow: discover behavior with BDD, prove it with TDD, record change history, keep release versions standard, and preserve verification evidence.
+cx is a Codex skill package for disciplined human-AI software development. Its core goal is to make AI first anchor work in `docs/cx` use cases, design notes, tasks, and change documents, then implement Python, PyTorch, and Rust projects with strict TDD and strict OOP or equivalent type modeling.
 
-cx is not a component library. Implementation domains such as progress UI widgets, ragged tensor utilities, or Rust UI components should live in their own project/component directories with their own README, API docs, and tests. They are not core cx skills.
+cx is not a component library or business implementation. It defines collaboration flow, document structure, task splitting, test-first work, release versioning, and delivery evidence.
 
-Current package version: `0.1.2`. cx is still experimental and has not yet been validated as a stable 1.0 workflow.
+Current package version: `0.1.2`. cx is still experimental and has not declared a stable `1.0.0` workflow.
 
-For Chinese documentation, see [README.zh-CN.md](README.zh-CN.md).
+Chinese README: [README.zh-CN.md](README.zh-CN.md). In this repository, Chinese workflow changes are completed first and then synchronized into English.
 
-## What cx Installs
+## Installable Content
 
-This repository publishes two language packs for the same workflow:
+This repository publishes the same workflow in two language packages:
 
-- `SKILLS/en`: English skills.
 - `SKILLS/zh`: Chinese skills.
+- `SKILLS/en`: English skills.
 
-Users do not need to clone this repository or install a separate `cx` command. Installation and updates are handled by `shskills`, which reads the repository `SKILLS/` directory from GitHub.
-
-## Prepare shskills
-
-Use it temporarily:
-
-```powershell
-uvx shskills --help
-```
-
-Install it long-term:
-
-```powershell
-uv tool install shskills
-```
+Users do not need to install a `cx` command first. Install and update skills directly with `shskills`.
 
 ## Install Or Update
 
-Local Codex skills must be installed or updated only from the repository's default `main` branch. Do not pass `--ref`, and do not update local skills from work branches.
+Local Codex skills should be installed or updated only from the repository's default `main` branch.
 
-On machines with this repository cloned, prefer the installer script. It updates skills from remote `main` and automatically overwrites the global `AGENTS.md`:
+Recommended from a cloned repository:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tools\install_cx_en.ps1
 ```
 
-`shskills install` currently installs skills only; it does not overwrite `$env:USERPROFILE\.codex\AGENTS.md` or `$env:CODEX_HOME\AGENTS.md`. If you use the raw `shskills` command, sync the matching package `AGENTS.md` separately.
-
-Install the English cx skills into the global Codex skills directory:
+Raw `shskills` install:
 
 ```powershell
+uv tool install shskills
 shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath en --force --clean
 ```
 
-If `CODEX_HOME` is set, use:
-
-```powershell
-shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:CODEX_HOME\skills" --subpath en --force --clean
-```
-
-For Chinese, change `--subpath en` to `--subpath zh`.
+If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 
 ## Core Workflow
 
-1. `$cx-workflow` classifies the request, creates a visible todo list in the conversation, and selects the smallest necessary set of skills.
-2. `$cx-bdd` creates or updates the ordered feature folder and BDD scenarios when behavior discovery is needed; ordinary non-programming tasks do not create BDD automatically.
-3. After `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md` are complete, the agent must stop, report the document result and next implementation plan, and wait for explicit user confirmation.
-4. After confirmation, the agent keeps updating the todo list while `$cx-tdd` maps BDD scenarios to failing tests, runs red/green/refactor, and records evidence.
-5. Specialist skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, or `$cx-common-module` add language or design constraints.
-6. `$cx-changelog`, `$cx-version`, and `$cx-evidence` keep the work auditable before release or delivery; before finalizing, every todo item must be completed, canceled, or explicitly blocked.
+1. `$cx-workflow` classifies the request, creates a visible todo list, and selects the smallest required skills.
+2. `$cx-story` maintains use cases, design notes, tasks, and changes under `docs/cx`.
+3. Each main success scenario has one folder, such as `docs/cx/01.create_user/`.
+4. Each scenario folder contains `00.use_case.md`, `00.design.md`, `tasks/`, and `changes/`.
+5. Each task is a folder, such as `tasks/01.write_user_entity/00.task.md`.
+6. Each change is written under `changes/<timestamp>-task<id>-<task_name>.md`; AI checks unfinished changes before choosing work.
+7. One task handles one task document, one code file, and one matching unit-test file when needed.
+8. Before work starts, the agent asks one execution-mode question: finish documentation, tests, implementation, and validation directly, or ask after each completed task.
+9. If the user does not explicitly choose per-task confirmation, the default is direct completion; document completion does not stop the flow.
+10. Only per-task confirmation mode stops after each task and waits for review.
+11. `$cx-tdd` runs narrow failing tests, minimal implementation, and refactor. `$cx-pytorch-tdd`, `$cx-rust-tdd`, and `$cx-common-module` add language and reusable-entrypoint constraints.
 
-## Branch And Release Gates
-
-Every feature group should be developed on a short-lived local work branch. When the feature group is complete and the user has confirmed the work, merge that branch into `main`, delete the local work branch, and push only `main`.
-
-When a feature group is added and completed during pre-1.0 development, bump only the minor version, such as `0.1.3` to `0.2.0`. Changes, bug fixes, or adjustments inside an existing feature group bump only the patch version, such as `0.1.3` to `0.1.4`. Confirm the completed version with the user before creating a release.
-
-When the user only asks to update, bump, or prepare the version, default to bumping patch only; bump earlier version segments only when the user explicitly asks for a new feature group, minor, major, stable, or incompatible release.
-
-Release order is strict:
-
-1. Finish the local feature-group branch.
-2. After the user confirms the version is complete, merge that branch into `main` and delete the local branch.
-3. Only on `main`, create the version commit, create the annotated `vX.Y.Z` tag, then push `main` and the release tag.
-
-Do not create release commits or tags on work branches.
-The remote repository should keep only `main` and version tags. Do not push work branches unless the user explicitly overrides this main-only remote policy in the current conversation.
-
-## Runtime Environment And UI Checks
-
-Before long builds, tests, installation, or UI real-device checks, the agent should find and start the project-provided keep-awake or session-preservation mechanism for the current platform, then restore it before ending, blocking, or handing off. After UI changes in a macOS desktop or GUI project, the agent must package, install, or launch the real app using the project workflow, then use Computer Use or the project-required real-device check to observe the result and record commands, results, and residual risk as verification evidence.
-
-Python commands should prefer the project `uv` workflow or a Python interpreter installed and managed by `uv`, such as `uv run python ...` or `uv run --python <version> ...`; system Python is for environment inspection, not the default runtime for tests, builds, or tooling commands.
-
-## Prompt Contract
-
-cx works best when the human prompt gives the agent a small, explicit contract instead of a vague task. Use this structure for Codex, Claude Code, or any coding agent:
+## docs/cx Layout
 
 ```text
-Goal:
-Context:
-Constraints:
-Required workflow:
-Verification:
-Deliverables:
+docs/cx/
+docs/cx/00.project.md
+docs/cx/01.create_user/
+docs/cx/01.create_user/00.use_case.md
+docs/cx/01.create_user/00.design.md
+docs/cx/01.create_user/tasks/
+docs/cx/01.create_user/tasks/01.write_user_entity/00.task.md
+docs/cx/01.create_user/changes/
+docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
 ```
 
-The prompt should name the target feature folder when known, the cx skills to use, commands that must pass, and what evidence should be left behind. If the prompt is missing acceptance criteria, target environment, or verification requirements, `$cx-workflow` should ask the smallest clarifying question. For development tasks that need a documentation set, the agent must wait for user confirmation after documents are complete and before tests or implementation.
-
-For projects that also use Claude Code, keep `AGENTS.md` as the shared source of repository rules and have `CLAUDE.md` import or point to it. Do not maintain two divergent instruction files.
-
-When the Chinese cx package is installed, every cx-generated or cx-maintained document must be Simplified Chinese. When the user asks to commit, deliver, open a PR, or release, the AGENTS template treats the current working tree as one commit and does not split files by who changed them or whether they are untracked.
-
-Every project is organized as multiple feature groups. Feature documentation folders must use a three-digit order prefix, lowercase words, and underscores:
-
-```text
-docs/001_configuration_system/
-docs/002_user_sessions/
-docs/003_model_evaluation/
-```
-
-The BDD document inside the folder must use the same name:
-
-```text
-docs/001_configuration_system/BDD.md
-# BDD: 001_configuration_system
-
-Feature: 001_configuration_system
-```
-
-Chinese projects use the same folder-name convention while writing document content in Simplified Chinese:
-
-```text
-docs/001_config_system/
-docs/001_config_system/BDD.md
-# BDD: 001_config_system
-Feature: 001_config_system
-```
-
-The `docs/` root is reserved for `INDEX.md`, `README.md`, and `VERSIONS.md`; concrete engineering documents live in numbered feature-group folders. If a non-programming request might or might not need BDD, `$cx-workflow` should ask the user first.
+All cx scenario, task, process, and change documents belong under `docs/cx`. Documents elsewhere are unrelated to cx.
 
 ## Available Skills
 
-| Skill | Use for |
+| Skill | Purpose |
 | --- | --- |
-| `$cx-workflow` | Entry point for task routing, workflow selection, and deciding whether BDD, TDD, research, release versioning, or evidence review is needed. |
-| `$cx-bdd` | BDD discovery, ordered feature-folder naming, business rules, Gherkin-style examples, acceptance criteria, and main/alternate/exception scenarios. |
-| `$cx-tdd` | Test-first implementation after BDD: red-green-refactor, narrow failing tests, Test Matrix updates, code quality gates, and verification evidence. |
-| `$cx-changelog` | `CHANGE-*` entries, changelog consistency, and mapping changes back to the same feature documentation set. |
-| `$cx-version` | Release version management using the target project's `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, annotated `vX.Y.Z` Git tags, and GitHub Releases. |
-| `$cx-research` | Model selection, model mechanism research, recent AI paper scans, academic/blog synthesis, and citation-backed recommendations. |
-| `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensor utilities, ML tests, deterministic small test data, and strict Python OOP/TDD quality rules. |
-| `$cx-pytorch-quick-hpo` | PyTorch quick tuning: one-tenth complete-entity samples, field-contribution research, feature sets, window length, labels, training hyperparameters, optimizer/scheduler choices, model-capacity screening, and convergence evidence. |
-| `$cx-pytorch-full-hpo` | PyTorch full-data tuning: complete-data training, test-set evaluation, backtesting, top-3 candidate comparison, release-candidate model selection, and evidence recording. |
-| `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling: field-role classification, covariates, leakage checks, backtesting, PyTorch Forecasting as the primary reference, and deep model selection. |
-| `$cx-rust-tdd` | Rust implementation and TDD: structs/enums/traits, ownership, `Result` errors, `cargo test`, `rustfmt`, `clippy`, and non-UI Rust code quality. |
-| `$cx-common-module` | Generic capabilities, reusable features, reusable classes, stable APIs, migration plans, and duplicate logic control. |
-| `$cx-evidence` | Final delivery review for BDD/TDD compliance, test output, changelog/spec consistency, and missing evidence. |
+| `$cx-workflow` | Workflow routing and minimal skill selection |
+| `$cx-story` | Use cases, main success scenarios, branch scenarios, tasks, and changes |
+| `$cx-tdd` | Strict test-first work, narrow failing tests, minimal implementation, and refactor |
+| `$cx-changelog` | `changes/` documents, release notes, and audit trails |
+| `$cx-version` | Project-local `tools/semver.py`, `VERSION`, `docs/VERSIONS.md`, release tags, and release validation |
+| `$cx-research` | Model selection, paper research, source filtering, and cited synthesis |
+| `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensors, training, and ML tests |
+| `$cx-pytorch-quick-hpo` | Quick PyTorch tuning, field contribution research, feature sets, and candidates |
+| `$cx-pytorch-full-hpo` | Full PyTorch tuning, full-data training, evaluation, backtesting, and candidate selection |
+| `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling and PyTorch Forecasting selection |
+| `$cx-rust-tdd` | Rust type design, ownership design, built-in tests, `cargo fmt`, `cargo test`, and `clippy` |
+| `$cx-common-module` | Reusable features, reusable classes, public entrypoints, and repeated logic convergence |
+| `$cx-evidence` | Pre-handoff evidence review |
 
-## Version Management
+## Prompt Contract
 
-cx uses standard release mechanics:
+A strong coding-agent prompt should include:
 
-- `VERSION` is the single source of truth and stores a SemVer value without a leading `v`.
+- Goal: behavior or result to change.
+- Context: target `docs/cx` scenario, task, change, files, branch, or environment.
+- Constraints: API, language rules, performance, compatibility, or style limits.
+- Required workflow: cx skills to use and whether TDD, research, versioning, or evidence review is needed.
+- Verification: commands, tests, screenshots, or checks expected.
+- Deliverables: code, documents, change records, evidence, or summary.
+
+## Release Versioning
+
+- `VERSION` is the single source of truth.
 - `packages/en/manifest.json` and `packages/zh/manifest.json` must match `VERSION`.
 - Root `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-- Release tags use annotated Git tags named `vX.Y.Z`, consistent with Git release tagging practice.
-- GitHub Releases can use the matching changelog section as release notes.
+- Release tags use annotated Git tags named `vX.Y.Z`.
 
-Version numbers use `MAJOR.MINOR.PATCH`:
-
-- New or unproven projects start at `0.0.1` unless the user explicitly says the project has reached `1.0.0`.
-- Major version `0` means the project is not formally released. Interface and workflow contract changes are expected during this phase.
-- While major version is `0`, adding a feature group bumps only minor, for example `0.1.3` to `0.2.0`.
-- While major version is `0`, changes, bug fixes, or adjustments inside an existing feature group bump only patch, for example `0.1.3` to `0.1.4`.
-- `1.0.0` means the first stable public workflow/API contract after the project is complete and explicitly declared stable.
-- After `1.0.0`, compatible public additions use minor versions such as `1.1.0`, and incompatible public contract changes use major versions such as `2.0.0`.
-
-For cx specifically, the split from `$cx-bdd-tdd` into `$cx-bdd` and `$cx-tdd` remains in the pre-1.0 experimental line. The branch/release-gate feature group is released as `0.1.0`; it is not a `1.0.0` stability declaration or a `2.0.0` breaking release.
-
-Useful commands:
+Common commands:
 
 ```bash
 python tools/cx_version.py show .
 python tools/cx_version.py check .
-python tools/validate_release.py .  # must run on main for release commits/tags
+python tools/validate_release.py .
 ```
 
-For target projects, copy `SKILLS/<language>/cx-version/scripts/semver.py` to the project's `tools/semver.py`, then use:
+Target projects copy `$cx-version`'s `scripts/semver.py` to `tools/semver.py` and use:
 
 ```bash
 python tools/semver.py next feature-group --root .
@@ -191,13 +118,7 @@ python tools/semver.py next patch --root .
 python tools/semver.py prepare <version> "<title>" --root .
 ```
 
-## Research Basis
-
-The BDD rules follow Cucumber/Gherkin conventions: BDD is discovery, collaboration, and examples; Gherkin uses `Feature`, `Rule`, `Scenario`, `Given`, `When`, and `Then`; a feature file has one feature and scenarios should stay focused. See the [Cucumber introduction](https://cucumber.io/docs), [Gherkin reference](https://cucumber.io/docs/gherkin/reference/), and [Three Amigos guidance](https://cucumber.io/docs/bdd/who-does-what/).
-
-The release rules follow [Semantic Versioning](https://semver.org/), [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and Git annotated tags. The research workflow uses academic-source discovery patterns from sources such as [Semantic Scholar](https://www.semanticscholar.org/product/api) and PRISMA-style screening discipline.
-
-## Release Validation
+## Pre-Release Validation
 
 ```bash
 python tools/cx_version.py check .

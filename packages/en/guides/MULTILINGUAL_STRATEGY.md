@@ -2,39 +2,39 @@
 
 ## Recommendation
 
-Maintain one GitHub repository with two installable language packages:
+Maintain two installable language packages in one GitHub repository:
 
 ```text
 packages/en
 packages/zh
 ```
 
-The skill names and agent names must be identical in both packages and must start with `cx-`. The language changes only human-facing content: descriptions, instructions, templates, guides, and examples.
+English and Chinese skill and agent names must match exactly and start with `cx-`. Language affects only human-facing content: descriptions, instructions, templates, guides, and examples.
 
-## Documentation Language Constraint
+## Synchronization Order
 
-A target project installs only one language package. When the Chinese package is installed, every long-lived document generated or maintained by cx must be Simplified Chinese, including BDD, engineering specs, changelogs, indexes, implementation plans, test matrices, and verification evidence. Code identifiers, commands, API names, and quoted external names may remain in their source language.
+When this repository changes workflow rules, skills, templates, or examples, complete the Chinese package first, then synchronize the English package. The Chinese package is the rule source; the English package must keep the same structure and constraints.
 
-## Why not install both languages into one target project
+## Document Language
 
-Codex discovers skills by scanning `.agents/skills` from the current working directory up to the repository root. If two skills share the same `name`, they are not merged; both may appear. That creates ambiguity and wastes context. Install only one language pack into the target repository.
+A target project installs one language package only. With the English package installed, cx-generated and cx-maintained documents should use English. With the Chinese package installed, those documents must use Simplified Chinese. Code identifiers, commands, API names, library names, and external proper names may remain in their source language.
 
-## GitHub README approach
+## Why Not Install Both
 
-Put a short `README.md` in the repository root and link to `README.zh-CN.md`. GitHub renders the root README as the primary visitor page and relative links keep the repository usable after cloning.
+Codex discovers `.agents/skills` from the working directory upward. If two language packages use the same `name`, they may both appear instead of merging. That creates ambiguity and wastes context.
 
-## Naming stability
+## Stable Names
 
-Keep names stable across language packages. During pre-1.0 development, new feature groups use minor versions, while changes, bug fixes, or adjustments inside existing feature groups use patch versions and the major version stays `0`; after `1.0.0`, incompatible renames require a major release:
-
-- `$cx-bdd`
+- `$cx-workflow`
+- `$cx-story`
 - `$cx-tdd`
 - `$cx-changelog`
 - `$cx-version`
 - `$cx-research`
 - `$cx-pytorch-tdd`
+- `$cx-pytorch-quick-hpo`
+- `$cx-pytorch-full-hpo`
+- `$cx-timeseries-modeling`
 - `$cx-rust-tdd`
 - `$cx-common-module`
 - `$cx-evidence`
-
-Consistent names let users write prompts, tutorials, and automation once, then choose the language package separately.

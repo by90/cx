@@ -1,180 +1,230 @@
 #!/usr/bin/env python3
-"""Validate cx documentation-set layout for a target repository."""
+"""Validate the docs/cx use-case, task, and change single-source policy.
+
+This file exposes `validate_single_source` for checking project-level docs, scenario folders,
+task folders, and change folders under `docs/cx`. Main classes are `ScenarioFolder` and
+`ValidationReport`.
+"""
 
 from __future__ import annotations
 
-import argparse  # argparse turns command-line arguments into Python objects.
-import re  # re finds CHANGE IDs and BDD IDs with regular expressions.
-from dataclasses import dataclass  # dataclass declares small result objects.
-from pathlib import Path  # Path handles filesystem paths in an object-oriented way.
+import re  # Use regular expressions for stable folder and file naming checks.
+from dataclasses import dataclass  # Use dataclasses for immutable validation data objects.
+from pathlib import Path  # Use Path for object-oriented cross-platform filesystem paths.
 
 
-CHANGE_ID_RE = re.compile(r"CHANGE-\d{4}-\d{3}")  # Match stable change IDs.
-BDD_ID_RE = re.compile(r"BDD-[A-Z0-9]+-\d{3}")  # Match stable behavior scenario IDs.
-FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # Match folders like 001_project_template.
-ROOT_INDEX_DOCS = {"INDEX.md", "README.md", "VERSIONS.md"}  # Root docs may keep only indexes, instructions, and versions.
-ROOT_FORBIDDEN_DOCS = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # Root docs must not hold feature files.
-DOC_SET_FILES = {"ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # Each feature set needs these files.
-OPTIONAL_DOC_SET_FILES = {"BDD.md", "INDEX.md", "README.md"}  # BDD exists only when behavior work needs it.
+SCENARIO_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # A main success scenario folder looks like 01.create_user.
+TASK_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # A task folder looks like 01.write_user_entity.
+CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}-task\d{2}-.+\.md\Z")  # A change file carries timestamp, task id, and task name.
+LEGACY_CX_FILE_NAMES = {"B" + "DD.md", "ENGINEERING" + "_SPEC.md", "CHANGE" + "LOG.md", "GUIDE.md"}  # Old cx files are not allowed.
+LEGACY_CX_TEXT_RE = re.compile(r"\bB" + r"DD\b|\bGher" + r"kin\b|ENGINEERING" + r"_SPEC|CHANGE" + r"LOG")  # Old workflow words are not allowed in cx docs.
+CHANGE_REQUIRED_HEADINGS = (
+    "## Timestamp",
+    "## Status",
+    "## Task",
+    "## Task Name",
+    "## What Was Done Before",
+    "## What Should Happen Now",
+)  # Each change must include the fields that let AI continue work safely.
 
 
 @dataclass(frozen=True)
-class DocSet:
-    """Describe one folder that owns an engineering spec and changelog."""
+class ScenarioFolder:
+    """Represent one main success scenario folder under docs/cx."""
 
-    root_relative: str  # User-facing relative path for error messages.
-    directory: Path  # Actual directory path for file checks.
-    spec_path: Path  # Full path to ENGINEERING_SPEC.md.
-    changelog_path: Path  # Full path to CHANGELOG.md.
+    root_relative: str  # Store a user-facing relative path like docs/cx/01.create_user.
+    directory: Path  # Store the real scenario directory path.
+    usecase_path: Path  # Store the use-case document path.
+    design_path: Path  # Store the design document path.
+    tasks_path: Path  # Store the tasks directory path.
+    changes_path: Path  # Store the changes directory path.
 
 
 @dataclass(frozen=True)
 class ValidationReport:
     """Return validation success, errors, and warnings as one object."""
 
-    ok: bool  # True means there are no errors.
-    errors: tuple[str, ...]  # Errors are issues that must be fixed.
-    warnings: tuple[str, ...]  # Warnings are issues worth attention.
+    ok: bool  # True means no blocking errors were found.
+    errors: tuple[str, ...]  # Store blocking validation errors.
+    warnings: tuple[str, ...]  # Store non-blocking validation warnings.
+
+
+class ScenarioScanner:
+    """Scan docs/cx without spreading filesystem traversal across validators."""
+
+    def __init__(self, root: Path = Path(".")) -> None:
+        """Create a scanner.
+
+        `root` is the target repository root; this method stores paths and returns no value.
+        """
+
+        self.root = root  # Store the repository root for later scans.
+        self.docs_dir = root / "docs"  # Store the docs root for legacy-file checks.
+        self.cx_dir = self.docs_dir / "cx"  # Store the new cx single-source root.
+
+    def scenario_folders(self) -> list[ScenarioFolder]:
+        """Return all direct main success scenario folders under docs/cx."""
+
+        if not self.cx_dir.exists():  # Missing docs/cx means there are no scenarios to scan.
+            return []  # Return an empty list and let the caller report the missing root.
+        folders: list[ScenarioFolder] = []  # Collect scenario folders in a stable list.
+        for child in sorted(self.cx_dir.iterdir()):  # Iterate direct docs/cx children by name.
+            if child.is_dir():  # Only directories can be main success scenarios.
+                folders.append(self._build_scenario(child))  # Convert the directory to a structured object.
+        return folders  # Return all discovered scenario folders.
+
+    def legacy_cx_files(self) -> list[Path]:
+        """Return old fixed-name cx files still present under docs."""
+
+        if not self.docs_dir.exists():  # Without docs there are no old files to scan.
+            return []  # Return an empty list and let docs/cx validation handle the root error.
+        return sorted(  # Sort results so error output is stable.
+            path  # Return each matching path.
+            for path in self.docs_dir.rglob("*")  # Recursively scan docs.
+            if path.is_file() and path.name in LEGACY_CX_FILE_NAMES  # Match only old fixed cx names.
+        )
+
+    def _build_scenario(self, directory: Path) -> ScenarioFolder:
+        """Convert a directory into a `ScenarioFolder`.
+
+        `directory` is the scenario candidate; the return value contains all convention paths.
+        """
+
+        return ScenarioFolder(  # Build an immutable scenario path object.
+            root_relative=f"docs/cx/{directory.name}",  # Store the user-facing path.
+            directory=directory,  # Store the real directory path.
+            usecase_path=directory / "00.use_case.md",  # Store the English use-case path.
+            design_path=directory / "00.design.md",  # Store the English design path.
+            tasks_path=directory / "tasks",  # Store the tasks directory path.
+            changes_path=directory / "changes",  # Store the changes directory path.
+        )
 
 
 def read_text(path: Path) -> str:
-    """Read UTF-8 text, returning an empty string when the file is absent."""
+    """Read UTF-8 text, returning an empty string for missing files."""
 
-    if path.exists():  # Read only when the file exists.
-        return path.read_text(encoding="utf-8")  # cx documents are UTF-8 text.
-    return ""  # Missing files return empty text so validation can continue.
-
-
-def markdown_files(directory: Path) -> set[str]:
-    """Return Markdown file names directly inside one directory."""
-
-    if not directory.exists():  # A missing directory has no Markdown files.
-        return set()  # Return an empty set for easy set operations.
-    return {path.name for path in directory.glob("*.md") if path.is_file()}  # Collect only direct file names.
+    if path.exists():  # Read only existing files to avoid masking other validation errors.
+        return path.read_text(encoding="utf-8")  # cx text files use UTF-8 without BOM.
+    return ""  # Missing files produce empty text for downstream checks.
 
 
-def discover_doc_sets(root: Path) -> list[DocSet]:
-    """Find numbered feature-folder documentation sets under docs/."""
+def markdown_files(directory: Path) -> list[Path]:
+    """Return direct Markdown files under one directory."""
 
-    docs_dir = root / "docs"  # All long-lived docs live under docs/.
-    doc_sets: list[DocSet] = []  # Store every discovered documentation set.
-    if docs_dir.exists():  # Scan children only when docs/ exists.
-        for child in sorted(path for path in docs_dir.iterdir() if path.is_dir()):  # Inspect first-level feature folders.
-            child_spec = child / "ENGINEERING_SPEC.md"  # Feature-set engineering spec path.
-            child_changelog = child / "CHANGELOG.md"  # Feature-set changelog path.
-            child_guide = child / "GUIDE.md"  # Feature-set usage guide path.
-            child_bdd = child / "BDD.md"  # Optional behavior document path.
-            if child_spec.exists() or child_changelog.exists() or child_guide.exists() or child_bdd.exists():  # Any set file makes a child candidate.
-                doc_sets.append(  # Save this feature-group documentation set.
-                    DocSet(
-                        root_relative=f"docs/{child.name}",  # User-facing feature docs path.
-                        directory=child,  # Feature documentation set directory.
-                        spec_path=child_spec,  # Feature engineering spec file.
-                        changelog_path=child_changelog,  # Feature changelog file.
-                    )
-                )
-    return doc_sets  # Return every candidate documentation set.
+    if not directory.exists():  # Missing directories contain no Markdown files.
+        return []  # Return an empty list to keep callers simple.
+    return sorted(path for path in directory.glob("*.md") if path.is_file())  # Collect only direct Markdown files.
 
 
-def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
-    """Validate one documentation set and return errors plus warnings."""
+def validate_scenario_folder(scenario: ScenarioFolder) -> tuple[list[str], list[str]]:
+    """Validate one main success scenario folder."""
 
-    errors: list[str] = []  # Collect this set's errors.
-    warnings: list[str] = []  # Collect this set's warnings.
-    if not FEATURE_FOLDER_RE.fullmatch(doc_set.directory.name):  # Feature folders need a number and lowercase underscores.
-        errors.append(f"feature documentation folder must be named like docs/001_project_template: {doc_set.root_relative}")  # Report bad naming.
-    bdd_path = doc_set.directory / "BDD.md"  # BDD exists only when behavior work needs it.
-    if not doc_set.spec_path.exists():  # Every set needs an engineering spec.
-        errors.append(f"missing {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Report the missing spec.
-    if not doc_set.changelog_path.exists():  # Every set needs a changelog.
-        errors.append(f"missing {doc_set.root_relative}/CHANGELOG.md")  # Report the missing changelog.
-    if not (doc_set.directory / "GUIDE.md").exists():  # Every feature group needs a usage guide.
-        errors.append(f"missing {doc_set.root_relative}/GUIDE.md")  # Report the missing guide.
-
-    allowed = DOC_SET_FILES | OPTIONAL_DOC_SET_FILES  # Core files and local notes are allowed.
-    for doc_name in sorted(markdown_files(doc_set.directory) - allowed):  # Find extra Markdown files.
-        errors.append(f"unexpected long-lived docs file: {doc_set.root_relative}/{doc_name}")  # Block orphan docs.
-
-    spec_text = read_text(doc_set.spec_path)  # Read the engineering spec text.
-    bdd_text = read_text(bdd_path)  # Read the BDD document text.
-    change_ids_in_spec = set(CHANGE_ID_RE.findall(spec_text))  # Extract change IDs from spec.
-    change_ids_in_bdd = set(CHANGE_ID_RE.findall(bdd_text))  # Extract change IDs from BDD.
-    for change_id in sorted(change_ids_in_spec):  # Specs must not keep concrete change IDs.
-        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Report misplaced change.
-    for change_id in sorted(change_ids_in_bdd):  # BDD docs must not keep concrete change IDs.
-        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/BDD.md")  # Report misplaced change.
-
-    if bdd_text:  # Check feature-name alignment only when BDD exists.
-        expected = doc_set.directory.name  # The BDD heading and Feature name should both equal the folder name.
-        if f"# BDD: {expected}" not in bdd_text or f"Feature: {expected}" not in bdd_text:  # Require both names to match.
-            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD and Feature name as its folder")  # Report BDD naming drift.
-
-    bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text + "\n" + bdd_text)))  # Extract BDD scenario IDs from docs.
-    if doc_set.spec_path.exists() and not bdd_ids:  # A spec without BDD IDs is suspicious but not fatal.
-        warnings.append(f"no BDD-* scenario IDs found in {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Ask for behavior IDs.
-    if bdd_ids and "## 6. Test Matrix" not in spec_text:  # BDD scenarios need test mappings.
-        errors.append(f"BDD IDs exist but Test Matrix section is missing in {doc_set.root_relative}/ENGINEERING_SPEC.md")  # Report missing matrix.
-    return errors, warnings  # Return this set's validation results.
+    errors: list[str] = []  # Collect blocking errors for this scenario.
+    warnings: list[str] = []  # Collect non-blocking warnings for this scenario.
+    if not SCENARIO_FOLDER_RE.fullmatch(scenario.directory.name):  # The scenario folder must use two digits and a dot.
+        errors.append(f"scenario folder must be named like docs/cx/01.create_user: {scenario.root_relative}")  # Report bad naming.
+    if not scenario.usecase_path.exists():  # Every scenario needs a use-case document.
+        errors.append(f"missing {scenario.root_relative}/00.use_case.md")  # Report a missing use-case document.
+    if not scenario.design_path.exists():  # Every scenario needs a design document.
+        errors.append(f"missing {scenario.root_relative}/00.design.md")  # Report a missing design document.
+    if not scenario.tasks_path.is_dir():  # Every scenario needs tasks.
+        errors.append(f"missing {scenario.root_relative}/tasks/")  # Report a missing tasks directory.
+    if not scenario.changes_path.is_dir():  # Every scenario needs changes.
+        errors.append(f"missing {scenario.root_relative}/changes/")  # Report a missing changes directory.
+    errors.extend(validate_task_root(scenario))  # Merge task-root errors.
+    errors.extend(validate_change_root(scenario))  # Merge change-root errors.
+    errors.extend(validate_legacy_text(scenario))  # Merge old-wording errors.
+    if not markdown_files(scenario.changes_path):  # No changes means AI has no change-first work source.
+        warnings.append(f"no change documents found in {scenario.root_relative}/changes/")  # Warn without blocking.
+    return errors, warnings  # Return scenario validation results.
 
 
-def validate_single_source(root: Path, allowed_docs: set[str] | None = None) -> ValidationReport:
-    """Validate numbered feature-folder documentation sets."""
+def validate_task_root(scenario: ScenarioFolder) -> list[str]:
+    """Validate the tasks directory for one scenario."""
 
-    extra_allowed_docs = allowed_docs or set()  # Allow callers to whitelist extra root Markdown files.
-    docs_dir = root / "docs"  # The docs directory is the long-lived documentation root.
-    errors: list[str] = []  # Collect global errors.
-    warnings: list[str] = []  # Collect global warnings.
+    errors: list[str] = []  # Collect task errors.
+    if not scenario.tasks_path.exists():  # The caller already reports a missing tasks directory.
+        return errors  # Stop scanning this missing directory.
+    for task_file in markdown_files(scenario.tasks_path):  # Task docs must not live directly under tasks.
+        errors.append(f"task document must live under a task folder, not {task_file.relative_to(scenario.directory).as_posix()}")  # Report a stray task doc.
+    task_dirs = sorted(path for path in scenario.tasks_path.iterdir() if path.is_dir())  # Collect task subfolders.
+    if not task_dirs:  # A scenario needs at least one task folder.
+        errors.append(f"missing task folders under {scenario.root_relative}/tasks/")  # Report an empty task list.
+    for task_dir in task_dirs:  # Validate each task folder.
+        if not TASK_FOLDER_RE.fullmatch(task_dir.name):  # Task folders use the same two-digit style.
+            errors.append(f"task folder must be named like tasks/01.write_user_entity: {scenario.root_relative}/tasks/{task_dir.name}")  # Report bad task naming.
+        if not (task_dir / "00.task.md").exists():  # Each task folder needs one task document.
+            errors.append(f"missing {scenario.root_relative}/tasks/{task_dir.name}/00.task.md")  # Report a missing task document.
+        for task_doc in markdown_files(task_dir):  # Only one task Markdown file is allowed.
+            if task_doc.name != "00.task.md":  # Extra Markdown files break the single-task-document rule.
+                errors.append(f"unexpected task document: {scenario.root_relative}/tasks/{task_dir.name}/{task_doc.name}")  # Report the extra file.
+    return errors  # Return task errors.
 
-    if not docs_dir.exists():  # A repository without docs/ cannot satisfy the policy.
-        errors.append("missing docs directory")  # Report missing docs/.
-        return ValidationReport(ok=False, errors=tuple(errors), warnings=tuple(warnings))  # Stop early.
 
-    doc_sets = discover_doc_sets(root)  # Discover all numbered feature-group documentation sets.
-    if not doc_sets:  # At least one documentation set is required.
-        errors.append("missing docs/<numbered_feature_group>/ENGINEERING_SPEC.md")  # Report missing numbered feature spec.
+def validate_change_root(scenario: ScenarioFolder) -> list[str]:
+    """Validate the changes directory for one scenario."""
 
-    for doc_name in sorted(markdown_files(docs_dir) & ROOT_FORBIDDEN_DOCS):  # Root docs cannot hold feature documents.
-        errors.append(f"root docs must contain only indexes; move docs/{doc_name} into docs/001_feature_name/")  # Report root feature doc.
-    if doc_sets and not any((docs_dir / name).exists() for name in ROOT_INDEX_DOCS):  # Feature sets need an index.
-        errors.append("multi-doc-set mode requires docs/INDEX.md or docs/README.md")  # Report missing root index.
+    errors: list[str] = []  # Collect change errors.
+    if not scenario.changes_path.exists():  # The caller already reports a missing changes directory.
+        return errors  # Stop scanning this missing directory.
+    for child in sorted(scenario.changes_path.iterdir()):  # Iterate change children stably.
+        if child.is_dir():  # Changes should be files, not nested directories.
+            errors.append(f"change documents must be files, not directory: {scenario.root_relative}/changes/{child.name}")  # Report nested change dirs.
+    for change_file in markdown_files(scenario.changes_path):  # Validate each change document.
+        if not CHANGE_FILE_RE.fullmatch(change_file.name):  # The file name must sort and identify a task.
+            errors.append(f"change file must look like 20260629T120000-task01-task_name.md: {scenario.root_relative}/changes/{change_file.name}")  # Report bad change naming.
+        change_text = read_text(change_file)  # Read the change document.
+        for heading in CHANGE_REQUIRED_HEADINGS:  # Check every required heading.
+            if heading not in change_text:  # Missing headings prevent AI from resuming work safely.
+                errors.append(f"missing heading {heading} in {scenario.root_relative}/changes/{change_file.name}")  # Report the missing heading.
+    return errors  # Return change errors.
 
-    root_allowed = ROOT_INDEX_DOCS | extra_allowed_docs  # Root docs are index-only by default.
-    for doc_name in sorted(markdown_files(docs_dir) - root_allowed):  # Reject extra root Markdown files.
-        errors.append(f"unexpected long-lived docs file: docs/{doc_name}")  # Report the orphan root file.
 
-    for doc_set in doc_sets:  # Validate each documentation set.
-        doc_errors, doc_warnings = validate_doc_set(doc_set)  # Validate one set.
-        errors.extend(doc_errors)  # Merge set errors.
-        warnings.extend(doc_warnings)  # Merge set warnings.
+def validate_legacy_text(scenario: ScenarioFolder) -> list[str]:
+    """Validate that scenario documents do not carry old workflow wording."""
 
-    return ValidationReport(ok=not errors, errors=tuple(errors), warnings=tuple(warnings))  # Return the final report.
+    errors: list[str] = []  # Collect old-wording errors.
+    for doc_path in sorted(scenario.directory.rglob("*.md")):  # Scan every Markdown file in this scenario.
+        text = read_text(doc_path)  # Read the document text.
+        if LEGACY_CX_TEXT_RE.search(text):  # New cx documents should not contain old workflow terms.
+            relative_path = doc_path.relative_to(scenario.directory).as_posix()  # Build a scenario-relative path.
+            errors.append(f"legacy cx wording is not allowed in {scenario.root_relative}/{relative_path}")  # Report old wording.
+    return errors  # Return old-wording errors.
+
+
+def validate_single_source(root: Path = Path(".")) -> ValidationReport:
+    """Validate the target repository's docs/cx single-source rules."""
+
+    scanner = ScenarioScanner(root)  # Create a scanner for the target repository.
+    errors: list[str] = []  # Collect all blocking errors.
+    warnings: list[str] = []  # Collect all non-blocking warnings.
+    if not scanner.cx_dir.is_dir():  # docs/cx must exist.
+        errors.append("missing docs/cx directory")  # Report the missing root.
+        return ValidationReport(ok=False, errors=tuple(errors), warnings=tuple(warnings))  # Return early without docs/cx.
+    for legacy_path in scanner.legacy_cx_files():  # Look for old fixed files under docs.
+        errors.append(f"legacy cx document is not allowed: {legacy_path.relative_to(root).as_posix()}")  # Report old files.
+    scenarios = scanner.scenario_folders()  # Discover scenario folders.
+    if not scenarios:  # At least one scenario is needed.
+        errors.append("missing docs/cx/01.main_success_scenario folder")  # Report missing scenarios.
+    for scenario in scenarios:  # Validate every scenario.
+        scenario_errors, scenario_warnings = validate_scenario_folder(scenario)  # Validate one scenario.
+        errors.extend(scenario_errors)  # Merge scenario errors.
+        warnings.extend(scenario_warnings)  # Merge scenario warnings.
+    return ValidationReport(ok=not errors, errors=tuple(errors), warnings=tuple(warnings))  # Return the full report.
 
 
 def main() -> int:
-    """Run the validator from the command line."""
+    """Run docs/cx validation from the current working directory."""
 
-    parser = argparse.ArgumentParser(description="Validate cx documentation-set policy.")  # Create CLI parser.
-    parser.add_argument("root", nargs="?", default=".", help="Target repository root")  # Optional target path.
-    parser.add_argument(  # Allow extra root Markdown documents when explicitly requested.
-        "--allow-doc",
-        action="append",
-        default=[],
-        help="Additional allowed Markdown file name in docs/",
-    )
-    args = parser.parse_args()  # Parse command-line arguments.
-
-    root = Path(args.root).resolve()  # Resolve the target path to an absolute path.
-    report = validate_single_source(root, allowed_docs=set(args.allow_doc))  # Run validation.
-
+    report = validate_single_source(Path(".").resolve())  # Validate the current repository without command-line parameters.
     for warning in report.warnings:  # Print every warning.
-        print(f"WARN  {warning}")  # Warnings do not fail validation.
+        print(f"WARN  {warning}")  # Prefix warnings for readability.
     for error in report.errors:  # Print every error.
-        print(f"ERROR {error}")  # Errors fail validation.
-
-    if report.ok:  # Success means no errors were collected.
-        print("OK documentation-set policy passed")  # Print success message.
-        return 0  # Return success status.
-    return 1  # Return failure status.
+        print(f"ERROR {error}")  # Prefix errors for readability.
+    if report.ok:  # No errors means success.
+        print("OK docs/cx single-source policy passed")  # Print success output.
+        return 0  # Return success.
+    return 1  # Return failure when any error exists.
 
 
 if __name__ == "__main__":

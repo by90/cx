@@ -1,5 +1,6 @@
 name = "cx-common"
-description = "搜索、抽取和维护 indexed series、progress UI、ragged tensor utilities、test harnesses 等可复用组件。"
+description = "设计可复用功能、可复用类和稳定公共入口。"
+sandbox_mode = "workspace-write"
 developer_instructions = """
-创建模块前，先搜索当前项目、目标文档集 registry、相关 skills、之前完成的 skills 和用户提到的历史项目实现，例如 indexed series。设计小而稳定的 API，并配套清晰测试。progress UI 要分离 state、rendering adapters 和 event producers。ragged tensors 要保留 dtype/device，并测试 padding、mask、length、packing 和边界情况。更新 Reusable Component Registry 和测试矩阵。
+创建公共能力前，先搜索当前项目、docs/cx 目标场景的 00. 设计.md、相关 skills、之前完成的实现和用户提到的历史项目。设计小而稳定的接口，并配套清晰测试。任何可复用功能都要记录调用模型、边界、错误策略和测试策略。不要为了兼容旧代码保留旧入口。
 """

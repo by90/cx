@@ -1,140 +1,128 @@
 from __future__ import annotations
 
-import tempfile  # tempfile creates temporary directories that clean themselves up.
-import unittest  # unittest is the required Python unit test framework for this project.
-from pathlib import Path  # Path creates and joins filesystem paths.
+import tempfile  # tempfile creates automatically cleaned temporary repositories.
+import unittest  # unittest is the package's standard test framework.
+from pathlib import Path  # Path builds cross-platform filesystem paths.
 
-from tools.validate_single_source import validate_single_source  # Import the function under test.
+from tools.validate_single_source import validate_single_source  # Import the docs/cx validator under test.
 
 
 class TestValidateSingleSource(unittest.TestCase):
-    """Cover numbered feature-set and invalid documentation layouts."""
+    """Cover docs/cx use-case, task, and change single-source validation."""
 
-    def test_root_doc_set_is_error(self) -> None:
-        """Every project must use numbered feature groups, not root docs sets."""
-
-        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            docs = root / "docs"  # Point to the docs directory.
-            docs.mkdir()  # Create the docs directory.
-            (docs / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Write a forbidden root spec.
-            (docs / "CHANGELOG.md").write_text("# changelog\n", encoding="utf-8")  # Write a forbidden root changelog.
-
-            report = validate_single_source(root)  # Run validation.
-
-        self.assertFalse(report.ok)  # Root documentation sets should fail.
-        self.assertIn(  # Error should instruct moving to a numbered feature group.
-            "root docs must contain only indexes; move docs/ENGINEERING_SPEC.md into docs/001_feature_name/",
-            report.errors,
-        )
-
-    def test_valid_feature_folder_docs_pass(self) -> None:
-        """A multi-feature project may keep documentation sets in docs subfolders."""
+    def test_valid_docs_cx_story_layout_passes(self) -> None:
+        """A valid scenario, task, and change layout should pass."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            docs = root / "docs"  # Point to the docs root.
-            feature = docs / "001_training"  # Point to one numbered lowercase feature-group docs folder.
-            feature.mkdir(parents=True)  # Create docs and the feature folder.
-            (docs / "INDEX.md").write_text("# docs index\n", encoding="utf-8")  # Write the root index.
-            (docs / "VERSIONS.md").write_text("# versions\n", encoding="utf-8")  # Write the root version index.
-            (feature / "BDD.md").write_text(  # Write the feature BDD document.
-                "# BDD: 001_training\n\nFeature: 001_training\n\nScenario: BDD-TRAIN-001 - Train model\n",
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            scenario = root / "docs" / "cx" / "01.create_user"  # Build the main success scenario path.
+            task = scenario / "tasks" / "01.write_user_entity"  # Build the task folder path.
+            changes = scenario / "changes"  # Build the changes folder path.
+            task.mkdir(parents=True)  # Create the task folder and parents.
+            changes.mkdir()  # Create the changes folder.
+            (root / "docs" / "cx" / "00.project.md").write_text("# Project\n", encoding="utf-8")  # Write a project document.
+            (scenario / "00.use_case.md").write_text("# Use Case\n\n## Main Success Scenario\n", encoding="utf-8")  # Write a use-case document.
+            (scenario / "00.design.md").write_text("# Design\n\n## Common Code\n", encoding="utf-8")  # Write a design document.
+            (task / "00.task.md").write_text("# Task\n\n## Class\nUser\n", encoding="utf-8")  # Write a task document.
+            (changes / "20260629T120000-task01-write_user_entity.md").write_text(  # Write a change document.
+                "# Change\n\n"
+                "## Timestamp\n2026-06-29T12:00:00\n\n"
+                "## Status\nopen\n\n"
+                "## Task\n01\n\n"
+                "## Task Name\nwrite_user_entity\n\n"
+                "## What Was Done Before\nNothing has been implemented.\n\n"
+                "## What Should Happen Now\nWrite the test first, then implement the class.\n",
                 encoding="utf-8",
             )
-            (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write the feature usage guide.
-            (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertTrue(report.ok, report.errors)  # The multi-set layout should pass.
+        self.assertTrue(report.ok, report.errors)  # The valid layout must pass.
 
-    def test_change_id_in_spec_is_error(self) -> None:
-        """A CHANGE belongs only in changelog, not in the engineering spec."""
+    def test_missing_docs_cx_is_error(self) -> None:
+        """Missing docs/cx should fail."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            docs = root / "docs"  # Point to the docs root.
-            feature = docs / "001_training"  # Point to the feature docs folder.
-            feature.mkdir(parents=True)  # Create docs and feature folder.
-            (docs / "INDEX.md").write_text("# index\n", encoding="utf-8")  # Write the root index.
-            (feature / "ENGINEERING_SPEC.md").write_text(  # Spec intentionally includes an invalid CHANGE.
-                "CHANGE-2026-001\nBDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write the usage guide.
-            (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write changelog.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
 
-            report = validate_single_source(root)  # Run validation.
+            report = validate_single_source(root)  # Validate the empty repository.
 
-        self.assertFalse(report.ok)  # CHANGE in spec should fail.
-        self.assertIn(  # Error should point to the same documentation set.
-            "CHANGE-2026-001 must be recorded in docs/001_training/CHANGELOG.md, not docs/001_training/ENGINEERING_SPEC.md",
-            report.errors,
-        )
+        self.assertFalse(report.ok)  # Missing docs/cx must fail.
+        self.assertIn("missing docs/cx directory", report.errors)  # The error must point to the new root.
 
-    def test_bad_feature_folder_name_is_error(self) -> None:
-        """Feature folders must use a number and lowercase underscores."""
+    def test_legacy_cx_documents_are_error(self) -> None:
+        """Old fixed-name cx documents should be rejected."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            docs = root / "docs"  # Point to the docs root.
-            feature = docs / "1.Training"  # Intentionally use the old dot and uppercase name.
-            feature.mkdir(parents=True)  # Create docs and feature folder.
-            (docs / "INDEX.md").write_text("# index\n", encoding="utf-8")  # Write the root index.
-            (feature / "ENGINEERING_SPEC.md").write_text("# spec\n", encoding="utf-8")  # Write spec.
-            (feature / "CHANGELOG.md").write_text("# changelog\n", encoding="utf-8")  # Write changelog.
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write guide.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            legacy = root / "docs" / "001_user"  # Build an old-style folder path.
+            legacy.mkdir(parents=True)  # Create the old-style folder.
+            old_name = "B" + "DD.md"  # Build the old fixed file name without exposing it as a workflow entry.
+            (legacy / old_name).write_text("# old\n", encoding="utf-8")  # Write an old cx file.
+            (root / "docs" / "cx").mkdir()  # Create docs/cx so this test focuses on the old file.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertFalse(report.ok)  # Old naming should fail.
-        self.assertIn(  # Error should provide the new naming example.
-            "feature documentation folder must be named like docs/001_project_template: docs/1.Training",
-            report.errors,
-        )
+        expected_path = "docs/" + "001_user/" + "B" + "DD.md"  # Build the expected error path.
+        self.assertFalse(report.ok)  # Old files must fail.
+        self.assertIn(f"legacy cx document is not allowed: {expected_path}", report.errors)  # The error must identify the file.
 
-    def test_extra_markdown_doc_is_error(self) -> None:
-        """The docs root must not keep random long-lived planning files."""
+    def test_bad_scenario_folder_name_is_error(self) -> None:
+        """Scenario folders must use two digits and a dot."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            docs = root / "docs"  # Point to the docs directory.
-            docs.mkdir()  # Create docs.
-            (docs / "random_plan.md").write_text("# random\n", encoding="utf-8")  # Write a forbidden orphan document.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            scenario = root / "docs" / "cx" / "1_create_user"  # Build a badly named scenario folder.
+            task = scenario / "tasks" / "01.write_user_entity"  # Build a valid task folder under it.
+            task.mkdir(parents=True)  # Create the task folder.
+            (scenario / "changes").mkdir()  # Create the changes folder.
+            (scenario / "00.use_case.md").write_text("# Use Case\n", encoding="utf-8")  # Write a use-case document.
+            (scenario / "00.design.md").write_text("# Design\n", encoding="utf-8")  # Write a design document.
+            (task / "00.task.md").write_text("# Task\n", encoding="utf-8")  # Write a task document.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertFalse(report.ok)  # Orphan document should fail.
-        self.assertIn("unexpected long-lived docs file: docs/random_plan.md", report.errors)  # Confirm clear error.
+        self.assertFalse(report.ok)  # Bad scenario naming must fail.
+        self.assertIn("scenario folder must be named like docs/cx/01.create_user: docs/cx/1_create_user", report.errors)  # The error must show the target format.
 
-    def test_multi_doc_mode_requires_root_index(self) -> None:
-        """Multi-feature mode requires a docs root index."""
+    def test_task_document_must_be_inside_task_folder(self) -> None:
+        """Task documents must not be placed directly under tasks."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            feature = root / "docs" / "001_training"  # Point to one feature docs folder.
-            feature.mkdir(parents=True)  # Create the feature folder.
-            (feature / "BDD.md").write_text(  # Write the required BDD document.
-                "# BDD: 001_training\n\nFeature: 001_training\n\nScenario: BDD-TRAIN-001 - Train model\n",
-                encoding="utf-8",
-            )
-            (feature / "ENGINEERING_SPEC.md").write_text(  # Write the feature engineering spec.
-                "BDD-TRAIN-001\n\n## 6. Test Matrix\n",
-                encoding="utf-8",
-            )
-            (feature / "GUIDE.md").write_text("# guide\n", encoding="utf-8")  # Write the usage guide.
-            (feature / "CHANGELOG.md").write_text("CHANGE-2026-001\n", encoding="utf-8")  # Write the feature changelog.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            scenario = root / "docs" / "cx" / "01.create_user"  # Build the scenario folder.
+            tasks = scenario / "tasks"  # Build the tasks root.
+            tasks.mkdir(parents=True)  # Create the tasks root.
+            (scenario / "changes").mkdir()  # Create the changes folder.
+            (scenario / "00.use_case.md").write_text("# Use Case\n", encoding="utf-8")  # Write a use-case document.
+            (scenario / "00.design.md").write_text("# Design\n", encoding="utf-8")  # Write a design document.
+            (tasks / "00.task.md").write_text("# Task\n", encoding="utf-8")  # Intentionally write a stray task document.
 
             report = validate_single_source(root)  # Run validation.
 
-        self.assertFalse(report.ok)  # Missing root index should fail.
-        self.assertIn("multi-doc-set mode requires docs/INDEX.md or docs/README.md", report.errors)  # Confirm index error.
+        self.assertFalse(report.ok)  # Stray task documents must fail.
+        self.assertIn("task document must live under a task folder, not tasks/00.task.md", report.errors)  # The error must identify the stray file.
+
+    def test_change_document_requires_working_headings(self) -> None:
+        """Change documents must contain the headings AI needs to resume work."""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            scenario = root / "docs" / "cx" / "01.create_user"  # Build the scenario folder.
+            task = scenario / "tasks" / "01.write_user_entity"  # Build the task folder.
+            changes = scenario / "changes"  # Build the changes folder.
+            task.mkdir(parents=True)  # Create the task folder.
+            changes.mkdir()  # Create the changes folder.
+            (scenario / "00.use_case.md").write_text("# Use Case\n", encoding="utf-8")  # Write a use-case document.
+            (scenario / "00.design.md").write_text("# Design\n", encoding="utf-8")  # Write a design document.
+            (task / "00.task.md").write_text("# Task\n", encoding="utf-8")  # Write a task document.
+            (changes / "20260629T120000-task01-write_user_entity.md").write_text("# Change\n", encoding="utf-8")  # Intentionally omit required headings.
+
+            report = validate_single_source(root)  # Run validation.
+
+        self.assertFalse(report.ok)  # Missing headings must fail.
+        self.assertIn("missing heading ## What Should Happen Now in docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md", report.errors)  # The error must identify the missing heading.
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main()  # Allow direct unittest execution.

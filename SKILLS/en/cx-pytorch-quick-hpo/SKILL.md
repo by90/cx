@@ -17,7 +17,7 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 3. When saving checkpoints or weights, persist the complete config snapshot associated with the in-memory recipe alongside that artifact. The tuning script may persist trial configs, best recipes, metrics, and backtest configs into the output directory, but must never rewrite the current project config, default config, or user-maintained config files.
 4. Quick tuning uses about one tenth of the data, but the sampling unit must be a complete entity. For daily data from 2,000 stocks, randomly select about 200 stocks and keep each selected stock's full daily history.
 5. Before quick tuning, study every field in the field combination for every candidate model against the label: positive contribution, negative contribution, and noise suspicion. Identify important fields, secondary fields, duplicated fields, and likely redundant fields.
-6. Field research must be documented in the target documentation set's data-processing area. If the project already has a `series` data-processing directory, prefer `docs/<feature_group>/series/`.
+6. Field research must be documented in the target `docs/cx` scenario, task, change, or experiment summary area.
 7. Field research must separate the semantic roles of daily base fields, market-strength indicators, position indicators, and ranking indicators: daily fields are the base; market-strength indicators measure cross-sectional overall strength; position indicators measure location in a time window; ranking indicators measure cross-sectional comparison.
 8. Ranking fields need a dedicated check. They usually correspond to base fields, so determine whether using base and ranking fields together is harmful, whether ranking fields alone are sufficient, and whether ranking plus position fields works.
 9. Before tuning, give explicit recommendations for enabled fields/features. Use one fixed model to validate different field combinations and document the recommendation in the field-research document.
@@ -34,7 +34,7 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 
 ## Required Workflow
 
-1. Confirm the target documentation set defines the business objective, data boundary, label target, and validation path. If not, return to `$cx-workflow` to recommend `$cx-bdd`, `$cx-research`, or `$cx-timeseries-modeling`.
+1. Confirm the target `docs/cx` use case, design document, task, or change defines the business objective, data boundary, label target, and validation path. If not, return to `$cx-workflow` to recommend `$cx-story`, `$cx-research`, or `$cx-timeseries-modeling`.
 2. Before startup or resume, confirm resource-monitor paths, the five-minute sampling method, and the top-10 candidate report fields. If the project lacks a shared resource monitor, add the public monitor and narrow tests first; do not replace structured artifacts with terminal spam.
 3. Use `$cx-common-module` to check whether training entrypoints, backtest entrypoints, config hooks, recipes, resource monitoring, metric aggregation, and output persistence already have public entrypoints. If not, define the calling model first.
 4. Use `$cx-pytorch-tdd` to verify standalone training, standalone backtesting, config clone/override hooks, trial-to-config mapping, resource monitoring, metric parsing, and output persistence paths.
@@ -43,7 +43,7 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 7. Once data recipes are stable, search window length and batch size together. On dual 32 GB RTX 5090 hardware, try `8192`, `4096`, `2048`, `1024`, and `512` in descending order for each candidate window, and keep the fastest non-OOM setting with strong VRAM and GPU utilization.
 8. Search learning rate, weight decay, optimizer, and scheduler after the window/batch budget is fixed; when batch size changes, retune learning rate with it.
 9. Search model-structure parameters last, such as hidden size, layers, dropout, encoder length, capacity, and complexity.
-10. Rerun the best recipe and record best trial, top candidates, each model's per-model best recipe, failed trials, pruned trials, five-minute tracking summaries, random seed, data version, field recommendations, and convergence evidence in the target documentation set.
+10. Rerun the best recipe and record best trial, top candidates, each model's per-model best recipe, failed trials, pruned trials, five-minute tracking summaries, random seed, data version, field recommendations, and convergence evidence in the target `docs/cx` task, change, or experiment summary.
 11. When the user requests business-first ranking, show the top-10 candidates by Top10 hit rate, missed-candidate mean gain, downside share, downside mean loss, and `val_loss`, while still preserving the `val_loss` diagnostic view.
 
 ## Verification Evidence

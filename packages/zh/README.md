@@ -1,24 +1,24 @@
-# cx 中文 BDD/TDD 工作流包
+# cx 中文用例驱动 TDD 工作流包
 
-本目录是 cx 中文包源码。cx 是用于人类与 AI 协作研发的 Codex workflow pack，公共安装源是仓库根目录的 `SKILLS/zh`；本目录保留完整源码、模板、指南、agents 和发布验证工具。
+本目录是 cx 中文包源码。公共安装源是仓库根目录的 `SKILLS/zh`，本目录保留完整源码、模板、指南、agents 和发布验证工具。
 
-不要把中英文包同时安装到同一个目标项目。两套包的 skill 和 agent 名称故意保持一致。
+不要把中文包和英文包同时安装到同一个目标项目。两套包的 skill 和 agent 名称保持一致，语言只影响面向人的说明、模板和示例。
 
-## 核心契约
+## 核心约定
 
-cx 是工作流包，不是组件库。它规范人类和 AI 如何发现行为、先写文档、等待确认、再写测试和实现代码，并管理研究、发布版本和审查证据。
+cx 是工作流包，不是组件库。它规定人类和 AI 如何用 `docs/cx` 保存用例、设计、任务、变更和验证证据。开工前先选择执行模式；用户未明确选择逐任务确认时，AI 默认直接完成文档、严格 TDD、实现和验证。
 
-所有项目都按多个功能组组织；功能文件夹按业务能力编号，使用三位序号、小写英文和下划线：
+所有 cx 文档只属于 `docs/cx`：
 
 ```text
-docs/001_config_system/
-docs/001_config_system/BDD.md
-docs/001_config_system/ENGINEERING_SPEC.md
-docs/001_config_system/CHANGELOG.md
-docs/001_config_system/GUIDE.md
+docs/cx/00.项目说明.md
+docs/cx/01.创建用户/00.用例.md
+docs/cx/01.创建用户/00. 设计.md
+docs/cx/01.创建用户/tasks/01.编写用户实体/00.任务.md
+docs/cx/01.创建用户/changes/20260629T120000-任务01-编写用户实体.md
 ```
 
-`BDD.md` 的标题和 `Feature:` 名称必须与文件夹名一致。普通、非编程任务不要自行创建 BDD；不确定是否需要行为发现时先询问用户。
+每个任务的基本量具是类或类型组合。一个任务只处理一份任务文档、一个代码文件，以及必要时一个一一对应的单元测试文件。
 
 ## 快速开始
 
@@ -30,66 +30,37 @@ docs/001_config_system/GUIDE.md
 powershell -ExecutionPolicy Bypass -File .\tools\install_cx_zh.ps1
 ```
 
-`shskills install` 当前只安装 skills，不会覆盖 `$env:USERPROFILE\.codex\AGENTS.md` 或 `$env:CODEX_HOME\AGENTS.md`；如果只运行原始命令，需要额外同步本包的 `AGENTS.md`。
+只运行原始命令时，需要额外同步本包的 `AGENTS.md`：
 
 ```powershell
 uv tool install shskills
 shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:USERPROFILE\.codex\skills" --subpath zh --force --clean
 ```
 
-如果设置了 `CODEX_HOME`，目标目录改为 `$env:CODEX_HOME\skills`。
-
 ## 提示词模式
-
-高质量 coding-agent 提示词应先给出明确契约：
-
-```text
-目标：
-上下文：
-约束：
-必须遵循的流程：
-验证方式：
-交付物：
-```
-
-优先说明目标功能文件夹、要使用的 cx skills、必须通过的命令，以及要记录的证据。使用 Claude Code 的项目，应把 `AGENTS.md` 作为共同规则来源，让 `CLAUDE.md` 引用或指向它。安装中文包时，所有 cx 文档必须使用简体中文。
 
 功能或缺陷：
 
 ```text
-请使用 $cx-workflow，选择最小必要 cx skills。先用 $cx-bdd 创建或更新 docs/001_feature_name 形式的编号功能文件夹、BDD.md、ENGINEERING_SPEC.md 和 CHANGELOG.md；完成文档后停止并等待我确认。确认后再用 $cx-tdd 写失败测试并实现。
+请使用 $cx-workflow，选择最小必要 cx skills。开工前先询问我是要直接做完文档、测试、实现和验证，还是每完成一个任务后征求同意；如果我没有选择逐任务确认，默认直接做完。先用 $cx-story 在 docs/cx 下创建或更新用例、设计、任务和变更文档，再用 $cx-tdd 写失败测试并实现。
 ```
 
-Git 提交：
+Python / PyTorch：
 
 ```text
-提交时请按 AGENTS.md 规则处理：把当前工作区作为一次整体变更，暂存已跟踪和未跟踪文件，创建一个提交，不分析哪些文件是谁修改的。
-```
-
-Python / PyTorch / Lightning：
-
-```text
-请使用 $cx-bdd、$cx-tdd 和 $cx-pytorch-tdd。Python 使用 uv 安装管理的解释器和项目 uv 工作流。对状态和不变量使用明确 OOP 设计，先写 unittest，使用确定性小数据，禁止默认使用 getattr/setattr 等动态反射。
+请使用 $cx-story、$cx-tdd 和 $cx-pytorch-tdd。Python 使用 uv 管理的解释器和项目 uv 工作流。对状态、生命周期、不变量和领域对象协作使用严格面向对象设计，先写 unittest，使用确定性小数据，禁止默认使用 getattr/setattr 等动态反射。
 ```
 
 Rust：
 
 ```text
-请使用 $cx-bdd、$cx-tdd 和 $cx-rust-tdd。用 struct/enum/trait 表达状态，先写失败的 #[test] 或集成测试，再运行 cargo test、cargo fmt，可行时运行 clippy。
-```
-
-研究：
-
-```text
-请使用 $cx-research。先定义研究问题、搜索窗口、纳入/排除标准、学术来源、官方来源和解读来源。每个非显然主张都要引用来源。
+请使用 $cx-story、$cx-tdd 和 $cx-rust-tdd。用 struct/enum/trait 表达领域状态，先写失败的 #[test] 或集成测试，再运行 cargo test、cargo fmt，可行时运行 clippy。
 ```
 
 发布：
 
 ```text
-请使用 $cx-version。功能组工作必须在短生命周期本地分支完成，并且只在用户确认后合并到 main。不要 push 工作分支；远端只保留 main 和版本 tag。只有在 main 上才更新 VERSION/manifests/CHANGELOG、验证、创建带注释 vX.Y.Z tag，然后 push main 和发布 tag。
-
-目标项目必须使用项目内 `tools/semver.py`；如果项目还没有该工具，从 `$cx-version` 的 `scripts/semver.py` 复制过去。用户只要求更新版本号时默认更新 patch；只有明确要求新增功能组、minor、major、稳定版或不兼容发布时才更新前面的版本号。`0.x.x` 阶段新增功能组用 `python tools/semver.py next feature-group --root .` 计算下一个 minor；既有功能组内修改、bug 修复或调整用 `python tools/semver.py next patch --root .` 计算下一个 patch。准备发布时用 `python tools/semver.py prepare <version> "<标题>" --root .` 更新 `VERSION`、可选的 `pyproject.toml` 和 `docs/VERSIONS.md`。
+请使用 $cx-version。工作必须在短生命周期本地分支完成，并且只在用户确认后合并到 main。不要 push 工作分支；远端只保留 main 和版本 tag。只有在 main 上才更新 VERSION、manifest、根 changelog、验证、创建带注释 vX.Y.Z tag，然后 push main 和发布 tag。
 ```
 
 ## Skill 对照表
@@ -97,17 +68,17 @@ Rust：
 | Skill | 用途 |
 | --- | --- |
 | `$cx-workflow` | 流程分流和 skill 选择 |
-| `$cx-bdd` | BDD 发现、编号功能文件夹、业务规则、场景 |
-| `$cx-tdd` | Red-green-refactor、测试矩阵、代码质量门槛 |
-| `$cx-changelog` | `CHANGE-*` 条目和变更记录一致性 |
-| `$cx-version` | 项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md`、发布 tag |
-| `$cx-research` | 模型选择、模型原理、近期论文、带来源综合分析 |
-| `$cx-pytorch-tdd` | Python/PyTorch/Lightning 实现和测试 |
-| `$cx-pytorch-quick-hpo` | PyTorch 快速调参、字段贡献研究、特征组合、窗口长度、标签、训练超参和模型容量初筛 |
-| `$cx-pytorch-full-hpo` | PyTorch 全量调参、完整数据训练、测试集评估、回测、top 3 候选比较和 release 候选模型选择 |
-| `$cx-timeseries-modeling` | 异构多变量时间序列建模、字段语义、协变量、泄漏检查和 PyTorch Forecasting 选型 |
-| `$cx-rust-tdd` | Rust 实现、所有权设计、cargo test/fmt/clippy |
-| `$cx-common-module` | 通用功能、可复用功能、可复用类和 API 设计 |
+| `$cx-story` | 用例、主成功场景、分支场景、任务和变更 |
+| `$cx-tdd` | 严格测试先行、最窄失败测试、最小实现和重构 |
+| `$cx-changelog` | `changes/` 变更文档和发布说明一致性 |
+| `$cx-version` | 项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md` 和发布 tag |
+| `$cx-research` | 模型选择、模型原理、近期论文和带来源综合分析 |
+| `$cx-pytorch-tdd` | Python、PyTorch、Lightning 实现和测试 |
+| `$cx-pytorch-quick-hpo` | PyTorch 快速调参、字段贡献研究、特征组合和候选初筛 |
+| `$cx-pytorch-full-hpo` | PyTorch 全量调参、完整训练、评估、回测和候选模型选择 |
+| `$cx-timeseries-modeling` | 异构多变量时间序列建模和 PyTorch Forecasting 选型 |
+| `$cx-rust-tdd` | Rust 类型设计、所有权设计和 cargo test/fmt/clippy |
+| `$cx-common-module` | 通用功能、可复用类和公共入口设计 |
 | `$cx-evidence` | 交付前证据审查 |
 
 ## 验证
@@ -116,5 +87,5 @@ Rust：
 python -m unittest discover -s tests
 python tools/validate_skill_pack.py .
 python tools/validate_cx_pack.py .
-python tools/validate_single_source.py examples/python_ml_project
+python tools/validate_single_source.py
 ```

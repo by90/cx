@@ -1,0 +1,87 @@
+---
+name: cx-story
+description: Use for use-case-driven story discovery, main success scenario folders, task folders, change folders, single-current-document discipline, unfinished-change-first execution, and limiting each task to one task document, one code file, and one unit-test file when needed.
+version: 0.1.0
+---
+
+# cx Use Cases, Tasks, and Changes
+
+## Purpose
+
+Use this skill before implementation and testing. cx uses use-case-driven story documents instead of the old scenario-expression workflow. Reusable-code scenarios and business scenarios use the same structure: a main success scenario plus branch scenarios.
+
+## docs/cx Layout
+
+All cx project descriptions, scenarios, tasks, process documents, and change documents live under `docs/cx`. Documents outside `docs/cx` are not part of cx.
+
+```text
+docs/cx/
+docs/cx/00.project.md
+docs/cx/01.create_user/
+docs/cx/01.create_user/00.use_case.md
+docs/cx/01.create_user/00.design.md
+docs/cx/01.create_user/tasks/
+docs/cx/01.create_user/tasks/01.write_user_entity/00.task.md
+docs/cx/01.create_user/changes/
+docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
+```
+
+Chinese projects may use Chinese file names such as `00.项目说明.md`, `00.用例.md`, and `00. 设计.md`. English projects use the same folder responsibilities with English names.
+
+## Workflow Rules
+
+1. Read project-level `docs/cx` documents first.
+2. Read the target main success scenario's use-case document, design document, tasks, and changes.
+3. Unless the work is adding a new task, branch, or use case, inspect unfinished changes first and decide the current work from those changes.
+4. A use case contains one main success scenario and its branch scenarios.
+5. A task is a folder under `tasks/` and starts at `01.`.
+6. A task document's basic measure is a class or type group. It may cover one class or a tightly collaborating set of classes or types.
+7. A single task touches one task document, one code file, and one matching unit-test file when a test file is required.
+8. If one change affects several tasks or also changes the use-case document, split the work into an ordered task list and execute it one task at a time.
+9. Before starting work, ask whether to finish documentation, tests, implementation, and validation directly, or ask after each task.
+10. If the user does not explicitly choose per-task confirmation, default to direct completion; direct mode continues after document updates into tests, implementation, and validation.
+11. Only per-task confirmation mode stops after one task and waits for user review before starting the next task.
+
+## Use-Case Document
+
+The use-case document owns behavior expression:
+
+- Main success scenario.
+- Branch scenarios.
+- Observable result.
+- Completion conditions.
+
+It should not contain implementation detail that belongs in a task document.
+
+## Design Document
+
+The design document explains:
+
+- Existing common code that can simplify work.
+- New common code that should be written for reuse.
+- Design decisions.
+- Task boundaries.
+
+## Change Documents
+
+Each change document must explain:
+
+- Timestamp.
+- Task number.
+- Task name.
+- What was done before.
+- What should be done now.
+- Status.
+
+The agent uses unfinished changes to decide what to do next.
+
+## Output
+
+When this skill is used, return:
+
+- Target `docs/cx` scenario folder.
+- Use-case branch or task being changed.
+- Ordered task list when the request spans multiple tasks.
+- Current task document.
+- Current change document.
+- The execution mode and whether per-task review is required.
