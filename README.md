@@ -45,10 +45,12 @@ If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 5. Each task is a folder, such as `tasks/01.write_user_entity/00.task.md`.
 6. Each change is written under `changes/<timestamp>-task<id>-<task_name>.md`; AI checks unfinished changes before choosing work.
 7. One task handles one task document, one code file, and one matching unit-test file when needed.
-8. Before work starts, the agent asks one execution-mode question: finish documentation, tests, implementation, and validation directly, or ask after each completed task.
-9. If the user does not explicitly choose per-task confirmation, the default is direct completion; document completion does not stop the flow.
-10. Only per-task confirmation mode stops after each task and waits for review.
-11. `$cx-tdd` runs narrow failing tests, minimal implementation, and refactor. `$cx-pytorch-tdd`, `$cx-rust-tdd`, and `$cx-common-module` add language and reusable-entrypoint constraints.
+8. One main success scenario folder carries one user-goal use case. The main success scenario usually has 3 to 9 steps from trigger to completed goal and does not bundle several mutually exclusive choices, page buttons, or complete tasks.
+9. If a main-success step needs its own actors, preconditions, steps, and branches, it is a sub-use case or separate use case and should move to its own scenario folder with an index in `docs/cx/00.project.md`.
+10. Before work starts, the agent asks one execution-mode question: finish documentation, tests, implementation, and validation directly, or ask after each completed task.
+11. If the user does not explicitly choose per-task confirmation, the default is direct completion; document completion does not stop the flow.
+12. Only per-task confirmation mode stops after each task and waits for review.
+13. `$cx-tdd` runs narrow failing tests, minimal implementation, and refactor. `$cx-pytorch-tdd`, `$cx-rust-tdd`, and `$cx-common-module` add language and reusable-entrypoint constraints.
 
 ## docs/cx Layout
 

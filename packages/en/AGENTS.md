@@ -36,17 +36,21 @@ This repository uses a `docs/cx` use-case-driven flow. All cx project descriptio
 3. Each main success scenario has one folder, such as `docs/cx/01.create_user/`.
 4. Each scenario folder contains `00.use_case.md`, `00.design.md`, `tasks/`, and `changes/`.
 5. The use-case document expresses the main success scenario and all branch scenarios.
-6. The design document explains reusable code, new common code, and design decisions.
-7. Each task is a folder starting at `01.`, such as `tasks/01.write_user_entity/00.task.md`.
-8. Each change is one file, such as `changes/20260629T120000-task01-write_user_entity.md`.
-9. When a change spans multiple tasks or also changes the use-case document, split it into an ordered task list. Only per-task confirmation mode waits for user review after each completed task.
-10. One task touches one task document, one code file, and one matching unit-test file when needed.
-11. A task document's basic measure is a class or type group.
-12. Use `$cx-workflow` for routing and skill selection.
-13. Use `$cx-story` for use cases, main success scenarios, branch scenarios, task splits, and changes.
-14. Use `$cx-tdd` for test-first implementation; use `$cx-pytorch-tdd` for Python/PyTorch and `$cx-rust-tdd` for Rust.
-15. Use `$cx-common-module` before adding reusable features, classes, or common entrypoints.
-16. Run the narrowest effective test first, then broader validation as needed, and record commands and results.
+6. One `docs/cx/NN.name/` folder carries one user-goal use case. Do not use a vague "use the app" use case to hold a whole application, page set, menu, or several independent operations.
+7. The main success scenario describes the most common path from trigger to completed user goal, usually 3 to 9 steps. Each step is one observable actor-system interaction.
+8. If a main-success step needs its own actors, preconditions, steps, and branches, it is a sub-use case or separate use case and should move to a new `docs/cx/NN.name/` folder with an index in project docs.
+9. Branch scenarios attach to a concrete main-success step. Split complex branches into separate use cases when they exceed 3 to 5 steps, introduce a new actor, have independent completion criteria, or need independent tasks and tests.
+10. The design document explains reusable code, new common code, and design decisions.
+11. Each task is a folder starting at `01.`, such as `tasks/01.write_user_entity/00.task.md`.
+12. Each change is one file, such as `changes/20260629T120000-task01-write_user_entity.md`.
+13. When a change spans multiple tasks or also changes the use-case document, split it into an ordered task list. Only per-task confirmation mode waits for user review after each completed task.
+14. One task touches one task document, one code file, and one matching unit-test file when needed.
+15. A task document's basic measure is a class or type group.
+16. Use `$cx-workflow` for routing and skill selection.
+17. Use `$cx-story` for use cases, main success scenarios, branch scenarios, task splits, and changes.
+18. Use `$cx-tdd` for test-first implementation; use `$cx-pytorch-tdd` for Python/PyTorch and `$cx-rust-tdd` for Rust.
+19. Use `$cx-common-module` before adding reusable features, classes, or common entrypoints.
+20. Run the narrowest effective test first, then broader validation as needed, and record commands and results.
 
 ## docs/cx Layout
 

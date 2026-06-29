@@ -18,6 +18,8 @@ docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
 
 Each task's basic measure is a class or type group. One task handles one task document, one code file, and one matching unit-test file when needed.
 
+Use-case granularity follows user goals: one main success scenario folder carries one user-goal use case. The main success scenario runs from trigger to completed goal, usually in 3 to 9 steps, and each step is one observable actor-system interaction. Do not put several home-screen buttons, mutually exclusive choices, or complete tasks into one main success scenario. If a complex branch needs its own actors, steps, and completion criteria, split it into a separate use case and index it from the project document.
+
 ## Quick Start
 
 Install or update from the repository default `main` branch only:

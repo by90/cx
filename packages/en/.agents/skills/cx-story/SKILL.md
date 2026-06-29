@@ -42,6 +42,18 @@ Chinese projects may use Chinese file names such as `00.项目说明.md`, `00.�
 10. If the user does not explicitly choose per-task confirmation, default to direct completion; direct mode continues after document updates into tests, implementation, and validation.
 11. Only per-task confirmation mode stops after one task and waits for user review before starting the next task.
 
+## Use-Case Granularity And Main Success Scenario Discipline
+
+1. One `docs/cx/NN.name/` folder represents one user-goal use case; it does not represent a whole app, a menu, a page set, or several independent operations.
+2. Name each use case as the actor's goal, such as "view exposed location", "save current location", or "manage favorite locations"; do not use a vague "use the app" use case to hold every behavior.
+3. The main success scenario describes the most common direct path from trigger to completed user goal; keep it to about 3 to 9 steps.
+4. Each main-success step is one observable actor-system interaction. Do not put a menu, several mutually exclusive choices, several complete tasks, or several user goals into one step.
+5. If a main-success step needs its own actors, preconditions, main success scenario, and branches, it is a sub-use case or a separate use case. Split it into a new `docs/cx/NN.name/` folder or list it in the project use-case index.
+6. Branch scenarios attach to a concrete main-success step, for example "2a: user denies permission"; write the trigger condition, system handling, and observable result.
+7. Keep short branches in the current use-case document. Split complex branches into separate use cases when they exceed about 3 to 5 steps, introduce a new actor, have independent completion criteria, or need independent tasks and tests.
+8. Do not put every button on a home screen into one main success scenario. Showing the home screen, selecting a favorite, saving the current location, and managing favorites are different user goals and should be separate use cases.
+9. A top-level requirement may keep a use-case index and navigation relationships in `docs/cx/00.project.md`, but each use case owns its actors, preconditions, main success scenario, branches, and completion conditions in its own use-case file.
+
 ## Use-Case Document
 
 The use-case document owns behavior expression:
@@ -52,6 +64,8 @@ The use-case document owns behavior expression:
 - Completion conditions.
 
 It should not contain implementation detail that belongs in a task document.
+
+The use-case document should describe one user goal only. If a branch or step becomes another user goal, create a separate use case and link it from the project index or the current use case's sub-use-case list.
 
 ## Design Document
 
