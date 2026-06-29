@@ -3,10 +3,10 @@
 本包基于当前 Codex customization 模型：
 
 - `AGENTS.md` 是 coding agents 的持久仓库指导。
-- Skills 是可复用工作流，以包含 `SKILL.md` 的目录保存。每个 skill 需要 `name` 和 `description`。
+- Skills 是可复用工作流，以包含 `SKILL.md` 的目录保存。
 - 仓库级 skills 放在 `.agents/skills` 下被发现。
 - Skills 可以通过 `$skill-name` 显式调用，也可以根据 description 被隐式选择。
-- 自定义 subagents 放在 `.codex/agents/*.toml`。每个 custom agent 需要 `name`、`description` 和 `developer_instructions`。
+- 自定义 subagents 放在 `.codex/agents/*.toml`。
 - Codex 只有在用户明确要求时才会启动 subagents。
 
 参考资料：
@@ -18,4 +18,4 @@
 - https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes
 - https://agents.md/
 
-核心设计决策是保留 Spec/Plan/Tasks 的阶段纪律，但把长期产物压缩进 `docs/` 下的文档集。所有项目都使用 `docs/INDEX.md`、`docs/VERSIONS.md` 加多个 `docs/001_feature_name/` 形式的功能组文档集。具体变更编号和任务顺序只在各功能组 `CHANGELOG.md` 中维护，非编程任务不使用 TDD，也不自行创建 BDD；不确定是否需要行为发现时先询问用户。这样既能保留可测试行为和审计历史，又能防止按需求生成文档垃圾。
+核心设计决策是保留“先文档明确边界，再测试，再实现”的阶段纪律，但不再把文档完成作为默认停止点。开工前先让用户选择执行模式；用户未明确选择逐任务确认时，AI 默认直接完成文档、测试、实现和验证。`docs/cx` 可以保存项目说明和业务领域说明；每个主成功场景一个文件夹；任务进入 `tasks/`；变更进入 `changes/`。这样能让 AI 从未完成变更判断下一步，同时避免按需求生成散落文档。

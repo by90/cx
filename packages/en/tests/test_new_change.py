@@ -1,54 +1,86 @@
 from __future__ import annotations
 
-import tempfile  # tempfile creates temporary directories that clean themselves up.
-import unittest  # unittest is the required Python test framework.
-from pathlib import Path  # Path builds filesystem paths safely.
+import tempfile  # tempfile creates automatically cleaned temporary repositories.
+import unittest  # unittest is the package's standard test framework.
+from pathlib import Path  # Path builds cross-platform filesystem paths.
 
-from tools.new_change import append_change  # Import the change-log helper under test.
+from tools.new_change import create_change_document  # Import the change-document creator under test.
 
 
 class TestNewChange(unittest.TestCase):
-    """Verify that changes are appended only to the target changelog."""
+    """Verify change documents are written only under docs/cx scenario changes."""
 
-    def test_appends_changes_in_order_to_feature_changelog(self) -> None:
-        """Multiple changes in one feature group should keep creation order."""
-
-        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            first_id = append_change(  # Append the first change.
-                root,
-                "Create project template",
-                "feature",
-                doc_set="001_project_template",
-                today="2026-05-18",
-                branch="codex/create-template",
-            )
-            second_id = append_change(  # Append the second change.
-                root,
-                "Add usage guide",
-                "docs",
-                doc_set="001_project_template",
-                today="2026-05-18",
-                branch="codex/create-template",
-            )
-            changelog = (root / "docs" / "001_project_template" / "CHANGELOG.md").read_text(encoding="utf-8")  # Read target changelog.
-
-        self.assertEqual(first_id, "CHANGE-2026-001")  # First change ID should start at 001.
-        self.assertEqual(second_id, "CHANGE-2026-002")  # Second change ID should increment.
-        self.assertLess(  # First change should appear before the second to preserve task order.
-            changelog.index("CHANGE-2026-001"),
-            changelog.index("CHANGE-2026-002"),
-        )
-        self.assertIn("- Branch: codex/create-template", changelog)  # Changelog should keep the work branch.
-
-    def test_rejects_unnumbered_doc_set(self) -> None:
-        """The change helper should reject unnumbered feature folders."""
+    def test_creates_change_document_under_scenario_changes(self) -> None:
+        """Creating a change should write into the selected scenario changes directory."""
 
         with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
-            root = Path(tmpdir)  # Convert the temporary path string into Path.
-            with self.assertRaisesRegex(ValueError, "001_project_template"):  # Assert that the hint shows the new format.
-                append_change(root, "Create project template", "feature", doc_set="template")  # Pass the old feature-group name.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            path = create_change_document(  # Create one change document.
+                root,
+                "01.create_user",
+                1,
+                "write_user_entity",
+                "No user entity exists yet.",
+                "Write the user entity test first, then implement the entity class.",
+                timestamp="20260629T120000",
+            )
+            text = path.read_text(encoding="utf-8")  # Read the generated document.
+
+        self.assertEqual(path.name, "20260629T120000-task01-write_user_entity.md")  # The filename must carry timestamp, task id, and task name.
+        self.assertIn("docs\\cx\\01.create_user\\changes", str(path))  # The path must target the scenario changes directory.
+        self.assertIn("## What Was Done Before\nNo user entity exists yet.", text)  # The document must preserve previous state.
+        self.assertIn("## What Should Happen Now\nWrite the user entity test first, then implement the entity class.", text)  # The document must preserve next action.
+
+    def test_accepts_docs_cx_prefixed_scenario(self) -> None:
+        """The scenario argument may include a docs/cx prefix."""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            path = create_change_document(  # Create a change with a prefixed scenario path.
+                root,
+                "docs/cx/01.create_user",
+                "02",
+                "add_branch_scenario",
+                "The main success scenario exists.",
+                "Add the branch and update tasks.",
+                timestamp="20260629T121500",
+            )
+
+        self.assertEqual(path.parent, root / "docs" / "cx" / "01.create_user" / "changes")  # The prefix must not be duplicated.
+        self.assertEqual(path.name, "20260629T121500-task02-add_branch_scenario.md")  # The filename must preserve the task id.
+
+    def test_rejects_bad_scenario_name(self) -> None:
+        """Bad scenario names should be rejected."""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            with self.assertRaisesRegex(ValueError, "01.create_user"):  # Assert the error explains the format.
+                create_change_document(  # Pass an old-style scenario name.
+                    root,
+                    "001_user",
+                    1,
+                    "write_user_entity",
+                    "None.",
+                    "Implement.",
+                    timestamp="20260629T120000",
+                )
+
+    def test_rejects_bad_task_number(self) -> None:
+        """Task numbers must be two digits."""
+
+        with tempfile.TemporaryDirectory() as tmpdir:  # Create a temporary repository root.
+            root = Path(tmpdir)  # Wrap the temporary path as a Path object.
+            with self.assertRaisesRegex(ValueError, "task_number"):  # Assert the error points to the task number.
+                create_change_document(  # Pass an invalid task number.
+                    root,
+                    "01.create_user",
+                    "1A",
+                    "write_user_entity",
+                    "None.",
+                    "Implement.",
+                    timestamp="20260629T120000",
+                )
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main()  # Allow direct unittest execution.

@@ -1,34 +1,53 @@
 ---
 name: cx-changelog
-description: Use when updating changelogs, release notes, change IDs, audit trails, or ensuring CHANGE entries map back to the target documentation set's engineering specification.
+description: Use for docs/cx change documents, release notes, audit trails, status changes, and keeping each change mapped to one scenario task instead of a duplicated requirement document.
 version: 0.1.0
 ---
 
-# cx Changelog Curator
+# cx Change Documents
 
 ## Purpose
 
-Maintain the target documentation set's `CHANGELOG.md` as a compact historical index. It must not become a second requirements document and must not duplicate long behavior descriptions. Every project is organized as multiple feature groups, and each `docs/001_feature_name/CHANGELOG.md` records that feature group's history while `docs/INDEX.md` handles cross-feature indexing.
+Maintain `changes/` under each `docs/cx` scenario. A change document is the current audit and handoff unit for AI work. It must not duplicate the whole use case.
+
+## Required Location
+
+```text
+docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
+```
+
+Chinese projects may use:
+
+```text
+docs/cx/01.创建用户/changes/20260629T120000-任务01-编写用户实体.md
+```
+
+## Required Content
+
+Each change must include:
+
+- Timestamp.
+- Status.
+- Task number.
+- Task name.
+- What was done before.
+- What should be done now.
 
 ## Rules
 
-1. Every entry must have a stable `CHANGE-YYYY-NNN` ID.
-2. Every entry must include date, type, summary, related engineering spec sections, BDD scenarios, tests, and evidence.
-3. If the changelog entry has no matching target engineering spec content, update the same documentation set's `ENGINEERING_SPEC.md` first.
-4. Do not copy long requirements into the changelog.
-5. Do not create separate release-note documents unless the user explicitly asks.
-6. Keep entries short enough to scan and concrete enough to audit.
+1. Inspect unfinished changes before choosing new work.
+2. Do not create duplicate planning files outside `docs/cx`.
+3. If a change spans multiple tasks, list those tasks in order and execute one at a time.
+4. If a change also modifies the use-case document, make that part of the ordered task list.
+5. Mark a change complete only after task verification is recorded.
+6. Follow the execution mode chosen at work start: direct mode continues through all in-scope tasks, while per-task confirmation mode waits for user review after each completed task.
 
-## Entry template
+## Output
 
-```markdown
-### CHANGE-YYYY-NNN - Title
+Return:
 
-- Date:
-- Type: feature | bugfix | refactor | test | docs | research
-- Summary:
-- Engineering spec sections:
-- Related BDD scenarios:
-- Related tests:
-- Verification evidence:
-```
+- Change file path.
+- Current status.
+- Task mapping.
+- Next required action.
+- Verification evidence or missing evidence.

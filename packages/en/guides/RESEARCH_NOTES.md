@@ -1,15 +1,15 @@
 # Research Notes
 
-This package is based on the current Codex customization model:
+This package follows the current Codex customization model:
 
 - `AGENTS.md` is durable repository guidance for coding agents.
-- Skills are reusable workflows stored as directories with `SKILL.md` files. Each skill needs a `name` and `description`.
-- Repository skills are discovered under `.agents/skills`.
-- Skills can be invoked explicitly with `$skill-name`, and they can also be selected implicitly from their description.
-- Custom subagents live under `.codex/agents/*.toml`. Each custom agent needs `name`, `description`, and `developer_instructions`.
-- Codex only spawns subagents when explicitly asked.
+- Skills are reusable workflows stored in directories with `SKILL.md`.
+- Repository-level skills are discovered under `.agents/skills`.
+- Skills can be invoked explicitly with `$skill-name` or selected implicitly from their description.
+- Custom subagents live under `.codex/agents/*.toml`.
+- Codex starts subagents only when the user explicitly asks.
 
-Useful references:
+References:
 
 - https://developers.openai.com/codex/skills
 - https://developers.openai.com/codex/subagents
@@ -18,4 +18,4 @@ Useful references:
 - https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes
 - https://agents.md/
 
-The main design decision is to keep Spec/Plan/Tasks discipline but collapse long-lived artifacts into documentation sets under `docs/`. Every project uses `docs/INDEX.md`, `docs/VERSIONS.md`, and multiple `docs/001_feature_name/` feature-group documentation sets. Concrete change IDs and task order live only in each feature group's `CHANGELOG.md`; non-programming tasks do not use TDD and do not create BDD automatically, with unclear behavior-discovery needs clarified with the user first. This preserves testable behavior and audit history while preventing per-requirement document clutter.
+The core design decision is to keep the discipline of documents first, tests second, and implementation third, without treating document completion as the default stop point. Before work starts, the agent asks for an execution mode; if the user does not explicitly choose per-task confirmation, AI defaults to completing documentation, tests, implementation, and validation directly. `docs/cx` can hold project and domain notes; each main success scenario owns one folder; tasks live in `tasks/`; changes live in `changes/`. This lets AI decide work from unfinished changes while preventing scattered per-request documents.

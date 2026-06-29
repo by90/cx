@@ -2,15 +2,15 @@
   "package": "cx",
   "language": "zh",
   "version": "0.1.2",
-  "purpose": "Codex BDD/TDD documentation-set engineering workflow",
+  "purpose": "Codex use-case-driven TDD workflow with docs/cx tasks and changes",
   "skills": [
     {
       "name": "cx-workflow",
       "path": ".agents/skills/cx-workflow/SKILL.md"
     },
     {
-      "name": "cx-bdd",
-      "path": ".agents/skills/cx-bdd/SKILL.md"
+      "name": "cx-story",
+      "path": ".agents/skills/cx-story/SKILL.md"
     },
     {
       "name": "cx-tdd",
@@ -63,8 +63,8 @@
       "path": ".codex/agents/cx-spec.toml"
     },
     {
-      "name": "cx-bdd",
-      "path": ".codex/agents/cx-bdd.toml"
+      "name": "cx-story",
+      "path": ".codex/agents/cx-story.toml"
     },
     {
       "name": "cx-tdd",

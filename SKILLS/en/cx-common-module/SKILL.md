@@ -56,7 +56,7 @@ If the answers do not support abstraction, inline the logic or keep the direct i
 
 Before adding a new abstraction, search:
 
-1. The current project's `src/`, `tests/`, `docs/`, and the target documentation set's Reusable Capability Registry.
+1. The current project's `src/`, `tests/`, `docs/cx`, and the target scenario's design document.
 2. Enabled related workflow skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, `$cx-tdd`, and this skill.
 3. Existing projects or prior implementations explicitly mentioned by the user, such as `IndexedSeries` in `rise202604`.
 4. Adjacent structures with the same shape, such as indexed series, packed tensor batches, ragged tensors, time-window datasets, or GPUI state reducers.
@@ -68,7 +68,7 @@ Record candidates, accept/reject reasons, and migration impact. Do not add a reu
 Extract a generic capability, reusable class, or common module when at least one is true:
 
 - The same logic appears in two or more places.
-- A behavior is important enough to have its own BDD scenario.
+- A behavior is important enough to have its own use-case branch or task.
 - The logic crosses project areas, such as training and UI.
 - The logic is error-prone: indexed series, tensor padding, masks, progress synchronization, cancellation, metrics, checkpoint paths, or UI state reducers.
 - A data structure already expresses a stable domain concept, such as grouped long series, window indices, packed batches, state reducers, or test data fixtures.
@@ -81,8 +81,8 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 - Public API proposal with public entrypoint, normal call style, special-case entrypoint, lifecycle, state source, inputs, outputs, error policy, and a minimal example.
 - Tests first, preferably covering real small data and edge cases.
 - Backward-compatible migration plan describing which call sites move and which stay unchanged.
-- Reusable Capability Registry update in the target documentation set's `ENGINEERING_SPEC.md`.
-- Test Matrix update in the target documentation set.
+- Reusable capability notes in the target `docs/cx` design document.
+- Task or change document updates for the tests that prove the reusable capability.
 
 ## Code Constraints
 

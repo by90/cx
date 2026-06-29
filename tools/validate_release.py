@@ -129,13 +129,14 @@ def main() -> int:
                 )
 
     for package in (en, zh):
-        for command in (
-            [sys.executable, "-m", "unittest", "discover", "-s", "tests"],
-            [sys.executable, "tools/validate_skill_pack.py", "."],
-            [sys.executable, "tools/validate_cx_pack.py", "."],
-            [sys.executable, "tools/validate_single_source.py", "examples/python_ml_project"],
+        example = package / "examples" / "python_ml_project"
+        for command, cwd in (
+            ([sys.executable, "-m", "unittest", "discover", "-s", "tests"], package),
+            ([sys.executable, "tools/validate_skill_pack.py", "."], package),
+            ([sys.executable, "tools/validate_cx_pack.py", "."], package),
+            ([sys.executable, str(package / "tools" / "validate_single_source.py")], example),
         ):
-            code = run(command, cwd=package)
+            code = run(command, cwd=cwd)
             if code != 0:
                 errors.append(f"validation failed in {package.relative_to(root)}: {' '.join(command)}")
 

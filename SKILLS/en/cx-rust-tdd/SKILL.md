@@ -8,13 +8,13 @@ version: 0.1.0
 
 ## Purpose
 
-Use this skill for Rust implementation work after behavior is defined by `$cx-bdd`. It is a general Rust code-quality and TDD skill; for GPUI/macOS desktop UI work, it adds real-device verification discipline without replacing a dedicated UI component design process.
+Use this skill for Rust implementation work after the current `docs/cx` task and execution mode are known. It is a general Rust code-quality and TDD skill; for GPUI/macOS desktop UI work, it adds real-device verification discipline without replacing a dedicated UI component design process.
 
 ## Required Workflow
 
-1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
-2. Read `BDD.md`, `ENGINEERING_SPEC.md`, `CHANGELOG.md`, and the relevant Rust modules.
-3. Map one BDD ID to one narrow Rust test.
+1. Confirm the execution mode first; if the user did not explicitly choose per-task confirmation, direct mode proceeds into testing, implementation, and validation without a separate document-complete confirmation gate.
+2. Read the target use-case document, design document, current task document, current change document, and the relevant Rust modules.
+3. Map the current class/type measure to one narrow Rust test.
 4. Write the failing test first using `#[test]`, integration tests under `tests/`, or doc tests when the behavior is public API documentation.
 5. Run `cargo test <filter>` or the narrowest project command and record the red failure.
 6. Implement the smallest Rust change.
@@ -104,7 +104,7 @@ SWIFT
 
 ## Output
 
-- BDD ID to Rust test mapping.
+- Current task to Rust test mapping.
 - Expected red failure command and output summary.
 - Minimal Rust implementation.
 - `cargo test` result.

@@ -8,21 +8,22 @@ version: 0.1.0
 
 ## 目的
 
-在 `$cx-bdd` 已经定义行为后，用本 skill 处理 Rust 实现。它是通用 Rust 代码质量和 TDD skill；涉及 GPUI/macOS 桌面 UI 时，只补充实机验证纪律，不替代专门 UI 组件设计。
+在 `$cx-story` 已经定义当前 story、变更和任务后，用本 skill 处理 Rust 实现。它是通用 Rust 代码质量和 TDD skill；涉及 GPUI/macOS 桌面 UI 时，只补充实机验证纪律，不替代专门 UI 组件设计。
 
 ## 必须执行的流程
 
-1. 先确认用户已经在文档更新后明确同意进入测试和实现阶段；没有确认时停止并请求确认。
-2. 阅读 `BDD.md`、`ENGINEERING_SPEC.md`、`CHANGELOG.md` 和相关 Rust 模块。
-3. 将一个 BDD ID 映射到一个最窄 Rust 测试。
-4. 先写失败测试：可以使用 `#[test]`、`tests/` 下的集成测试，或用于公共 API 文档的 doc test。
-5. 运行 `cargo test <filter>` 或项目中最窄命令，并记录 red failure。
-6. 实现最小 Rust 改动。
-7. 先运行最窄测试，再运行 `cargo test`。
-8. 运行 `cargo fmt --check` 或 `cargo fmt`。
-9. 可行时运行 `cargo clippy --all-targets --all-features`。
-10. 只有测试 green 后才重构。
-11. 记录验证证据。
+1. 先确认本轮执行模式；如果用户没有明确选择逐任务确认，默认直接进入当前任务的测试、实现和验证阶段。
+2. 阅读当前主成功场景文件夹中的 `00.用例.md`、`00. 设计.md`、当前 `changes/*.md`、当前 `tasks/<编号.任务名>/00.任务.md` 和相关 Rust 模块。
+3. 确认当前任务的量具是一个 Rust 类型或一组高度内聚的 Rust 类型组，例如 struct、enum、trait 与其直接协作对象。
+4. 将当前任务目标映射到一个最窄 Rust 测试。
+5. 先写失败测试：可以使用 `#[test]`、`tests/` 下的集成测试，或用于公共 API 文档的 doc test。
+6. 运行 `cargo test <filter>` 或项目中最窄命令，并记录 red failure。
+7. 实现最小 Rust 改动。
+8. 先运行最窄测试，再运行 `cargo test`。
+9. 运行 `cargo fmt --check` 或 `cargo fmt`。
+10. 可行时运行 `cargo clippy --all-targets --all-features`。
+11. 只有测试 green 后才重构。
+12. 在当前任务文档和变更文档中记录验证证据。
 
 ## 最小实现纪律
 
@@ -104,7 +105,7 @@ SWIFT
 
 ## 输出
 
-- BDD ID 到 Rust 测试的映射。
+- 当前 story、变更文档、任务文档和 Rust 类型量具的映射。
 - 预期 red failure 命令和输出摘要。
 - 最小 Rust 实现。
 - `cargo test` 结果。

@@ -149,7 +149,7 @@ def insert_version_entry(
             f"- Date: {date.today().isoformat()}",
             f"- Feature groups: {feature_group}",
             f"- Summary: {summary}",
-            f"- Source changes: see feature group CHANGELOG entries.",
+            f"- Source changes: see docs/cx change documents.",
             f"- Verification evidence: {evidence}",
             "",
         ]

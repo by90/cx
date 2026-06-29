@@ -1,34 +1,74 @@
 ---
 name: cx-changelog
-description: 用于 changelog、release notes、change IDs、audit trails，以及确保 CHANGE 条目映射回目标文档集的 ENGINEERING_SPEC 研发主文档。
+description: 用于维护 docs/cx 下的 changes 变更文档、变更审计、未完成变更优先级、顺序任务清单、release notes 输入，以及确保变更映射到 story、任务、代码文件和测试文件。
 version: 0.1.0
 ---
 
-# cx 变更记录维护
+# cx 变更文档维护
 
 ## 目的
 
-将目标文档集的 `CHANGELOG.md` 维护为简洁的历史索引。它不能变成第二份需求文档，也不能复制长篇行为说明。所有项目都按多个功能组组织，每个 `docs/001_feature_name/CHANGELOG.md` 只记录该功能组历史，`docs/INDEX.md` 负责跨功能组索引。
+维护当前主成功场景文件夹下的 `changes/`。变更文档是 AI 决定当前工作的第一入口：除非用户明确要求新增任务、新增用例分支或新增用例，否则 AI 必须先处理未完成变更。
 
 ## 规则
 
-1. 每个条目必须有稳定的 `CHANGE-YYYY-NNN` ID。
-2. 每个条目必须包含日期、类型、摘要、相关研发主文档章节、BDD 场景、测试和证据。
-3. 如果变更记录条目没有对应目标研发主文档内容，先更新同一文档集的 `ENGINEERING_SPEC.md`。
-4. 不要把长需求复制进变更记录。
-5. 除非用户明确要求，不要创建单独 release note 文档。
-6. 条目要足够短，便于扫描；同时足够具体，便于审计。
+1. 每个主成功场景文件夹都必须有 `changes/`。
+2. 每次文档、任务、设计或实现意图变化都必须创建或更新一份变更文档。
+3. 变更文档必须映射到当前 `00.用例.md`、`00. 设计.md`、相关任务文档、代码文件和测试文件。
+4. 如果一次变更涉及多个任务，或涉及用例文档修改，必须在变更文档中写出顺序任务清单。
+5. AI 每次只执行顺序任务清单中的一项；完成后更新状态，并按开工时选择的执行模式决定是否继续。
+6. 不要创建第二份需求文档、草稿、旧版或并行计划。
+7. 变更文档必须简洁但可审计：写清时间戳、任务编号、任务名称、之前做了什么、现在应该如何、验证方式和处理结果。
+8. release notes 只能从已完成变更和验证证据汇总，不要把 release 内容提前写成另一份长期文档。
 
-## 条目模板
+## 文件命名
+
+```text
+docs/cx/01.创建用户/changes/20260629143000-任务01-编写请求校验.md
+```
+
+## 变更模板
 
 ```markdown
-### CHANGE-YYYY-NNN - Title
+# 变更：任务 01 编写请求校验
 
-- Date:
-- Type: feature | bugfix | refactor | test | docs | research
-- Summary:
-- Engineering spec sections:
-- Related BDD scenarios:
-- Related tests:
-- Verification evidence:
+## 时间戳
+
+2026-06-29 14:30:00
+
+## 状态
+
+未完成
+
+## 关联对象
+
+- 用例：`00.用例.md`
+- 设计：`00. 设计.md`
+- 任务：`tasks/01.编写请求校验/00.任务.md`
+- 代码文件：`src/users/create_user.py`
+- 测试文件：`tests/users/create_user_test.py`
+
+## 之前做了什么
+
+TODO
+
+## 现在应该如何
+
+TODO
+
+## 顺序任务清单
+
+| 顺序 | 类型 | 目标 | 状态 |
+| --- | --- | --- | --- |
+| 01 | 用例文档 | 更新 `00.用例.md` 的分支说明 | 未完成 |
+| 02 | 任务实现 | 执行 `tasks/01.编写请求校验/00.任务.md` | 未完成 |
+
+## 验证方式
+
+TODO
+
+## 处理结果
+
+- 结果：TODO
+- 执行模式：直接做完或逐任务确认
 ```

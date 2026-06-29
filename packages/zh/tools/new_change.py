@@ -1,133 +1,166 @@
 #!/usr/bin/env python3
-"""向目标文档集的 CHANGELOG.md 追加一条 CHANGE 记录。"""
+"""在 docs/cx 主成功场景的 changes 目录中创建一份变更文档。
+
+本文件提供 `create_change_document` 入口，用于把一次变更写成 AI 可继续执行的单份 Markdown
+文档。主要函数是 `change_path_for`、`build_change_text` 和 `create_change_document`。
+"""
 
 from __future__ import annotations
 
-import argparse  # argparse 用于把命令行参数解析成 Python 对象。
-import datetime as dt  # datetime 用于生成默认日期。
-import re  # re 用于用正则表达式识别已有 CHANGE 编号。
-from pathlib import Path  # Path 用于安全拼接跨平台文件路径。
+import datetime as dt  # datetime 用于生成默认时间戳。
+import re  # re 用于校验场景、任务编号和文件名片段。
+from pathlib import Path  # Path 用于以面向对象方式拼接跨平台路径。
 
 
-CHANGE_ID_RE = re.compile(r"CHANGE-(\d{4})-(\d{3})")  # 匹配 CHANGE-年份-序号。
-FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # 匹配编号小写下划线功能组目录。
-DEFAULT_CHANGELOG = "# CHANGELOG.md\n\n## Unreleased\n"  # 新 changelog 的最小可用内容。
+SCENARIO_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # 主成功场景目录必须形如 01.创建用户。
+TASK_NUMBER_RE = re.compile(r"\d{2}\Z")  # 任务编号必须使用两位数字。
+SAFE_NAME_RE = re.compile(r'[\\/:*?"<>|\r\n\t]+')  # Windows 和 Markdown 文件名中不应出现这些字符。
 
 
-def next_change_id(changelog_text: str, year: int) -> str:
-    """根据当前年份和已有文本生成下一个 CHANGE 编号。"""
+def normalize_scenario_name(scenario: str) -> str:
+    """把用户传入的场景路径规范化为场景文件夹名。
 
-    numbers = [  # 收集同一年已经使用过的序号。
-        int(match.group(2))  # 第二个分组是三位序号，把它转成整数便于比较。
-        for match in CHANGE_ID_RE.finditer(changelog_text)  # 遍历 changelog 中所有 CHANGE 编号。
-        if int(match.group(1)) == year  # 只统计目标年份的编号，避免跨年冲突。
-    ]
-    next_number = max(numbers, default=0) + 1  # 没有已有编号时从 1 开始，否则取最大值加 1。
-    return f"CHANGE-{year}-{next_number:03d}"  # 把序号补齐三位，形成稳定 ID。
+    `scenario` 可以是 `01.创建用户` 或 `docs/cx/01.创建用户`；返回值是场景文件夹名。
+    """
 
-
-def changelog_path_for(root: Path, doc_set: str | None) -> Path:
-    """根据编号功能组名称计算 changelog 路径。"""
-
-    normalized = (doc_set or "").strip().strip("/\\")  # 清理空白和首尾路径分隔符。
-    if normalized.startswith("docs/") or normalized.startswith("docs\\"):  # 允许用户传入 docs/<group>。
-        normalized = normalized[5:]  # 去掉 docs/ 前缀，避免得到 docs/docs/<group>。
-    if not FEATURE_FOLDER_RE.fullmatch(normalized):  # 所有项目都必须使用编号功能组目录。
-        raise ValueError("doc_set must look like 001_project_template")  # 给调用方清楚的修复提示。
-    return root / "docs" / normalized / "CHANGELOG.md"  # 返回功能组 changelog 路径。
+    normalized = scenario.strip().strip("/\\")  # 去除首尾空白和路径分隔符。
+    normalized = normalized.replace("\\", "/")  # 统一 Windows 路径分隔符，便于后续处理。
+    if normalized.startswith("docs/cx/"):  # 允许调用方传入完整 cx 相对路径。
+        normalized = normalized[len("docs/cx/") :]  # 去掉固定前缀，只保留场景名。
+    if "/" in normalized:  # 场景名不应再包含子路径。
+        raise ValueError("scenario must look like 01.创建用户")  # 报告明确的场景命名要求。
+    if not SCENARIO_FOLDER_RE.fullmatch(normalized):  # 校验两位编号加点号的格式。
+        raise ValueError("scenario must look like 01.创建用户")  # 报告明确的场景命名要求。
+    return normalized  # 返回规范化后的场景文件夹名。
 
 
-def build_entry(
-    change_id: str,
-    title: str,
-    change_type: str,
-    today: str,
-    branch: str,
-    base_branch: str,
-    feature_group: str,
-) -> str:
-    """把一条 CHANGE 记录渲染成 Markdown 文本。"""
+def normalize_task_number(task_number: int | str) -> str:
+    """把任务编号规范化为两位数字字符串。
 
-    return f"""
-### {change_id} - {title}
+    `task_number` 可以是整数或字符串；返回值是两位数字字符串。
+    """
 
-- Date: {today}
-- Type: {change_type}
-- Status: planned
-- Branch: {branch}
-- Base branch: {base_branch}
-- Feature group: {feature_group}
-- Summary: TODO
-- Related scenarios: TODO
-- Related tests: TODO
-- Verification evidence: TODO
-""".strip()  # 去掉模板首尾空行，让插入逻辑控制空行数量。
+    if isinstance(task_number, int):  # 整数任务号需要补齐两位。
+        normalized = f"{task_number:02d}"  # 使用两位数字表达任务编号。
+    else:  # 字符串任务号保留用户显式编号。
+        normalized = task_number.strip()  # 去除字符串任务号首尾空白。
+    if not TASK_NUMBER_RE.fullmatch(normalized):  # 任务号必须正好两位数字。
+        raise ValueError("task_number must look like 01")  # 报告明确的任务编号要求。
+    return normalized  # 返回两位任务编号。
 
 
-def append_under_unreleased(text: str, entry: str) -> str:
-    """把新条目按创建顺序追加到 Unreleased 小节末尾。"""
+def safe_filename_part(value: str) -> str:
+    """把任务名转换成可用于文件名的片段。
 
-    if "## Unreleased" not in text:  # 如果旧文件没有 Unreleased 小节，就补一个小节。
-        return text.rstrip() + f"\n\n## Unreleased\n\n{entry}\n"  # 把条目放进新小节。
-    header_index = text.index("## Unreleased")  # 找到 Unreleased 标题的起点。
-    search_start = header_index + len("## Unreleased")  # 从标题后面开始找下一个二级标题。
-    next_header_index = text.find("\n## ", search_start)  # 下一个二级标题表示 Unreleased 结束。
-    if next_header_index == -1:  # 没有后续版本小节时，追加到文件末尾。
-        return text.rstrip() + f"\n\n{entry}\n"  # 保留旧条目顺序，再追加新条目。
-    before = text[:next_header_index].rstrip()  # 取出 Unreleased 小节已有内容。
-    after = text[next_header_index:]  # 保留后续版本小节。
-    return before + f"\n\n{entry}\n" + after  # 把新条目插入 Unreleased 末尾。
+    `value` 是任务名称；返回值是去除危险路径字符后的名称。
+    """
+
+    cleaned = SAFE_NAME_RE.sub("", value.strip())  # 移除 Windows 文件名和路径分隔危险字符。
+    cleaned = re.sub(r"\s+", "", cleaned)  # 移除连续空白，保持变更文件名紧凑。
+    if not cleaned:  # 空任务名无法形成可读文件名。
+        raise ValueError("task_name must not be empty")  # 报告任务名不能为空。
+    return cleaned  # 返回安全文件名片段。
 
 
-def append_change(
+def timestamp_text(timestamp: dt.datetime | str | None = None) -> str:
+    """生成或规范化变更时间戳。
+
+    `timestamp` 可以为空、datetime 或字符串；返回值是 `YYYYMMDDTHHMMSS` 格式文本。
+    """
+
+    if timestamp is None:  # 调用方未传时间时使用当前本地时间。
+        actual = dt.datetime.now()  # 获取当前本地时间。
+        return actual.strftime("%Y%m%dT%H%M%S")  # 返回文件名友好的时间戳。
+    if isinstance(timestamp, dt.datetime):  # datetime 对象需要格式化。
+        return timestamp.strftime("%Y%m%dT%H%M%S")  # 返回文件名友好的时间戳。
+    compact = timestamp.strip().replace("-", "").replace(":", "")  # 移除常见时间分隔符。
+    compact = compact.replace(" ", "T")  # 允许 `YYYYMMDD HHMMSS` 转为标准形式。
+    if not re.fullmatch(r"\d{8}T\d{6}", compact):  # 时间戳必须稳定可排序。
+        raise ValueError("timestamp must look like 20260629T120000")  # 报告明确的时间戳格式。
+    return compact  # 返回规范化时间戳。
+
+
+def change_path_for(
     root: Path,
-    title: str,
-    change_type: str,
-    doc_set: str | None = None,
-    today: str | None = None,
-    branch: str = "TODO",
-    base_branch: str = "main",
-) -> str:
-    """创建 CHANGE 编号，并写入目标文档集的 changelog。"""
+    scenario: str,
+    task_number: int | str,
+    task_name: str,
+    timestamp: dt.datetime | str | None = None,
+) -> Path:
+    """计算变更文档路径。
 
-    changelog_path = changelog_path_for(root, doc_set)  # 根据文档集选择目标 changelog。
-    changelog_path.parent.mkdir(parents=True, exist_ok=True)  # 确保目标 docs 目录已经存在。
-    text = changelog_path.read_text(encoding="utf-8") if changelog_path.exists() else DEFAULT_CHANGELOG  # 读取旧文本或模板。
-    actual_today = today or dt.date.today().isoformat()  # 没传日期时使用今天。
-    year = int(actual_today[:4])  # CHANGE 编号按日期年份分组。
-    change_id = next_change_id(text, year)  # 生成下一个稳定编号。
-    feature_group = changelog_path.parent.name  # 记录该变更所属编号功能组。
-    entry = build_entry(change_id, title, change_type, actual_today, branch, base_branch, feature_group)  # 生成 Markdown 条目。
-    updated_text = append_under_unreleased(text, entry)  # 把条目追加到 Unreleased 小节末尾。
-    changelog_path.write_text(updated_text, encoding="utf-8")  # 用 UTF-8 写回 changelog。
-    return change_id  # 返回编号，方便脚本和测试继续使用。
+    `root` 是仓库根目录，`scenario` 是主成功场景，`task_number` 是任务号，`task_name` 是任务名，
+    `timestamp` 是可选时间戳；返回值是目标变更文档路径。
+    """
+
+    scenario_name = normalize_scenario_name(scenario)  # 规范化场景文件夹名。
+    task_id = normalize_task_number(task_number)  # 规范化任务编号。
+    safe_task_name = safe_filename_part(task_name)  # 规范化任务名称文件名片段。
+    stamp = timestamp_text(timestamp)  # 生成或规范化时间戳。
+    filename = f"{stamp}-任务{task_id}-{safe_task_name}.md"  # 组合变更文件名。
+    return root / "docs" / "cx" / scenario_name / "changes" / filename  # 返回完整变更文件路径。
+
+
+def build_change_text(
+    timestamp: str,
+    task_number: str,
+    task_name: str,
+    previous: str,
+    current: str,
+    status: str = "未完成",
+) -> str:
+    """渲染变更文档内容。
+
+    `timestamp` 是文件时间戳，`task_number` 是任务号，`task_name` 是任务名，`previous` 是之前状态，
+    `current` 是现在应该如何处理，`status` 是变更状态；返回值是 Markdown 文本。
+    """
+
+    return (  # 使用固定章节保证 AI 可以稳定解析。
+        "# 变更\n\n"
+        f"## 时间戳\n{timestamp}\n\n"
+        f"## 状态\n{status}\n\n"
+        f"## 任务\n{task_number}\n\n"
+        f"## 任务名称\n{task_name}\n\n"
+        f"## 之前做了什么\n{previous}\n\n"
+        f"## 现在应该如何\n{current}\n"
+    )  # 返回完整 Markdown 文本。
+
+
+def create_change_document(
+    root: Path,
+    scenario: str,
+    task_number: int | str,
+    task_name: str,
+    previous: str,
+    current: str,
+    status: str = "未完成",
+    timestamp: dt.datetime | str | None = None,
+) -> Path:
+    """创建一份变更文档。
+
+    `root` 是仓库根目录，`scenario` 是主成功场景，`task_number` 是任务号，`task_name` 是任务名，
+    `previous` 是之前状态，`current` 是现在应该如何处理，`status` 是变更状态，`timestamp` 是可选
+    时间戳；返回值是写入的变更文件路径。
+    """
+
+    task_id = normalize_task_number(task_number)  # 规范化任务编号。
+    stamp = timestamp_text(timestamp)  # 规范化时间戳。
+    path = change_path_for(root, scenario, task_id, task_name, stamp)  # 计算目标文件路径。
+    path.parent.mkdir(parents=True, exist_ok=True)  # 确保 changes 目录存在。
+    text = build_change_text(stamp, task_id, task_name, previous, current, status)  # 渲染变更文档内容。
+    path.write_text(text, encoding="utf-8")  # 以 UTF-8 无 BOM 写入 Markdown。
+    return path  # 返回生成的文件路径。
 
 
 def main() -> int:
-    """从命令行追加一条 CHANGE 记录。"""
+    """拒绝命令行参数方式创建变更文档。
 
-    parser = argparse.ArgumentParser(description="Append a CHANGE-* entry to a target docs changelog.")  # 创建命令行解析器。
-    parser.add_argument("title")  # 读取变更标题。
-    parser.add_argument("--type", default="feature", choices=["feature", "bugfix", "refactor", "test", "docs", "research"])  # 读取变更类型。
-    parser.add_argument("--root", default=".")  # 读取目标仓库根目录。
-    parser.add_argument("--doc-set", default=None)  # 读取目标文档集名称。
-    parser.add_argument("--branch", default="TODO")  # 读取当前工作分支。
-    parser.add_argument("--base-branch", default="main")  # 读取合并目标分支。
-    parser.add_argument("--date", default=None)  # 允许自动化传入固定日期。
-    args = parser.parse_args()  # 解析所有命令行参数。
+    本方法没有参数；返回值是进程退出码，1 表示用户应通过受控自动化调用函数。
+    """
 
-    change_id = append_change(  # 调用核心函数写入 changelog。
-        Path(args.root).resolve(),  # 把仓库根目录转换为绝对路径。
-        args.title,  # 传入标题。
-        args.type,  # 传入变更类型。
-        doc_set=args.doc_set,  # 传入目标文档集。
-        today=args.date,  # 传入可选日期。
-        branch=args.branch,  # 传入工作分支。
-        base_branch=args.base_branch,  # 传入合并目标分支。
-    )
-    print(change_id)  # 输出编号，方便用户复制到任务记录或自动化日志。
-    return 0  # 返回成功退出码。
+    print("请通过 create_change_document(...) 创建变更文档；本脚本不接收命令行参数。")  # 明确脚本使用方式。
+    return 1  # 返回失败退出码，避免误以为已经生成变更。
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())  # 让脚本退出码等于 main 的返回值。
+    raise SystemExit(main())  # 将 main 的返回值作为脚本退出码。

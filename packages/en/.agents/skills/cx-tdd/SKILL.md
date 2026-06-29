@@ -1,87 +1,60 @@
 ---
 name: cx-tdd
-description: Use for test-driven development after BDD is defined: red-green-refactor, narrow failing tests, test matrices, code quality gates, and verification evidence.
+description: Use for strict test-driven development after the docs/cx story task and execution mode are known: red-green-refactor, narrow failing tests, one task document, one code file, one matching unit-test file, strict OOP, and verification evidence.
 version: 0.1.0
 ---
 
-# cx TDD Implementation Discipline
+# cx Strict TDD
 
 ## Purpose
 
-Use this skill after `$cx-bdd` has defined the behavior. TDD turns BDD examples into executable tests, forces small design steps, and prevents the assistant from writing unverified production code.
+Use this skill after the current task and execution mode are known. If the user has not explicitly chosen per-task confirmation, proceed directly from documents into the narrowest failing test, the smallest implementation, and a focused refactor.
 
-## Required Workflow
+## Inputs
 
-1. First confirm the user has explicitly approved entry into testing and implementation after the document update. If not, stop and ask for confirmation.
-2. Read the target feature folder's `BDD.md`, `ENGINEERING_SPEC.md`, and `CHANGELOG.md`.
-3. Select one BDD ID and one observable behavior.
-4. Confirm the prompt provides verification commands or infer the narrowest existing command from the repository. If neither is possible, ask before implementation.
-5. Add or update the Test Matrix before implementation.
-6. For a generic capability, reusable feature, or reusable class, first write public-call tests, then special-entrypoint tests, then lifecycle/state restoration tests, and only after that consider internal boundaries.
-7. Place source files under `src/<subsystem>/` and create one-to-one test files under the matching test path; for example, `src/config/cnn_config.py` maps to `tests/config/cnn_config_test.py`.
-8. Write the narrowest failing test first.
-9. Run the test and record the expected red failure.
-10. Implement the smallest production change that can make the test pass.
-11. Run the narrow test until green.
-12. Refactor only after green, and keep tests green while refactoring.
-13. Run broader validation when the change touches shared behavior.
-14. Record commands, results, and residual gaps in the target feature folder.
+Read, in order:
 
-## Minimal Implementation Discipline
+1. Target scenario's use-case document.
+2. Target scenario's design document.
+3. Current unfinished change document.
+4. Current task document.
+5. The one code file named by the task.
+6. The one matching unit-test file when needed.
 
-Iron rule: absolutely no unmaintainable pile-up code.
+## Rules
 
-- Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early.
-- Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
-- Unless business rules explicitly require it, do not hide exceptions, silently fall back, or turn errors that would harm the product into defaults, empty results, skipped records, fake successful retries, or warnings; during development, let these errors stop execution.
-- Use a simple test: if the same bug shipped to the product would cause a problem, it must surface as a failure. Only add explicit handling when the business requires degradation, recovery, or user-visible guidance, and cover that path with tests.
-- Do not add validation that only "looks safer" but is not required, such as filename allowlists, path validity checks, extra AST scans, or duplicate config rule checks.
-- Do not put per-item data-validity checks inside large loops, training loops, hot paths, or batch processing to fall back or slow the system down. Handle data validity at entrypoints, data preparation, test fixtures, or separate diagnostic tasks, and never use those checks to replace real failures.
-- By default, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
-- Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
-- Prefer expressing defaults through function or constructor parameters; do not promote simple paths, filenames, or one-off defaults to module-level constants.
-- Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
-- Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
-- Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
-- Before implementing a generic capability, reusable feature, or reusable class, first lock down the public entrypoint, normal call style, special-case entrypoint, lifecycle, state source, and test coverage path; do not write internal loading, validation, conversion, caching, or persistence code until those are covered by tests.
-- Refactoring should delete code, reduce branches, and shrink the public surface, not move logic into more small functions.
+1. Confirm the execution mode first; if the user did not explicitly choose per-task confirmation, direct mode proceeds into tests, implementation, and validation without a separate document-complete confirmation gate.
+2. The task measure is a class or type group.
+3. One task changes one code file and, when needed, one matching unit-test file.
+4. Python tests mirror `src`: `src/subsystem/name.py` maps to `tests/subsystem/name_test.py`.
+5. Rust uses built-in tests and `cargo test`.
+6. Write the failing test first and report the expected failure.
+7. Implement the smallest change that passes.
+8. Refactor only within the current task boundary.
+9. Do not weaken assertions to make a test pass.
+10. Record verification commands and results in the current task or change document.
 
-## Code Quality Rules
+## Python Expectations
 
-- No unstructured pile-up code; also do not manufacture shell functions, classes, or interfaces for one-line forwarding or one-off logic.
-- Use object-oriented design only when the behavior has state, lifecycle, invariants, or collaboration between domain objects.
-- Prefer explicit attributes, methods, constructors, protocols, traits, or interfaces over dynamic reflection.
-- Do not use Python `getattr`, `setattr`, `delattr`, monkey-patching, dynamic method injection, or stringly typed dispatch by default.
-- If dynamic reflection appears necessary, first prove there is no clearer static API, record the reason, add focused tests, and isolate it behind a small adapter.
-- Avoid global mutable state, hidden singletons, catch-all exception handling, and broad mock-heavy tests.
-- Keep public APIs small and documented through tests.
-- Tests for a generic capability, reusable feature, or reusable class must first prove the real caller entrypoint works; do not start by testing internal helpers and freezing a wrong design.
-- Python source files and unit tests must include file-level explanations, class responsibility notes, function responsibility notes, and line-by-line intent comments. The file-level explanation must state the file's purpose and the main classes, functions, or test targets maintained by that file.
-- Function, method, and test-method explanations must describe parameter meanings and return values, or explicitly say there is no return value. Even when a test method only has `self`, explain that `unittest` supplies it.
-- Unit tests follow the same line-by-line intent-comment standard. Except for blank lines, pure formatting lines, or repeated structural lines, every line of test business logic must have an adjacent explanatory comment.
-- After editing Python source or tests, run Black default-format checks, for example `python -m black --check src tests tools`. A project may narrow the paths, but Black must not be omitted.
-- Subsystem code must not be flattened into the project root or mixed into unrelated directories. For the config subsystem, the source directory is `src/config/`, and CNN configuration must live in its own file, `src/config/cnn_config.py`.
-- Unit tests must live under `tests/`, mirror the `src` structure, and map one-to-one with source files by appending `_test.py`; do not use one broad test file for multiple source files, and do not split one source file across multiple arbitrarily named test files.
-- Constructors and functions should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`; move complex default construction into dataclasses, config objects, factories, or small dedicated methods.
-- Python scripts must not change behavior through command-line arguments. Do not add `argparse`, `click`, `typer`, `sys.argv`, or custom command-line parsers. When script behavior must be adjustable, define config-subsystem items with defaults, and use those defaults unless configuration is manually changed.
-- Code must stay minimal, small, and direct. Do not create bloated, long, hard-to-maintain code. Any potentially reusable feature, class, or logic must first invoke `$cx-common-module` to search existing implementation and design the public entrypoint.
-- Before final output, review the diff against the prompt contract: goal met, constraints honored, verification run, and residual risks stated.
+- Use `uv` managed Python.
+- Use `unittest` unless the project already uses another framework.
+- Use strict OOP for state, lifecycle, invariants, and domain collaboration.
+- Do not use dynamic reflection by default.
+- Do not add command-line parameters to target-project scripts.
 
-## Test Matrix Format
+## Rust Expectations
 
-```text
-BDD-CONFIG-001 -> tests/config/cnn_config_test.py::CnnConfigTest::test_missing_model_name_is_rejected
-Expected red: validator currently accepts missing model names
-Command: uv run python -m unittest tests.config.cnn_config_test.CnnConfigTest.test_missing_model_name_is_rejected
-```
+- Model domain state with struct, enum, trait, and explicit `Result`.
+- Avoid `unwrap`, `expect`, and `panic!` in production paths unless the invariant is local and documented.
+- Run `cargo fmt` and `cargo test`; run `cargo clippy --all-targets --all-features` when practical.
 
 ## Output
 
-Every TDD cycle should leave:
+Return:
 
-- A BDD ID mapped to a test.
-- A recorded red failure.
-- The minimal implementation.
-- A green test result.
-- Refactoring notes when refactoring happened.
-- Updated verification evidence.
+- Current task and class/type measure.
+- Test file and code file.
+- Expected red failure.
+- Implementation summary.
+- Verification commands and results.
+- Execution mode, remaining risk, or next task gate.

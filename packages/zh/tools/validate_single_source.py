@@ -1,181 +1,268 @@
 #!/usr/bin/env python3
-"""Validate cx documentation-set layout for a target repository."""
+"""校验目标仓库是否遵循 docs/cx 用例、任务与变更的单一文档来源规则。
+
+本文件提供 `validate_single_source` 入口，用于检查 `docs/cx` 下的项目说明、主成功场景、
+任务文件夹和变更文件夹。主要类是 `ScenarioFolder` 和 `ValidationReport`，主要函数是
+`validate_single_source`。
+"""
 
 from __future__ import annotations
 
-import argparse  # argparse 负责把命令行参数解析成 Python 对象。
-import re  # re 负责用正则表达式寻找 CHANGE ID 和 BDD ID。
-from dataclasses import dataclass  # dataclass 用来声明轻量结果对象。
-from pathlib import Path  # Path 用面向对象方式处理文件路径。
+import re  # 使用正则表达式校验场景文件夹、任务文件夹和变更文件命名。
+from dataclasses import dataclass  # 使用 dataclass 表达校验过程中传递的不可变结果对象。
+from pathlib import Path  # 使用 Path 以面向对象方式处理跨平台文件路径。
 
 
-CHANGE_ID_RE = re.compile(r"CHANGE-\d{4}-\d{3}")  # 匹配稳定变更编号。
-BDD_ID_RE = re.compile(r"BDD-[A-Z0-9]+-\d{3}")  # 匹配稳定行为场景编号。
-FEATURE_FOLDER_RE = re.compile(r"\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*\Z")  # 匹配 001_project_template 这类功能组目录。
-ROOT_INDEX_DOCS = {"INDEX.md", "README.md", "VERSIONS.md"}  # docs 根目录只允许索引、说明和版本索引。
-ROOT_FORBIDDEN_DOCS = {"BDD.md", "ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # 根目录禁止承载具体功能组文件。
-DOC_SET_FILES = {"ENGINEERING_SPEC.md", "CHANGELOG.md", "GUIDE.md"}  # 一个功能组文档集必须包含的核心文件。
-OPTIONAL_DOC_SET_FILES = {"BDD.md", "INDEX.md", "README.md"}  # BDD 只在行为任务需要时存在，说明文件也可选。
+SCENARIO_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # 主成功场景目录必须形如 01.创建用户。
+TASK_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # 任务目录必须形如 01.编写用户实体。
+CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}-任务\d{2}-.+\.md\Z")  # 变更文件名必须携带时间戳、任务号和任务名。
+LEGACY_CX_FILE_NAMES = {"B" + "DD.md", "ENGINEERING" + "_SPEC.md", "CHANGE" + "LOG.md", "GUIDE.md"}  # 旧 cx 文件不再允许出现。
+LEGACY_CX_TEXT_RE = re.compile(r"\bB" + r"DD\b|\bGher" + r"kin\b|ENGINEERING" + r"_SPEC|CHANGE" + r"LOG")  # 旧流程关键词不应进入新 cx 文档。
+CHANGE_REQUIRED_HEADINGS = (
+    "## 时间戳",
+    "## 状态",
+    "## 任务",
+    "## 任务名称",
+    "## 之前做了什么",
+    "## 现在应该如何",
+)  # 每个变更文件必须说明 AI 判断工作的关键依据。
 
 
 @dataclass(frozen=True)
-class DocSet:
-    """Describe one folder that owns an engineering spec and changelog."""
+class ScenarioFolder:
+    """表示一个 docs/cx 下的主成功场景文件夹。
 
-    root_relative: str  # 保存面向用户的相对路径，便于报错。
-    directory: Path  # 保存实际目录对象，便于读取文件。
-    spec_path: Path  # 保存 ENGINEERING_SPEC.md 的完整路径。
-    changelog_path: Path  # 保存 CHANGELOG.md 的完整路径。
+    `root_relative` 是面向用户的相对路径，`directory` 是实际目录对象，其余字段分别指向用例、
+    设计、任务目录和变更目录。该类无返回值行为，只保存校验所需路径。
+    """
+
+    root_relative: str  # 保存类似 docs/cx/01.创建用户 的可读路径。
+    directory: Path  # 保存主成功场景目录的真实文件系统路径。
+    usecase_path: Path  # 保存 00.用例.md 的路径。
+    design_path: Path  # 保存 00. 设计.md 的路径。
+    tasks_path: Path  # 保存 tasks 目录的路径。
+    changes_path: Path  # 保存 changes 目录的路径。
 
 
 @dataclass(frozen=True)
 class ValidationReport:
-    """Return validation success, errors, and warnings as one object."""
+    """表示一次 docs/cx 单一来源校验结果。
 
-    ok: bool  # True 表示没有错误。
-    errors: tuple[str, ...]  # errors 保存必须修复的问题。
-    warnings: tuple[str, ...]  # warnings 保存建议关注的问题。
+    `ok` 表示是否没有错误，`errors` 保存必须修复的问题，`warnings` 保存建议关注但不阻断的问题。
+    """
+
+    ok: bool  # True 表示没有发现阻断性错误。
+    errors: tuple[str, ...]  # 保存所有阻断性错误说明。
+    warnings: tuple[str, ...]  # 保存所有非阻断性提醒说明。
+
+
+class ScenarioScanner:
+    """封装 docs/cx 目录扫描逻辑，避免把路径遍历细节散落到校验函数中。"""
+
+    def __init__(self, root: Path = Path(".")) -> None:
+        """创建扫描器。
+
+        `root` 表示目标仓库根目录，默认值是当前工作目录；本方法只保存路径，无返回值。
+        """
+
+        self.root = root  # 保存目标仓库根目录，供后续方法复用。
+        self.docs_dir = root / "docs"  # 保存 docs 根目录，便于扫描旧 cx 文件。
+        self.cx_dir = self.docs_dir / "cx"  # 保存新的 cx 单一文档根目录。
+
+    def scenario_folders(self) -> list[ScenarioFolder]:
+        """返回 docs/cx 下所有主成功场景目录。
+
+        本方法没有参数；返回值是按名称排序后的 `ScenarioFolder` 列表。
+        """
+
+        if not self.cx_dir.exists():  # docs/cx 不存在时没有可扫描的场景。
+            return []  # 返回空列表，让上层统一报告缺失目录。
+        folders: list[ScenarioFolder] = []  # 收集发现的主成功场景文件夹。
+        for child in sorted(self.cx_dir.iterdir()):  # 按名称稳定遍历 docs/cx 的直接子项。
+            if child.is_dir():  # 只有目录才可能是主成功场景。
+                folders.append(self._build_scenario(child))  # 将目录转换成带固定路径字段的对象。
+        return folders  # 返回所有直接场景目录。
+
+    def legacy_cx_files(self) -> list[Path]:
+        """返回 docs 下残留的旧 cx 文件路径。
+
+        本方法没有参数；返回值是旧文件名命中的 Path 列表。
+        """
+
+        if not self.docs_dir.exists():  # docs 不存在时没有旧文件可扫描。
+            return []  # 返回空列表，缺失 docs/cx 的错误由上层处理。
+        return sorted(  # 使用排序保证错误输出稳定。
+            path  # 返回命中的旧文件路径。
+            for path in self.docs_dir.rglob("*")  # 递归扫描 docs 下所有路径。
+            if path.is_file() and path.name in LEGACY_CX_FILE_NAMES  # 只把旧 cx 固定文件名视为错误。
+        )
+
+    def _build_scenario(self, directory: Path) -> ScenarioFolder:
+        """把一个目录包装成 `ScenarioFolder`。
+
+        `directory` 是主成功场景候选目录；返回值是包含约定文件路径的 `ScenarioFolder`。
+        """
+
+        return ScenarioFolder(  # 构造不可变的路径对象。
+            root_relative=f"docs/cx/{directory.name}",  # 记录面向用户的相对路径。
+            directory=directory,  # 保存真实目录路径。
+            usecase_path=directory / "00.用例.md",  # 计算用例文档路径。
+            design_path=directory / "00. 设计.md",  # 计算设计文档路径。
+            tasks_path=directory / "tasks",  # 计算任务目录路径。
+            changes_path=directory / "changes",  # 计算变更目录路径。
+        )
 
 
 def read_text(path: Path) -> str:
-    """Read UTF-8 text, returning an empty string when the file is absent."""
+    """读取 UTF-8 文本。
 
-    if path.exists():  # 文件存在时才读取，避免 FileNotFoundError。
-        return path.read_text(encoding="utf-8")  # 所有 cx 文档都按 UTF-8 读取。
+    `path` 是目标文件路径；文件不存在时返回空字符串，存在时返回文件内容。
+    """
+
+    if path.exists():  # 只有文件存在时才读取，避免把缺失文件变成异常。
+        return path.read_text(encoding="utf-8")  # cx 文档统一按 UTF-8 无 BOM 读取。
     return ""  # 缺失文件返回空文本，让调用方继续收集其它错误。
 
 
-def markdown_files(directory: Path) -> set[str]:
-    """Return Markdown file names directly inside one directory."""
+def markdown_files(directory: Path) -> list[Path]:
+    """返回某个目录直接包含的 Markdown 文件。
 
-    if not directory.exists():  # 目录不存在时没有 Markdown 文件。
-        return set()  # 返回空集合，方便后续集合运算。
-    return {path.name for path in directory.glob("*.md") if path.is_file()}  # 只收集当前层文件名。
+    `directory` 是要扫描的目录；返回值只包含当前层级的 `.md` 文件。
+    """
 
-
-def discover_doc_sets(root: Path) -> list[DocSet]:
-    """Find numbered feature-folder documentation sets under docs/."""
-
-    docs_dir = root / "docs"  # cx 约定所有长期文档都在 docs 目录下。
-    doc_sets: list[DocSet] = []  # 用列表保存发现的文档集。
-    if docs_dir.exists():  # 只有 docs 存在时才扫描子目录。
-        for child in sorted(path for path in docs_dir.iterdir() if path.is_dir()):  # 逐个检查一级功能目录。
-            child_spec = child / "ENGINEERING_SPEC.md"  # 功能目录主文档路径。
-            child_changelog = child / "CHANGELOG.md"  # 功能目录变更记录路径。
-            child_guide = child / "GUIDE.md"  # 功能目录使用指南路径。
-            child_bdd = child / "BDD.md"  # 功能目录可选 BDD 文档路径。
-            if child_spec.exists() or child_changelog.exists() or child_guide.exists() or child_bdd.exists():  # 出现任一文档集文件就视为候选。
-                doc_sets.append(  # 保存功能组文档集。
-                    DocSet(
-                        root_relative=f"docs/{child.name}",  # 功能组文档集的用户可读路径。
-                        directory=child,  # 功能组文档集所在目录。
-                        spec_path=child_spec,  # 功能组主文档。
-                        changelog_path=child_changelog,  # 功能组变更记录。
-                    )
-                )
-    return doc_sets  # 返回所有候选文档集。
+    if not directory.exists():  # 目录不存在时没有文件可返回。
+        return []  # 返回空列表，便于调用方直接遍历。
+    return sorted(path for path in directory.glob("*.md") if path.is_file())  # 只收集当前目录的 Markdown 文件。
 
 
-def validate_doc_set(doc_set: DocSet) -> tuple[list[str], list[str]]:
-    """Validate one documentation set and return errors plus warnings."""
+def validate_scenario_folder(scenario: ScenarioFolder) -> tuple[list[str], list[str]]:
+    """校验一个主成功场景目录。
 
-    errors: list[str] = []  # 收集当前文档集的错误。
-    warnings: list[str] = []  # 收集当前文档集的警告。
-    if not FEATURE_FOLDER_RE.fullmatch(doc_set.directory.name):  # 功能组目录必须带三位序号并使用小写下划线。
-        errors.append(f"feature documentation folder must be named like docs/001_project_template: {doc_set.root_relative}")  # 报告命名错误。
-    bdd_path = doc_set.directory / "BDD.md"  # BDD 文档只在行为任务需要时存在。
-    if not doc_set.spec_path.exists():  # 每个文档集必须有研发主文档。
-        errors.append(f"missing {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 报告缺失主文档。
-    if not doc_set.changelog_path.exists():  # 每个文档集必须有变更记录。
-        errors.append(f"missing {doc_set.root_relative}/CHANGELOG.md")  # 报告缺失变更记录。
-    if not (doc_set.directory / "GUIDE.md").exists():  # 每个功能组必须有使用指南。
-        errors.append(f"missing {doc_set.root_relative}/GUIDE.md")  # 报告缺失使用指南。
+    `scenario` 是候选主成功场景；返回值是错误列表和警告列表。
+    """
 
-    allowed = DOC_SET_FILES | OPTIONAL_DOC_SET_FILES  # 文档集目录内允许核心文件和说明文件。
-    for doc_name in sorted(markdown_files(doc_set.directory) - allowed):  # 找出额外 Markdown 文件。
-        errors.append(f"unexpected long-lived docs file: {doc_set.root_relative}/{doc_name}")  # 阻止孤立文档。
-
-    spec_text = read_text(doc_set.spec_path)  # 读取主文档文本。
-    bdd_text = read_text(bdd_path)
-    change_ids_in_spec = set(CHANGE_ID_RE.findall(spec_text))  # 提取主文档中的变更编号。
-    change_ids_in_bdd = set(CHANGE_ID_RE.findall(bdd_text))  # 提取 BDD 文档中的变更编号。
-    for change_id in sorted(change_ids_in_spec):  # 研发主文档不能保存具体变更编号。
-        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 报告主文档误放变更。
-    for change_id in sorted(change_ids_in_bdd):  # BDD 文档也不能保存具体变更编号。
-        errors.append(f"{change_id} must be recorded in {doc_set.root_relative}/CHANGELOG.md, not {doc_set.root_relative}/BDD.md")  # 报告 BDD 误放变更。
-
-    if bdd_text:  # 只有存在 BDD 文档时才校验名称一致性，避免非编程任务被迫创建 BDD。
-        expected = doc_set.directory.name  # BDD 标题和 Feature 名都应等于功能组目录名。
-        if f"# BDD: {expected}" not in bdd_text or f"Feature: {expected}" not in bdd_text:  # 两处名称必须同时一致。
-            errors.append(f"{doc_set.root_relative}/BDD.md must use the same BDD and Feature name as its folder")  # 报告 BDD 命名漂移。
-
-    bdd_ids = sorted(set(BDD_ID_RE.findall(spec_text + "\n" + bdd_text)))  # 提取 BDD 场景编号。
-    if doc_set.spec_path.exists() and not bdd_ids:  # 主文档存在但没有 BDD ID 时给警告。
-        warnings.append(f"no BDD-* scenario IDs found in {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 提醒补行为场景。
-    if bdd_ids and "## 6. Test Matrix" not in spec_text:  # 有 BDD ID 就必须有测试矩阵。
-        errors.append(f"BDD IDs exist but Test Matrix section is missing in {doc_set.root_relative}/ENGINEERING_SPEC.md")  # 报告矩阵缺失。
-    return errors, warnings  # 返回当前文档集结果。
+    errors: list[str] = []  # 收集当前场景的阻断性错误。
+    warnings: list[str] = []  # 收集当前场景的非阻断性提醒。
+    if not SCENARIO_FOLDER_RE.fullmatch(scenario.directory.name):  # 场景文件夹必须使用两位数字和点号命名。
+        errors.append(f"scenario folder must be named like docs/cx/01.创建用户: {scenario.root_relative}")  # 报告命名错误。
+    if not scenario.usecase_path.exists():  # 每个场景必须有用例文档。
+        errors.append(f"missing {scenario.root_relative}/00.用例.md")  # 报告缺失用例文档。
+    if not scenario.design_path.exists():  # 每个场景必须有设计文档。
+        errors.append(f"missing {scenario.root_relative}/00. 设计.md")  # 报告缺失设计文档。
+    if not scenario.tasks_path.is_dir():  # 每个场景必须有任务目录。
+        errors.append(f"missing {scenario.root_relative}/tasks/")  # 报告缺失任务目录。
+    if not scenario.changes_path.is_dir():  # 每个场景必须有变更目录。
+        errors.append(f"missing {scenario.root_relative}/changes/")  # 报告缺失变更目录。
+    errors.extend(validate_task_root(scenario))  # 合并任务目录校验错误。
+    errors.extend(validate_change_root(scenario))  # 合并变更目录校验错误。
+    errors.extend(validate_legacy_text(scenario))  # 合并旧流程关键词校验错误。
+    if not markdown_files(scenario.changes_path):  # 没有变更文件时提醒 AI 无法从变更判断下一步。
+        warnings.append(f"no change documents found in {scenario.root_relative}/changes/")  # 给出非阻断提醒。
+    return errors, warnings  # 返回当前场景校验结果。
 
 
-def validate_single_source(root: Path, allowed_docs: set[str] | None = None) -> ValidationReport:
-    """Validate numbered feature-folder documentation sets."""
+def validate_task_root(scenario: ScenarioFolder) -> list[str]:
+    """校验场景的 tasks 目录。
 
-    extra_allowed_docs = allowed_docs or set()  # 调用方可以额外允许根目录 Markdown 文件。
-    docs_dir = root / "docs"  # 所有长期文档必须在 docs 目录下。
-    errors: list[str] = []  # 收集全局错误。
-    warnings: list[str] = []  # 收集全局警告。
+    `scenario` 是所属主成功场景；返回值是任务目录相关错误。
+    """
 
-    if not docs_dir.exists():  # 没有 docs 目录直接失败。
-        errors.append("missing docs directory")  # 报告缺失 docs。
-        return ValidationReport(ok=False, errors=tuple(errors), warnings=tuple(warnings))  # 提前返回。
+    errors: list[str] = []  # 收集任务目录错误。
+    if not scenario.tasks_path.exists():  # tasks 缺失时上层已经报错。
+        return errors  # 直接返回，避免继续扫描不存在目录。
+    for task_file in markdown_files(scenario.tasks_path):  # tasks 根目录不应直接放任务 Markdown。
+        errors.append(f"task document must live under a task folder, not {task_file.relative_to(scenario.directory).as_posix()}")  # 报告散落任务文档。
+    task_dirs = sorted(path for path in scenario.tasks_path.iterdir() if path.is_dir())  # 收集所有任务子目录。
+    if not task_dirs:  # 至少需要一个任务目录承接用例拆分。
+        errors.append(f"missing task folders under {scenario.root_relative}/tasks/")  # 报告任务列表为空。
+    for task_dir in task_dirs:  # 逐个校验任务文件夹。
+        if not TASK_FOLDER_RE.fullmatch(task_dir.name):  # 任务文件夹也必须两位编号。
+            errors.append(f"task folder must be named like tasks/01.编写用户实体: {scenario.root_relative}/tasks/{task_dir.name}")  # 报告任务命名错误。
+        if not (task_dir / "00.任务.md").exists():  # 每个任务目录必须有唯一任务文档。
+            errors.append(f"missing {scenario.root_relative}/tasks/{task_dir.name}/00.任务.md")  # 报告缺失任务文档。
+        for task_doc in markdown_files(task_dir):  # 任务目录内只能保留一份任务文档。
+            if task_doc.name != "00.任务.md":  # 额外 Markdown 会破坏单一任务说明。
+                errors.append(f"unexpected task document: {scenario.root_relative}/tasks/{task_dir.name}/{task_doc.name}")  # 报告额外任务文档。
+    return errors  # 返回任务目录错误。
 
-    doc_sets = discover_doc_sets(root)  # 找出所有编号功能组文档集。
-    if not doc_sets:  # 至少需要一个文档集。
-        errors.append("missing docs/<numbered_feature_group>/ENGINEERING_SPEC.md")  # 报告缺失编号功能组主文档。
 
-    for doc_name in sorted(markdown_files(docs_dir) & ROOT_FORBIDDEN_DOCS):  # 根目录不能直接保存功能组文档。
-        errors.append(f"root docs must contain only indexes; move docs/{doc_name} into docs/001_feature_name/")  # 报告根目录具体文档。
-    if doc_sets and not any((docs_dir / name).exists() for name in ROOT_INDEX_DOCS):  # 多功能组需要根索引。
-        errors.append("multi-doc-set mode requires docs/INDEX.md or docs/README.md")  # 报告缺失索引。
+def validate_change_root(scenario: ScenarioFolder) -> list[str]:
+    """校验场景的 changes 目录。
 
-    root_allowed = ROOT_INDEX_DOCS | extra_allowed_docs  # 根目录默认只允许索引和用户额外白名单。
-    for doc_name in sorted(markdown_files(docs_dir) - root_allowed):  # 检查根目录多余 Markdown 文件。
-        errors.append(f"unexpected long-lived docs file: docs/{doc_name}")  # 报告孤立根文档。
+    `scenario` 是所属主成功场景；返回值是变更目录相关错误。
+    """
 
-    for doc_set in doc_sets:  # 逐个验证文档集内部规则。
-        doc_errors, doc_warnings = validate_doc_set(doc_set)  # 验证单个文档集。
-        errors.extend(doc_errors)  # 合并错误。
-        warnings.extend(doc_warnings)  # 合并警告。
+    errors: list[str] = []  # 收集变更目录错误。
+    if not scenario.changes_path.exists():  # changes 缺失时上层已经报错。
+        return errors  # 直接返回，避免继续扫描不存在目录。
+    for child in sorted(scenario.changes_path.iterdir()):  # 稳定遍历变更目录。
+        if child.is_dir():  # 变更目录下不应再建子目录。
+            errors.append(f"change documents must be files, not directory: {scenario.root_relative}/changes/{child.name}")  # 报告多余子目录。
+    for change_file in markdown_files(scenario.changes_path):  # 逐个校验变更文档。
+        if not CHANGE_FILE_RE.fullmatch(change_file.name):  # 文件名必须可排序且可定位任务。
+            errors.append(f"change file must look like 20260629T120000-任务01-任务名称.md: {scenario.root_relative}/changes/{change_file.name}")  # 报告命名错误。
+        change_text = read_text(change_file)  # 读取变更文件内容。
+        for heading in CHANGE_REQUIRED_HEADINGS:  # 检查所有必要章节。
+            if heading not in change_text:  # 缺少章节会让 AI 无法判断当前工作。
+                errors.append(f"missing heading {heading} in {scenario.root_relative}/changes/{change_file.name}")  # 报告缺失章节。
+    return errors  # 返回变更目录错误。
 
-    return ValidationReport(ok=not errors, errors=tuple(errors), warnings=tuple(warnings))  # 汇总最终结果。
+
+def validate_legacy_text(scenario: ScenarioFolder) -> list[str]:
+    """校验场景文档不再携带旧流程关键词。
+
+    `scenario` 是所属主成功场景；返回值是旧关键词相关错误。
+    """
+
+    errors: list[str] = []  # 收集旧流程关键词错误。
+    for doc_path in sorted(scenario.directory.rglob("*.md")):  # 扫描当前场景下所有 Markdown 文档。
+        text = read_text(doc_path)  # 读取文档内容。
+        if LEGACY_CX_TEXT_RE.search(text):  # 新流程不应出现旧流程关键字。
+            relative_path = doc_path.relative_to(scenario.directory).as_posix()  # 生成场景内相对路径。
+            errors.append(f"legacy cx wording is not allowed in {scenario.root_relative}/{relative_path}")  # 报告旧词残留。
+    return errors  # 返回旧关键词错误。
+
+
+def validate_single_source(root: Path = Path(".")) -> ValidationReport:
+    """校验目标仓库的 docs/cx 单一来源规则。
+
+    `root` 是目标仓库根目录，默认是当前工作目录；返回值是 `ValidationReport`。
+    """
+
+    scanner = ScenarioScanner(root)  # 创建面向目标仓库的扫描器。
+    errors: list[str] = []  # 收集所有阻断性错误。
+    warnings: list[str] = []  # 收集所有非阻断性提醒。
+    if not scanner.cx_dir.is_dir():  # cx 根目录必须存在。
+        errors.append("missing docs/cx directory")  # 报告缺失新的 cx 文档根目录。
+        return ValidationReport(ok=False, errors=tuple(errors), warnings=tuple(warnings))  # 缺失根目录时提前返回。
+    for legacy_path in scanner.legacy_cx_files():  # 扫描 docs 下旧 cx 固定文件名。
+        errors.append(f"legacy cx document is not allowed: {legacy_path.relative_to(root).as_posix()}")  # 报告旧文件残留。
+    scenarios = scanner.scenario_folders()  # 收集所有主成功场景。
+    if not scenarios:  # 至少需要一个主成功场景承载用例流程。
+        errors.append("missing docs/cx/01.主成功场景 folder")  # 报告缺失场景目录。
+    for scenario in scenarios:  # 逐个校验主成功场景。
+        scenario_errors, scenario_warnings = validate_scenario_folder(scenario)  # 校验单个场景。
+        errors.extend(scenario_errors)  # 合并场景错误。
+        warnings.extend(scenario_warnings)  # 合并场景提醒。
+    return ValidationReport(ok=not errors, errors=tuple(errors), warnings=tuple(warnings))  # 返回最终校验报告。
 
 
 def main() -> int:
-    """Run the validator from the command line."""
+    """从当前工作目录运行 docs/cx 单一来源校验。
 
-    parser = argparse.ArgumentParser(description="Validate cx documentation-set policy.")  # 创建命令行解析器。
-    parser.add_argument("root", nargs="?", default=".", help="Target repository root")  # 读取目标仓库路径。
-    parser.add_argument(  # 支持额外允许的 docs 根目录 Markdown 文件。
-        "--allow-doc",
-        action="append",
-        default=[],
-        help="Additional allowed Markdown file name in docs/",
-    )
-    args = parser.parse_args()  # 解析命令行参数。
+    本方法没有参数；返回值是进程退出码，0 表示通过，1 表示失败。
+    """
 
-    root = Path(args.root).resolve()  # 把目标路径转换成绝对路径。
-    report = validate_single_source(root, allowed_docs=set(args.allow_doc))  # 执行校验。
-
-    for warning in report.warnings:  # 逐条输出警告。
-        print(f"WARN  {warning}")  # 警告不导致失败。
-    for error in report.errors:  # 逐条输出错误。
-        print(f"ERROR {error}")  # 错误会导致非零退出码。
-
+    report = validate_single_source(Path(".").resolve())  # 按当前工作目录执行校验，不接收命令行参数。
+    for warning in report.warnings:  # 输出所有非阻断提醒。
+        print(f"WARN  {warning}")  # 以 WARN 前缀区分提醒。
+    for error in report.errors:  # 输出所有阻断错误。
+        print(f"ERROR {error}")  # 以 ERROR 前缀区分错误。
     if report.ok:  # 没有错误时校验通过。
-        print("OK documentation-set policy passed")  # 输出成功信息。
+        print("OK docs/cx single-source policy passed")  # 输出成功信息。
         return 0  # 返回成功退出码。
-    return 1  # 返回失败退出码。
+    return 1  # 有错误时返回失败退出码。
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())  # 让脚本退出码等于 main 的返回值。
+    raise SystemExit(main())  # 将 main 的返回值作为脚本退出码。

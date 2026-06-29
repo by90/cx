@@ -1,6 +1,6 @@
 ---
 name: cx-evidence
-description: Use before finalizing a task, branch, or pull request to check BDD/TDD compliance, test output, changelog/spec consistency, and document-sprawl problems.
+description: Use before handoff, merge, or release to review docs/cx story compliance, strict TDD evidence, test output, change/task consistency, and document-sprawl problems.
 version: 0.1.0
 ---
 
@@ -8,58 +8,24 @@ version: 0.1.0
 
 ## Purpose
 
-Review whether the work is actually supported by tests and the target documentation set. This is a delivery gate, not a style-only review.
+Review whether the work is supported by the current `docs/cx` use case, task, change document, and executable verification. This is a delivery gate.
 
-## Review checklist
+## Checklist
 
-1. Does every change have a `CHANGE-*` entry?
-2. Does every `CHANGE-*` entry map to the same documentation set's `ENGINEERING_SPEC.md`?
-3. Were BDD scenarios added or updated for changed behavior?
-4. Does every BDD scenario map to tests?
-5. After documents were complete and before testing or implementation began, was there explicit user confirmation?
-6. Was a todo list created in the conversation when work began, and was each item updated to completed, canceled, or explicitly blocked?
-7. Was the red failure shown before implementation?
-8. Are test commands and results recorded?
-9. For long-running execution, builds, tests, installation, or UI real-device checks, was the project-provided temporary keep-awake mechanism started and then stopped before finalizing?
-10. For UI changes, was the real app packaged, installed, or launched using the project workflow, and for macOS GUI projects was Computer Use or the project-required real-device check used to observe the result?
-11. Does the `docs/` root contain only indexes, instructions, and the version index, with concrete documents under numbered lowercase underscore feature folders such as `docs/001_feature_name/`?
-12. Were orphan planning documents created?
-13. Were reusable features, classes, or components searched across existing implementation, related skills, and the Reusable Capability Registry before extraction or explicit non-extraction?
-14. Are Python tests `unittest` unless a project exception exists?
-15. Does Python source live under `src/<subsystem>/`, do tests under `tests/` mirror the `src` structure, and do test files map one-to-one as `xx.py` -> `xx_test.py`?
-16. Do added or edited source files and unit tests have file-level purpose explanations that name the main classes, functions, or test targets maintained by the file?
-17. Do added or edited classes, functions, methods, and test methods explain responsibilities, parameter meanings, return values, or explicitly say there is no return value?
-18. Do added or edited source files and unit tests follow the line-by-line intent-comment standard, with adjacent explanatory comments for every line of business logic?
-19. After Python changes, was a Black default-format check run, for example `python -m black --check src tests tools` or the project equivalent?
-20. Does Python express default behavior through default parameters, config objects, dataclasses, factories, or small methods instead of long branch stacks inside `__init__`?
-21. Did Python scripts avoid new command-line argument parsing, and is every adjustable behavior represented by config-subsystem items with defaults?
-22. Does the work follow the corresponding implementation skill's `## Minimal Implementation Discipline`: absolutely no unmaintainable pile-up code, no premature frameworkization, generalization, abstraction, or requirement-external validation?
-23. Did the work avoid catching, swallowing, silently skipping, default-fallbacking, empty-result-fallbacking, fake successful retries, or wrapping any exception that would cause product problems; if handling exists, is there an explicit business requirement, user-visible path, and test coverage?
-24. Did the work avoid per-item data-validity checks inside large loops, training loops, hot paths, or batch processing to fall back, filter, or slow performance; are data-validity checks placed at entrypoints, data preparation, test fixtures, or separate diagnostic tasks?
-25. Is the code minimal, small, and direct, and were reusable features, classes, or logic first searched and registered through `$cx-common-module`?
-26. Does the code avoid non-OOP dynamic access such as `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch; if unavoidable, is the reason documented, implementation isolated, and behavior tested?
-27. For a generic capability, reusable feature, or reusable class, were the public entrypoint, normal call style, special-case entrypoint, instance or state lifecycle, state source, test coverage path for all source call sites, and non-goals defined first?
-28. Does GUIDE or README show a normal-call example, and do tests cover that example?
-29. Do tests cover the special entrypoint, lifecycle, state restoration, or test isolation path?
-30. Are there helpers, wrappers, validators, or constants with only one call site and no real complexity to isolate?
-31. Did the work avoid requirement-external validation, exception wrapping, dynamic construction, scanners, registries, or future extension entrypoints?
-32. When adding a peer capability, config section, field, or data source, does the design avoid hard-coded export logic or control-flow branches?
-33. Were Rust commands run when Rust code changed?
-34. Does the work satisfy the prompt contract: goal, context, constraints, required workflow, verification, and deliverables?
-35. Did ordinary non-programming tasks avoid creating BDD automatically, and did unclear boundaries trigger a user question first?
-36. Does the final summary report commands run, results, skipped checks with reasons, and residual risk?
+1. Is all cx process documentation under `docs/cx`?
+2. Does the target scenario have a use-case document, design document, `tasks/`, and `changes/`?
+3. Did the agent inspect unfinished changes before choosing work?
+4. Does the current task map to one task document?
+5. Does the task name one code file and one unit-test file when needed?
+6. Is the task measure a class or type group?
+7. Was the execution mode recorded; in direct mode, did the work continue through documents, tests, implementation, and validation; in per-task confirmation mode, did it wait for review after each task?
+8. Is there a failing-test-first record or a clear reason no test was needed?
+9. Did Python use `uv` and mirrored tests?
+10. Did Rust use `cargo fmt` and `cargo test` when relevant?
+11. Are verification commands and results recorded in the current task or change document?
+12. Are there stray planning documents outside `docs/cx`?
+13. Was reusable code checked through `$cx-common-module` before adding new common logic?
 
-## Output format
+## Output
 
-```text
-Findings:
-1. [severity] file:line - issue
-   Evidence:
-   Fix:
-
-Verified:
-- command -> result
-
-Missing evidence:
-- ...
-```
+Return findings first, ordered by severity, with file paths and commands. If no issues are found, state that clearly and list residual test gaps or risks.

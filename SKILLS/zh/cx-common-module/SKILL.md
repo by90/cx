@@ -56,7 +56,7 @@ version: 0.1.0
 
 新增抽象前必须先搜索：
 
-1. 当前项目的 `src/`、`tests/`、`docs/` 和目标文档集 Reusable Capability Registry。
+1. 当前项目的 `src/`、`tests/`、`docs/cx/`、当前主成功场景的 `00. 设计.md`、相关任务文档和变更文档。
 2. 已启用的相关 workflow skills，例如 `$cx-pytorch-tdd`、`$cx-rust-tdd`、`$cx-tdd` 和本 skill。
 3. 用户明确提到的既有项目或历史实现，例如 `rise202604` 中的 `IndexedSeries`。
 4. 相邻领域是否已有同构结构，例如 indexed series、packed tensor batch、ragged tensor、time-window dataset、GPUI state reducer。
@@ -68,7 +68,7 @@ version: 0.1.0
 至少满足以下之一时抽取通用功能、复用类或通用模块：
 
 - 同一逻辑出现在两个或更多地方。
-- 某个行为重要到需要自己的 BDD 场景。
+- 某个行为重要到需要进入当前 story、任务文档和变更文档。
 - 逻辑跨越项目区域，例如训练和 UI。
 - 逻辑容易出错：indexed series、tensor padding、mask、进度同步、取消、metrics、checkpoint path 或 UI state reducer。
 - 数据结构已经表达了稳定领域概念，例如按实体分组的长序列、窗口索引、批次打包、状态 reducer 或测试数据夹具。
@@ -81,8 +81,8 @@ version: 0.1.0
 - 公共 API 提案，包含公共入口、常规调用方式、特殊场景入口、生命周期、状态来源、错误策略和最小示例。
 - 测试先行，优先覆盖真实小数据和边界条件。
 - 兼容迁移计划，说明哪些调用点迁移、哪些保持不动。
-- 更新目标文档集 `ENGINEERING_SPEC.md` 中的 Reusable Capability Registry。
-- 更新目标文档集 Test Matrix。
+- 更新当前主成功场景 `00. 设计.md` 中的复用能力记录。
+- 更新当前任务文档和变更文档中的测试映射、验证命令和处理结果。
 
 ## 代码约束
 
@@ -91,7 +91,7 @@ version: 0.1.0
 - Python 可复用能力优先用类型标注和默认参数表达默认行为；不要在 `__init__` 里堆叠大量参数情况判断。
 - 公共 API 必须使用明确 OOP 或静态接口；默认禁止 `getattr`、`setattr`、`delattr`、monkey patch、动态注入和字符串分发。
 
-## Registry 字段
+## 复用记录字段
 
 ```text
 Capability | Purpose | Public API | Owners/Callers | Tests | Migration notes
