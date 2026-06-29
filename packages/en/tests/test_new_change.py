@@ -40,14 +40,14 @@ class TestNewChange(unittest.TestCase):
                 root,
                 "docs/cx/01.create_user",
                 "02",
-                "add_branch_scenario",
+                "add_conditional_substep",
                 "The main success scenario exists.",
-                "Add the branch and update tasks.",
+                "Add the conditional substep and update tasks.",
                 timestamp="20260629T121500",
             )
 
         self.assertEqual(path.parent, root / "docs" / "cx" / "01.create_user" / "changes")  # The prefix must not be duplicated.
-        self.assertEqual(path.name, "20260629T121500-task02-add_branch_scenario.md")  # The filename must preserve the task id.
+        self.assertEqual(path.name, "20260629T121500-task02-add_conditional_substep.md")  # The filename must preserve the task id.
 
     def test_rejects_bad_scenario_name(self) -> None:
         """Bad scenario names should be rejected."""

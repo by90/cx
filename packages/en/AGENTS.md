@@ -32,14 +32,14 @@ These rules override other rules, cx skills, templates, examples, and temporary 
 This repository uses a `docs/cx` use-case-driven flow. All cx project descriptions, scenarios, tasks, process documents, and changes live under `docs/cx`; documents elsewhere are unrelated to cx.
 
 1. Before planning or code changes, read `docs/cx/00.project.md` or relevant project-level docs, then the target scenario's use-case document, design document, `tasks/`, and `changes/`.
-2. Unless adding a task, use-case branch, or use case, inspect unfinished changes first and use them to decide current work.
+2. Unless adding a task, conditional substep, or use case, inspect unfinished changes first and use them to decide current work.
 3. Each main success scenario has one folder, such as `docs/cx/01.create_user/`.
 4. Each scenario folder contains `00.use_case.md`, `00.design.md`, `tasks/`, and `changes/`.
-5. The use-case document expresses the main success scenario and all branch scenarios.
+5. The use-case document expresses the main success scenario and conditional, alternate, or exception substeps attached to concrete main steps.
 6. One `docs/cx/NN.name/` folder carries one user-goal use case. Do not use a vague "use the app" use case to hold a whole application, page set, menu, or several independent operations.
-7. The main success scenario describes the most common path from trigger to completed user goal, usually 3 to 9 steps. Each step is one observable actor-system interaction.
-8. If a main-success step needs its own actors, preconditions, steps, and branches, it is a sub-use case or separate use case and should move to a new `docs/cx/NN.name/` folder with an index in project docs.
-9. Branch scenarios attach to a concrete main-success step. Split complex branches into separate use cases when they exceed 3 to 5 steps, introduce a new actor, have independent completion criteria, or need independent tasks and tests.
+7. The main success scenario describes the most common path from trigger to completed user goal, usually 3 to 9 main steps. Each step is one observable actor-system interaction.
+8. If a main-success step needs its own actors, preconditions, main success scenario, and conditional substeps, it is a sub-use case or separate use case and should move to a new `docs/cx/NN.name/` folder; the original step should use a substep such as "enter use case: X".
+9. Conditional, alternate, and exception behavior must attach to a concrete main-success step with substep numbering such as `1.1` or `2.1`. Split complex conditional flows into separate use cases when they exceed 3 to 5 steps, introduce a new actor, have independent completion criteria, or need independent tasks and tests.
 10. The design document explains reusable code, new common code, and design decisions.
 11. Each task is a folder starting at `01.`, such as `tasks/01.write_user_entity/00.task.md`.
 12. Each change is one file, such as `changes/20260629T120000-task01-write_user_entity.md`.
@@ -47,7 +47,7 @@ This repository uses a `docs/cx` use-case-driven flow. All cx project descriptio
 14. One task touches one task document, one code file, and one matching unit-test file when needed.
 15. A task document's basic measure is a class or type group.
 16. Use `$cx-workflow` for routing and skill selection.
-17. Use `$cx-story` for use cases, main success scenarios, branch scenarios, task splits, and changes.
+17. Use `$cx-story` for use cases, main success scenarios, conditional substeps, task splits, and changes.
 18. Use `$cx-tdd` for test-first implementation; use `$cx-pytorch-tdd` for Python/PyTorch and `$cx-rust-tdd` for Rust.
 19. Use `$cx-common-module` before adding reusable features, classes, or common entrypoints.
 20. Run the narrowest effective test first, then broader validation as needed, and record commands and results.
@@ -75,7 +75,7 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 ## Skill Routing
 
 - `$cx-workflow`: workflow routing and skill orchestration.
-- `$cx-story`: use cases, main success scenarios, branch scenarios, task folders, change folders, and current task document.
+- `$cx-story`: use cases, main success scenarios, conditional substeps, task folders, change folders, and current task document.
 - `$cx-tdd`: strict test-first implementation and verification evidence.
 - `$cx-changelog`: `changes/` documents, release notes, and audit trails.
 - `$cx-version`: project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and annotated tags.

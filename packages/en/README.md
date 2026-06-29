@@ -18,7 +18,7 @@ docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
 
 Each task's basic measure is a class or type group. One task handles one task document, one code file, and one matching unit-test file when needed.
 
-Use-case granularity follows user goals: one main success scenario folder carries one user-goal use case. The main success scenario runs from trigger to completed goal, usually in 3 to 9 steps, and each step is one observable actor-system interaction. Do not put several home-screen buttons, mutually exclusive choices, or complete tasks into one main success scenario. If a complex branch needs its own actors, steps, and completion criteria, split it into a separate use case and index it from the project document.
+Use-case granularity follows user goals: one main success scenario folder carries one user-goal use case. The main success scenario runs from trigger to completed goal, usually in 3 to 9 main steps, and each step is one observable actor-system interaction. Conditional, alternate, and exception behavior must use substep numbering such as `1.1` or `2.1` under a concrete main step, and must say whether the flow returns to a step, ends this use case, or enters another use case. Do not put several home-screen buttons, mutually exclusive choices, or complete tasks into one main success scenario. If a complex conditional flow needs its own actors, steps, and completion criteria, split it into a separate use case and index it from the project document.
 
 ## Quick Start
 
@@ -66,7 +66,7 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 | Skill | Purpose |
 | --- | --- |
 | `$cx-workflow` | Workflow routing and skill selection |
-| `$cx-story` | Use cases, main success scenarios, branch scenarios, tasks, and changes |
+| `$cx-story` | Use cases, main success scenarios, conditional substeps, tasks, and changes |
 | `$cx-tdd` | Strict test-first work, narrow failing tests, minimal implementation, and refactor |
 | `$cx-changelog` | `changes/` documents and release-note consistency |
 | `$cx-version` | Project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and release tags |

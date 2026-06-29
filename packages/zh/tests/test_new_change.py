@@ -46,14 +46,14 @@ class TestNewChange(unittest.TestCase):
                 root,
                 "docs/cx/01.创建用户",
                 "02",
-                "补充分支场景",
+                "补充条件子步骤",
                 "已有主成功场景。",
-                "补充分支并更新任务。",
+                "补充条件子步骤并更新任务。",
                 timestamp="20260629T121500",
             )
 
         self.assertEqual(path.parent, root / "docs" / "cx" / "01.创建用户" / "changes")  # 父目录必须只包含一层 docs/cx。
-        self.assertEqual(path.name, "20260629T121500-任务02-补充分支场景.md")  # 文件名必须使用传入任务号。
+        self.assertEqual(path.name, "20260629T121500-任务02-补充条件子步骤.md")  # 文件名必须使用传入任务号。
 
     def test_rejects_bad_scenario_name(self) -> None:
         """场景名不符合 01.创建用户 格式时应拒绝。

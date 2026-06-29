@@ -16,7 +16,7 @@ Use this skill first when a user request needs workflow routing or several cx sk
 2. Read the target project's `AGENTS.md` or repository instructions when present.
 3. Read `docs/cx/00.project.md` or the relevant project-level `docs/cx` documents when present.
 4. If a target scenario exists, read its use-case document, design document, `tasks/`, and `changes/`.
-5. Unless adding a new task, use-case branch, or use case, inspect unfinished changes first and use them to decide the current work.
+5. Unless adding a new task, conditional substep, or use case, inspect unfinished changes first and use them to decide the current work.
 6. Recommend the smallest necessary cx skill combination before execution.
 
 ## Non-Negotiable Flow
@@ -34,7 +34,7 @@ Use this skill first when a user request needs workflow routing or several cx sk
 
 ## Skill Selection
 
-- Use `$cx-story` for use cases, main success scenarios, branch scenarios, tasks, and changes.
+- Use `$cx-story` for use cases, main success scenarios, conditional substeps, tasks, and changes.
 - Use `$cx-tdd` after the execution mode is known; direct mode proceeds into tests and implementation without a separate document-complete confirmation gate.
 - Use `$cx-common-module` before adding reusable code, reusable classes, shared utilities, stable APIs, or common state.
 - Use `$cx-pytorch-tdd` for Python, PyTorch, Lightning, tensors, training, or ML tests.

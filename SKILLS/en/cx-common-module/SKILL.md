@@ -68,7 +68,7 @@ Record candidates, accept/reject reasons, and migration impact. Do not add a reu
 Extract a generic capability, reusable class, or common module when at least one is true:
 
 - The same logic appears in two or more places.
-- A behavior is important enough to have its own use-case branch or task.
+- A behavior is important enough to have its own conditional substep, separate use case, or task.
 - The logic crosses project areas, such as training and UI.
 - The logic is error-prone: indexed series, tensor padding, masks, progress synchronization, cancellation, metrics, checkpoint paths, or UI state reducers.
 - A data structure already expresses a stable domain concept, such as grouped long series, window indices, packed batches, state reducers, or test data fixtures.

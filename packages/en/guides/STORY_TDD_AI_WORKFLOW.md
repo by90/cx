@@ -2,7 +2,7 @@
 
 ## Core Principle
 
-The use-case document defines the main success scenario and branch scenarios. The task document defines one class or type-group boundary. The change document defines how AI should continue current work. TDD proves task behavior with executable tests.
+The use-case document defines the main success scenario plus conditional, alternate, and exception substeps attached to concrete main steps. The task document defines one class or type-group boundary. The change document defines how AI should continue current work. TDD proves task behavior with executable tests.
 
 ## Standard Order
 
@@ -11,7 +11,7 @@ The use-case document defines the main success scenario and branch scenarios. Th
 3. If the user does not explicitly choose per-task confirmation, default to direct completion.
 4. Use `$cx-story` to read `docs/cx` project documents and the target scenario.
 5. If unfinished changes exist, read `changes/` first and let them decide current work.
-6. If adding a use case, branch, or task, update the use-case document, design document, or `tasks/`.
+6. If adding a use case, conditional substep, or task, update the use-case document, design document, or `tasks/`.
 7. If adjusting an existing task, write a `changes/` document with timestamp, task id, task name, previous state, and next action.
 8. Document completion is not a default stop point; continue with `$cx-tdd` and write the narrow failing test.
 9. Implement one task's code file and one matching unit-test file when needed.

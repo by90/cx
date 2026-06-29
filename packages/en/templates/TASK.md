@@ -10,7 +10,7 @@ TODO
 
 ## Related Use Case
 
-TODO
+TODO: Reference the main success step or conditional substep.
 
 ## Class Or Type Measure
 
