@@ -20,17 +20,27 @@ TODO
 
 TODO
 
-## Unit Test File
+## Unit Test File (Explicit Only)
 
-TODO
+Not declared. Fill this only when the user request, existing task document, or change document explicitly asks for unit tests or TDD.
 
 ## Expected Behavior
 
 1. TODO
 2. TODO
 
+## Implementation Discipline
+
+- After this task document is complete, edit only one production code file.
+- Do not create or edit unit tests by default.
+- Use full OOP, minimal code, reuse first, and avoid bloated files, overly long identifiers, and duplicated logic.
+
 ## Verification Command
 
 ```bash
 TODO
 ```
+
+## Review Decision
+
+TODO: Record `$cx-evidence` review PASS/FAIL. FAIL keeps this task incomplete.

@@ -22,7 +22,7 @@ Handle multivariate time series where each field has a different meaning. Do not
 8. Splits must be temporal or rolling-origin backtests. Random row splits are forbidden when they can leak future information.
 9. Metrics must match the business objective: point forecasts can use MAE/RMSE/SMAPE/MASE; quantile or probabilistic forecasts must record quantile loss, coverage, or calibration.
 10. When quickly tuning fields, labels, windows, model structure, or model choice, add `$cx-pytorch-quick-hpo`; when complete-data training, testing, backtesting, and release-candidate selection are required, add `$cx-pytorch-full-hpo`, and express the search space as config recipes.
-11. Unit tests only verify windows, field roles, leakage checks, metrics, and model input/output shapes. Do not run long training in unit tests.
+11. Do not create unit tests by default; when unit tests are explicitly requested, verify only windows, field roles, leakage checks, metrics, and model input/output shapes. Do not run long training in unit tests.
 
 ## Framework Selection
 

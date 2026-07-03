@@ -2,7 +2,7 @@
   "package": "cx",
   "language": "en",
   "version": "0.1.2",
-  "purpose": "Codex use-case-driven TDD workflow with docs/cx tasks and changes",
+  "purpose": "Codex use-case-driven workflow with docs/cx tasks, single-code-file implementation, explicit tests, OOP, and changes",
   "skills": [
     {
       "name": "cx-workflow",

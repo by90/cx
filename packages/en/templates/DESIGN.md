@@ -20,5 +20,7 @@
 
 ## Implementation Boundary
 
-- One task handles one task document, one code file, and one matching unit-test file when needed.
+- One task handles one task document and one production code file; split another task before editing a second code file.
+- Unit tests are not default deliverables; add one matching unit-test file only when unit tests or TDD are explicitly requested.
 - The task measure is a class or type group.
+- Default implementation uses full OOP, minimal code, reuse first, and avoids bloated files, overly long identifiers, and duplicated logic.

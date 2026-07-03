@@ -1,35 +1,38 @@
 ---
 name: cx-rust-tdd
-description: 用于 Rust 代码实现和 TDD，包括 ownership-aware design、struct/enum/trait、Result 错误、cargo test、rustfmt、clippy、GPUI/macOS 实机检查和高质量 Rust 代码。
+description: 用于 Rust 代码实现、可选显式 TDD、ownership-aware design、struct/enum/trait、Result 错误、cargo fmt、cargo clippy、cargo test、GPUI/macOS 实机检查和高质量 Rust 代码；单元测试或失败测试只在明确声明时创建。
 version: 0.1.0
 ---
 
-# cx Rust 编码与 TDD
+# cx Rust 编码与显式测试
 
 ## 目的
 
-在 `$cx-story` 已经定义当前 story、变更和任务后，用本 skill 处理 Rust 实现。它是通用 Rust 代码质量和 TDD skill；涉及 GPUI/macOS 桌面 UI 时，只补充实机验证纪律，不替代专门 UI 组件设计。
+在 `$cx-story` 已经定义当前 story、变更和任务后，用本 skill 处理 Rust 实现。它是通用 Rust 代码质量 skill；只有当前请求、任务文档或变更文档明确声明 TDD、单元测试或失败测试时，才进入测试先行流程。涉及 GPUI/macOS 桌面 UI 时，只补充实机验证纪律，不替代专门 UI 组件设计。
 
 ## 必须执行的流程
 
-1. 先确认本轮执行模式；如果用户没有明确选择逐任务确认，默认直接进入当前任务的测试、实现和验证阶段。
+1. 确认当前任务只编辑一个 Rust 生产代码文件；需要第二个代码文件时先拆任务。
 2. 阅读当前主成功场景文件夹中的 `00.用例.md`、`00. 设计.md`、当前 `changes/*.md`、当前 `tasks/<编号.任务名>/00.任务.md` 和相关 Rust 模块。
 3. 确认当前任务的量具是一个 Rust 类型或一组高度内聚的 Rust 类型组，例如 struct、enum、trait 与其直接协作对象。
-4. 将当前任务目标映射到一个最窄 Rust 测试。
-5. 先写失败测试：可以使用 `#[test]`、`tests/` 下的集成测试，或用于公共 API 文档的 doc test。
-6. 运行 `cargo test <filter>` 或项目中最窄命令，并记录 red failure。
+4. 默认不创建或修改 Rust 单元测试；只有明确声明需要测试时，才将当前任务目标映射到一个最窄 Rust 测试。
+5. 明确要求测试时，先写失败测试：可以使用 `#[test]`、`tests/` 下的集成测试，或用于公共 API 文档的 doc test。
+6. 明确要求测试时，运行 `cargo test <filter>` 或项目中最窄命令，并记录 red failure。
 7. 实现最小 Rust 改动。
-8. 先运行最窄测试，再运行 `cargo test`。
+8. 明确要求测试时先运行最窄测试，再按需要运行 `cargo test`；未要求测试时执行项目要求的构建、格式或静态检查。
 9. 运行 `cargo fmt --check` 或 `cargo fmt`。
 10. 可行时运行 `cargo clippy --all-targets --all-features`。
-11. 只有测试 green 后才重构。
-12. 在当前任务文档和变更文档中记录验证证据。
+11. 只有验证通过后才重构。
+12. 代码写完并完成必要验证后，必须使用 `$cx-evidence` 做强制 review；重点核对文档一致性、重复味道、完整 Rust 类型建模、极简实现和业务语义。
+13. review 不通过时，当前任务不得标记完成；先修复实现或文档，再重新验证和 review。
+14. 在当前任务文档和变更文档中记录验证证据和 review 结论。
 
 ## 最小实现纪律
 
 铁律：绝对禁止屎山代码。
 
 - 默认选择能满足当前需求的最少代码实现，不提前框架化、泛化或抽象。
+- 文件、类型、函数和变量命名要短而清楚；避免把完整句子写进标识符，命名过长时优先提炼职责或复用领域术语。
 - 不为单行转调、一次性逻辑或没有真实复用价值的流程创建函数、类、常量或校验器。
 - 除非业务规则明确要求，不掩盖任何异常，不静默兜底，不把会导致产品问题的错误转成默认值、空结果、跳过、重试成功假象或 warning；开发期间应让这类错误中止运行。
 - 判断标准很简单：如果同样错误发到产品会造成问题，就必须暴露为失败；只有业务明确要求降级、恢复或用户可见提示时，才允许写显式处理路径，并用测试覆盖。
@@ -52,7 +55,7 @@ version: 0.1.0
 - 可恢复失败使用 `Result<T, E>` 和明确错误 enum。
 - 生产路径避免 `unwrap`、`expect` 和 `panic!`，除非不变量局部、已证明并写明原因。
 - 不要为了绕过 borrow checker 乱 `clone`。所有权必须有明确设计。
-- 函数保持小、直接、极简；禁止把逻辑写成臃肿冗长的屎山代码，也不要拆成没有意义的空壳包装。
+- 函数保持小、直接、极简；文件也应保持高内聚和适度长度，禁止把逻辑写成臃肿冗长的屎山代码，也不要拆成没有意义的空壳包装。
 - 模块保持高内聚，公共 API 保持窄。
 - 任何可能复用的功能、类或逻辑都必须先调用 `$cx-common-module` 搜索已有实现和设计公共入口。
 - 缺失用 `Option`，失败用 `Result`；不要用魔法字符串或哨兵值编码错误。
@@ -60,7 +63,7 @@ version: 0.1.0
 
 ## 测试策略
 
-- 纯逻辑优先在模块旁边用 `#[cfg(test)]` 单元测试。
+- 明确要求单元测试时，纯逻辑优先在模块旁边用 `#[cfg(test)]` 单元测试。
 - 跨模块公共流程使用 `tests/` 下的集成测试。
 - 公共示例需要能编译时使用 doc test。
 - 覆盖成功、边界、非法输入、错误传播和所有权敏感行为。
@@ -69,7 +72,7 @@ version: 0.1.0
 
 ## GPUI/macOS 实机检查
 
-- 修改 Rust/GPUI 桌面 UI 后，除单元测试、`cargo fmt` 和 `cargo clippy` 外，还必须按项目方式打包、安装或启动真实应用，并用截图或 Computer Use 观察结果。
+- 修改 Rust/GPUI 桌面 UI 后，除明确声明的单元测试、`cargo fmt` 和 `cargo clippy` 外，还必须按项目方式打包、安装或启动真实应用，并用截图或 Computer Use 观察结果。
 - macOS 辅助功能授权要覆盖发起自动化的宿主和被测应用；常见需要启用 `Codex`、`Codex Computer Use`、被测 `.app`，以及实际发起脚本的终端或运行宿主。修改权限后优先重启自动化宿主和被测应用。
 - GPUI 内部按钮通常不会完整暴露为 Accessibility 树中的 `AXButton`；`System Events` 可优先用于菜单栏、窗口按钮和页面菜单动作，不要假设它能定位每个内容区按钮。
 - 点击 GPUI 内容区时先截图到项目 `temp/`，确认窗口逻辑坐标、显示器 bounds 和 Retina 缩放；截图像素坐标不能直接当成 `CGEvent` 逻辑点。
@@ -106,8 +109,9 @@ SWIFT
 ## 输出
 
 - 当前 story、变更文档、任务文档和 Rust 类型量具的映射。
-- 预期 red failure 命令和输出摘要。
+- 明确要求测试时的预期 red failure 命令和输出摘要；未要求测试时说明未创建单元测试。
 - 最小 Rust 实现。
 - `cargo test` 结果。
 - 格式化和 clippy 结果，或未运行原因。
+- `$cx-evidence` review 结论；FAIL 时任务仍为未完成。
 - 涉及 GPUI/macOS UI 时，真实应用启动方式、辅助功能授权状态、点击方式、截图路径和观察结论。

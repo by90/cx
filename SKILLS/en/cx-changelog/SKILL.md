@@ -39,8 +39,8 @@ Each change must include:
 2. Do not create duplicate planning files outside `docs/cx`.
 3. If a change spans multiple tasks, list those tasks in order and execute one at a time.
 4. If a change also modifies the use-case document, make that part of the ordered task list.
-5. Mark a change complete only after task verification is recorded.
-6. Follow the execution mode chosen at work start: direct mode continues through all in-scope tasks, while per-task confirmation mode waits for user review after each completed task.
+5. Mark a change complete only after task verification and `$cx-evidence` review PASS are recorded.
+6. Default execution stops at the current task and current production code-file boundary; continue through additional tasks only when the user explicitly requests multi-task continuation.
 
 ## Output
 
@@ -50,4 +50,4 @@ Return:
 - Current status.
 - Task mapping.
 - Next required action.
-- Verification evidence or missing evidence.
+- Verification evidence, review decision, or missing evidence.

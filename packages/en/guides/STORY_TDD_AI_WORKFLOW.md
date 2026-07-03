@@ -1,22 +1,23 @@
-# Use-Case-Driven TDD AI-Assisted Development Workflow
+# Use-Case-Driven AI-Assisted Development Workflow
 
 ## Core Principle
 
-The use-case document defines the main success scenario plus conditional, alternate, and exception substeps attached to concrete main steps. The task document defines one class or type-group boundary. The change document defines how AI should continue current work. TDD proves task behavior with executable tests.
+The use-case document defines the main success scenario plus conditional, alternate, and exception substeps attached to concrete main steps. The task document defines one class or type-group boundary. The change document defines how AI should continue current work. Default execution edits one production code file after the task document is complete; unit tests and TDD enter scope only when explicitly requested.
 
 ## Standard Order
 
 1. Use `$cx-workflow` to classify the task and create a visible todo list.
-2. Ask the execution-mode question: finish documentation, tests, implementation, and validation directly, or ask after each task.
-3. If the user does not explicitly choose per-task confirmation, default to direct completion.
+2. Use one-task/one-code-file execution by default: after the current task document is complete, edit only that task's bound production code file.
+3. Continue into another code file only when the user explicitly asks for multi-task continuation; wait after each task only when explicitly requested.
 4. Use `$cx-story` to read `docs/cx` project documents and the target scenario.
 5. If unfinished changes exist, read `changes/` first and let them decide current work.
 6. If adding a use case, conditional substep, or task, update the use-case document, design document, or `tasks/`.
 7. If adjusting an existing task, write a `changes/` document with timestamp, task id, task name, previous state, and next action.
-8. Document completion is not a default stop point; continue with `$cx-tdd` and write the narrow failing test.
-9. Implement one task's code file and one matching unit-test file when needed.
+8. After the task document is complete, implement that task's one production code file.
+9. Do not create or edit unit tests by default; use `$cx-tdd` and one matching unit-test file only when TDD, unit tests, or failing tests are explicitly requested.
 10. Run the narrowest validation and record command plus result.
-11. Only per-task confirmation mode waits for user review after the task.
+11. Run `$cx-evidence` mandatory review after code completion; if review fails, keep the task incomplete and return to fixing.
+12. After review passes, report and stop at the current code-file boundary by default.
 
 ## Document Location
 
@@ -31,9 +32,9 @@ docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
 ## Recommended Prompt
 
 ```text
-Use $cx-workflow and $cx-story. Ask the execution-mode question before starting; if I do not choose per-task confirmation, default to completing documentation, tests, implementation, and validation directly. First check whether the target docs/cx scenario has unfinished changes. Then read 00.use_case.md, 00.design.md, and the current task document, use $cx-tdd to write the failing test, and implement the current task.
+Use $cx-workflow and $cx-story. First check whether the target docs/cx scenario has unfinished changes. Then read 00.use_case.md, 00.design.md, and the current task document. By default, complete the current task document and implement only the one production code file bound to that task. Do not create or edit unit tests by default. Use $cx-tdd only when I explicitly ask for TDD, unit tests, or failing tests. After code is written, run $cx-evidence review; if review fails, do not mark the task complete.
 ```
 
-For Python ML work, combine `$cx-story`, `$cx-tdd`, and `$cx-pytorch-tdd`.
+For Python ML work, use `$cx-story` by default; add `$cx-tdd` and `$cx-pytorch-tdd` only when tests are explicitly requested.
 
-For Rust work, combine `$cx-story`, `$cx-tdd`, and `$cx-rust-tdd`.
+For Rust work, use `$cx-story` and `$cx-rust-tdd` by default; add `$cx-tdd` only when tests are explicitly requested.

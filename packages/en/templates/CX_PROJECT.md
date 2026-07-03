@@ -10,8 +10,10 @@ TODO
 
 ## Technical Constraints
 
-- Python, PyTorch, and Rust work use strict TDD.
-- State, lifecycle, invariants, and domain collaboration use strict OOP or equivalent type modeling.
+- Python, PyTorch, and Rust work do not use unit tests or TDD by default; create or edit unit tests only when the user request, task document, or change document explicitly asks for them.
+- State, lifecycle, invariants, and domain collaboration use full OOP or equivalent type modeling.
+- Default execution completes one task document and edits one production code file; split another task before editing a second code file.
+- Code stays minimal, reuse-first, low-duplication, and avoids bloated files or overly long identifiers.
 - All cx scenarios, tasks, process documents, and changes live under `docs/cx`.
 
 ## Scenario Index

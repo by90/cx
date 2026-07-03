@@ -22,7 +22,7 @@ version: 0.1.0
 8. 切分必须按时间或 rolling origin backtesting；禁止随机行切分导致未来信息泄漏。
 9. 指标必须匹配业务目标：point forecast 可用 MAE/RMSE/SMAPE/MASE，分位数或概率预测必须记录 quantile loss、coverage 或 calibration。
 10. 需要快速调字段、标签、窗口、模型结构或模型选择时，叠加 `$cx-pytorch-quick-hpo`；需要完整数据训练、测试、回测和 release 候选模型选择时，叠加 `$cx-pytorch-full-hpo`，并把搜索空间写成 config recipe。
-11. 单元测试只验证数据窗口、字段角色、泄漏检查、指标和模型输入输出形状；不要在单元测试里跑长训练。
+11. 默认不创建单元测试；明确要求单元测试时，只验证数据窗口、字段角色、泄漏检查、指标和模型输入输出形状，不在单元测试里跑长训练。
 
 ## 框架选择
 

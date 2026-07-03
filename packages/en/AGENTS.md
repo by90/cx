@@ -10,11 +10,11 @@ These rules override other rules, cx skills, templates, examples, and temporary 
 
 1. **Commits and pushes do not split by source**: when the user asks for a commit, delivery, PR, or release, treat the current working tree as one complete change set and stage tracked plus untracked files.
 2. **Comprehensive comments**: all new or edited source and unit-test files need file-level purpose notes, class/type notes, function notes, and line-by-line business-code intent comments.
-3. **Execution-mode gate**: before programming or workflow development work, ask whether to finish documents, tests, implementation, and validation directly or ask after each task. If the user does not explicitly choose per-task confirmation, default to direct completion; in direct mode, do not stop just because documents are complete.
+3. **Default one-task one-code-file execution**: before programming or workflow development work, default to completing the current task document and then editing only the one production code file bound to that task. If a second code file is needed, split the next task first. Continue into another code file only when the user explicitly requests multi-task continuation; wait after each task only when the user explicitly requests per-task confirmation.
 4. **Language package document language**: English package documents should be English; Chinese package documents must be Simplified Chinese.
-5. **Source/test one-to-one mapping**: unit tests mirror `src`; `src/<subsystem>/xx.py` maps only to `tests/<subsystem>/xx_test.py`.
+5. **Explicit unit tests**: by default, do not create, edit, or run unit tests. Create or edit one matching test file only when the current user request, existing task document, or change document explicitly asks for unit tests, TDD, failing tests, or red-green-refactor. When unit tests are explicitly requested, tests mirror `src`; `src/<subsystem>/xx.py` maps only to `tests/<subsystem>/xx_test.py`.
 6. **Default parameters first**: prefer clear type annotations and default parameters over large constructor branching.
-7. **Minimal code and OOP access**: avoid bloated code. Search and design common entrypoints with `$cx-common-module` before adding reusable logic. Do not default to dynamic reflection, monkey patching, dynamic injection, or string dispatch.
+7. **Full OOP, minimal code, and reuse first**: use full OOP for state, lifecycle, invariants, and domain collaboration. Avoid bloated code, overly long files, overly long variable names, and sentence-like identifiers. Search and design common entrypoints with `$cx-common-module` before adding reusable logic. Do not default to dynamic reflection, monkey patching, dynamic injection, or string dispatch.
 8. **Python scripts do not accept command-line parameters**: target-project scripts take adjustable behavior from config-subsystem items with defaults.
 9. **No legacy compatibility during development**: do not keep old entrypoints, aliases, adapters, bridges, or old/new coexistence branches.
 10. **Development errors must surface**: do not swallow, hide, default, skip, or fake success for product-harming errors.
@@ -25,7 +25,8 @@ These rules override other rules, cx skills, templates, examples, and temporary 
 15. **Avoid mixed-language prose**: use the package language for prose unless code identifiers, commands, paths, API names, libraries, protocols, standards, or proper names require source text.
 16. **Cross-platform encoding**: PowerShell scripts use UTF-8 with BOM; other source, Markdown, JSON, TOML, YAML, and text files use UTF-8 without BOM. When viewing, searching, or printing UTF-8-without-BOM files that contain Chinese in Windows or PowerShell, silently force UTF-8 read and output encoding by default, for example by setting `[Console]::InputEncoding`, `[Console]::OutputEncoding`, and `$OutputEncoding`, and by passing `-Encoding UTF8` to text commands. Do not treat mojibake console output as evidence that the file encoding is damaged, and do not patch against mojibake output. When exact location is needed, use project-level `uv` Python or its `.venv` interpreter to print line numbers and string representations in read-only mode. Apply edits with small `apply_patch` hunks anchored on functions, classes, headings, keys, and code structure. Unless the actual file encoding is abnormal, a patch fails, or the user asks for the reason, do not repeatedly describe encoding handling in routine progress updates or summaries.
 17. **Chinese first, English second**: when modifying cx workflow, skills, templates, examples, or install rules, finish the Chinese package first and then synchronize English.
-18. **Strict TDD and strict OOP**: Python, PyTorch, and Rust projects use strict TDD. State, lifecycle, invariants, and domain collaboration use strict OOP or equivalent type modeling.
+18. **Explicit tests and full OOP**: Python, PyTorch, and Rust projects do not use unit tests or TDD by default. Run test-first flow only when explicitly requested. State, lifecycle, invariants, and domain collaboration use full OOP or equivalent type modeling.
+19. **Mandatory review after code**: after production code is written, run local code review before considering the task complete. Review must check exact agreement with `00.use_case.md`, `00.design.md`, the task document, and the change document; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit. If review fails, the task remains incomplete until fixed and reviewed again.
 
 ## Repository Workflow
 
@@ -43,14 +44,15 @@ This repository uses a `docs/cx` use-case-driven flow. All cx project descriptio
 10. The design document explains reusable code, new common code, and design decisions.
 11. Each task is a folder starting at `01.`, such as `tasks/01.write_user_entity/00.task.md`.
 12. Each change is one file, such as `changes/20260629T120000-task01-write_user_entity.md`.
-13. When a change spans multiple tasks or also changes the use-case document, split it into an ordered task list. Only per-task confirmation mode waits for user review after each completed task.
-14. One task touches one task document, one code file, and one matching unit-test file when needed.
+13. When a change spans multiple tasks or also changes the use-case document, split it into an ordered task list. Default execution handles only the current task and one production code file; continue only when explicitly requested.
+14. One task touches one task document and one production code file. Add one matching unit-test file only when tests or TDD are explicitly requested.
 15. A task document's basic measure is a class or type group.
 16. Use `$cx-workflow` for routing and skill selection.
 17. Use `$cx-story` for use cases, main success scenarios, conditional substeps, task splits, and changes.
-18. Use `$cx-tdd` for test-first implementation; use `$cx-pytorch-tdd` for Python/PyTorch and `$cx-rust-tdd` for Rust.
+18. Use `$cx-tdd` only when TDD or unit tests are explicitly requested; add `$cx-pytorch-tdd` only for explicit Python/PyTorch tests. Use `$cx-rust-tdd` for Rust implementation, with Rust tests only when explicitly requested.
 19. Use `$cx-common-module` before adding reusable features, classes, or common entrypoints.
 20. Run the narrowest effective test first, then broader validation as needed, and record commands and results.
+21. After production code is complete, run `$cx-evidence` or an equivalent local code-review flow. Mark the task or change complete only after review passes.
 
 ## docs/cx Layout
 
@@ -76,7 +78,7 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 
 - `$cx-workflow`: workflow routing and skill orchestration.
 - `$cx-story`: use cases, main success scenarios, conditional substeps, task folders, change folders, and current task document.
-- `$cx-tdd`: strict test-first implementation and verification evidence.
+- `$cx-tdd`: explicit test-first implementation and verification evidence.
 - `$cx-changelog`: `changes/` documents, release notes, and audit trails.
 - `$cx-version`: project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and annotated tags.
 - `$cx-research`: model selection, paper research, source filtering, and cited synthesis.
@@ -87,23 +89,24 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 - `$cx-rust-tdd`: Rust implementation, ownership design, and cargo test/fmt/clippy.
 - `$cx-common-module`: reusable features, reusable classes, and common API design.
 - `$cx-evidence`: pre-merge or pre-handoff evidence review.
+- Mandatory post-code review uses `$cx-evidence`; a failed review means the task is not complete.
 
 ## Python Rules
 
 - Source code lives under `src/<subsystem>/`.
 - Use project-level `uv` environments and `uv run`.
 - Check official Python and PyTorch stable versions before creating or rebuilding Python/PyTorch environments.
-- Use functions for stateless logic; use OOP for state, lifecycle, invariants, and domain collaboration.
+- Use full OOP for domain logic. Tiny purely stateless logic may remain as short functions; state, lifecycle, invariants, and domain collaboration use OOP.
 - Do not add command-line argument parsing to target-project scripts; use config items with defaults.
 - Do not default to dynamic reflection.
-- Use `unittest` unless the project already uses another framework.
-- Tests mirror `src` one-to-one.
+- When Python unit tests are explicitly requested, use `unittest` unless the project already uses another framework.
+- When unit tests are explicitly requested, tests mirror `src` one-to-one.
 - Tensor tests cover shape, dtype, device, determinism, and edge cases.
 - Training tests stay tiny.
 
 ## Rust / GPUI Rules
 
-- Rust tests use built-in test mechanisms and `cargo test`.
+- When Rust unit tests are explicitly requested, use built-in test mechanisms and `cargo test`.
 - Run `cargo fmt` and `cargo test`; run `cargo clippy --all-targets --all-features` when practical.
 - Model domain state with struct, enum, trait, and explicit `Result`.
 - Avoid `unwrap`, `expect`, and `panic!` in production paths unless locally proven and documented.

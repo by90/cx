@@ -1,6 +1,6 @@
 ---
 name: cx-story
-description: Use for use-case-driven story discovery, main success scenario folders, task folders, change folders, single-current-document discipline, unfinished-change-first execution, and limiting each task to one task document, one code file, and one unit-test file when needed.
+description: Use for use-case-driven story discovery, main success scenario folders, task folders, change folders, single-current-document discipline, unfinished-change-first execution, and limiting each task to one task document plus one production code file; add a unit-test file only when tests are explicitly requested.
 version: 0.1.0
 ---
 
@@ -8,7 +8,7 @@ version: 0.1.0
 
 ## Purpose
 
-Use this skill before implementation and testing. cx uses use-case-driven story documents instead of the old scenario-expression workflow. Reusable-code scenarios and business scenarios use the same structure: a main success scenario plus conditional substeps attached to concrete main-success steps.
+Use this skill before implementation and validation. cx uses use-case-driven story documents instead of the old scenario-expression workflow. Reusable-code scenarios and business scenarios use the same structure: a main success scenario plus conditional substeps attached to concrete main-success steps.
 
 ## docs/cx Layout
 
@@ -36,11 +36,11 @@ Chinese projects may use Chinese file names such as `00.项目说明.md`, `00.�
 4. A use case contains one main success scenario and conditional, alternate, or exception substeps attached to concrete main-success steps.
 5. A task is a folder under `tasks/` and starts at `01.`.
 6. A task document's basic measure is a class or type group. It may cover one class or a tightly collaborating set of classes or types.
-7. A single task touches one task document, one code file, and one matching unit-test file when a test file is required.
-8. If one change affects several tasks or also changes the use-case document, split the work into an ordered task list and execute it one task at a time.
-9. Before starting work, ask whether to finish documentation, tests, implementation, and validation directly, or ask after each task.
-10. If the user does not explicitly choose per-task confirmation, default to direct completion; direct mode continues after document updates into tests, implementation, and validation.
-11. Only per-task confirmation mode stops after one task and waits for user review before starting the next task.
+7. A single task touches one task document and one production code file. If another code file is needed, split another task first.
+8. Unit tests are not default task deliverables. Add one matching unit-test file only when the user request, existing task document, or change document explicitly asks for unit tests or TDD.
+9. If one change affects several tasks or also changes the use-case document, split the work into an ordered task list and execute it one task at a time.
+10. Default execution is one-task/one-code-file: complete the current task document, edit only that task's production code file, report the result, and continue only when the user explicitly asks for continuation.
+11. Per-task confirmation mode still waits for user review after each task when explicitly requested.
 
 ## Use-Case Granularity And Main Success Scenario Discipline
 
@@ -99,4 +99,5 @@ When this skill is used, return:
 - Ordered task list when the request spans multiple tasks.
 - Current task document.
 - Current change document.
-- The execution mode and whether per-task review is required.
+- The execution mode, whether unit tests are explicitly requested, and whether continuation beyond the current code file is required.
+- Mandatory `$cx-evidence` review decision after code is written. FAIL means the task remains incomplete.

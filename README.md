@@ -1,8 +1,10 @@
-# cx Codex Use-Case-Driven TDD Workflow Pack
+# cx Codex Use-Case-Driven Workflow Pack
 
-cx is a Codex skill package for disciplined human-AI software development. Its core goal is to make AI first anchor work in `docs/cx` use cases, design notes, tasks, and change documents, then implement Python, PyTorch, and Rust projects with strict TDD and strict OOP or equivalent type modeling.
+cx is a Codex skill package for disciplined human-AI software development. Its core goal is to make AI first anchor work in `docs/cx` use cases, design notes, tasks, and change documents, then implement Python, PyTorch, and Rust projects by default with one task document and one production code file. Unit tests and TDD enter scope only when explicitly requested.
 
-cx is not a component library or business implementation. It defines collaboration flow, document structure, task splitting, test-first work, release versioning, and delivery evidence.
+cx is not a component library or business implementation. It defines collaboration flow, document structure, task splitting, full OOP, minimal reuse-first implementation, release versioning, and delivery evidence.
+
+After code is written, local review is mandatory before a task can be considered complete. If review fails, the task stays incomplete until document mismatch, duplication smells, non-OOP design, bloated implementation, extra validation, extra variable passing, redundant naming, or business-semantic drift is fixed.
 
 Current package version: `0.1.2`. cx is still experimental and has not declared a stable `1.0.0` workflow.
 
@@ -44,14 +46,15 @@ If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 4. Each scenario folder contains `00.use_case.md`, `00.design.md`, `tasks/`, and `changes/`.
 5. Each task is a folder, such as `tasks/01.write_user_entity/00.task.md`.
 6. Each change is written under `changes/<timestamp>-task<id>-<task_name>.md`; AI checks unfinished changes before choosing work.
-7. One task handles one task document, one code file, and one matching unit-test file when needed.
+7. One task handles one task document and one production code file. Split another task before editing a second code file. Add one matching unit-test file only when unit tests or TDD are explicitly requested.
 8. One main success scenario folder carries one user-goal use case. The main success scenario usually has 3 to 9 main steps from trigger to completed goal and does not bundle several mutually exclusive choices, page buttons, or complete tasks.
 9. Conditional, alternate, and exception behavior must use substep numbering such as `1.1` or `2.1` under a concrete main step, and must say whether the flow returns to a step, ends this use case, or enters another use case.
 10. If a main-success step needs its own actors, preconditions, steps, and conditional substeps, it is a sub-use case or separate use case and should move to its own scenario folder with an index in `docs/cx/00.project.md`.
-11. Before work starts, the agent asks one execution-mode question: finish documentation, tests, implementation, and validation directly, or ask after each completed task.
-12. If the user does not explicitly choose per-task confirmation, the default is direct completion; document completion does not stop the flow.
-13. Only per-task confirmation mode stops after each task and waits for review.
-14. `$cx-tdd` runs narrow failing tests, minimal implementation, and refactor. `$cx-pytorch-tdd`, `$cx-rust-tdd`, and `$cx-common-module` add language and reusable-entrypoint constraints.
+11. Default execution completes the current task document, edits only that task's production code file, reports the result, and continues to another code file only when the user explicitly requests multi-task continuation.
+12. By default, do not create, edit, or run unit tests. Use `$cx-tdd` only when the user request, existing task document, or change document explicitly asks for TDD, unit tests, or failing tests.
+13. After production code is written, `$cx-evidence` must run local code review; only review PASS allows the task or change to be marked complete.
+14. Only explicit per-task confirmation mode stops after each task and waits for review.
+15. `$cx-pytorch-tdd` is added only for explicit Python/PyTorch tests; `$cx-rust-tdd` handles Rust implementation and explicit tests; `$cx-common-module` adds reusable-entrypoint constraints.
 
 ## docs/cx Layout
 
@@ -75,7 +78,7 @@ All cx scenario, task, process, and change documents belong under `docs/cx`. Doc
 | --- | --- |
 | `$cx-workflow` | Workflow routing and minimal skill selection |
 | `$cx-story` | Use cases, main success scenarios, conditional substeps, tasks, and changes |
-| `$cx-tdd` | Strict test-first work, narrow failing tests, minimal implementation, and refactor |
+| `$cx-tdd` | Explicit test-first work, narrow failing tests, minimal implementation, and refactor |
 | `$cx-changelog` | `changes/` documents, release notes, and audit trails |
 | `$cx-version` | Project-local `tools/semver.py`, `VERSION`, `docs/VERSIONS.md`, release tags, and release validation |
 | `$cx-research` | Model selection, paper research, source filtering, and cited synthesis |
@@ -83,9 +86,9 @@ All cx scenario, task, process, and change documents belong under `docs/cx`. Doc
 | `$cx-pytorch-quick-hpo` | Quick PyTorch tuning, field contribution research, feature sets, and candidates |
 | `$cx-pytorch-full-hpo` | Full PyTorch tuning, full-data training, evaluation, backtesting, and candidate selection |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling and PyTorch Forecasting selection |
-| `$cx-rust-tdd` | Rust type design, ownership design, built-in tests, `cargo fmt`, `cargo test`, and `clippy` |
+| `$cx-rust-tdd` | Rust type design, ownership design, optional explicit tests, `cargo fmt`, `cargo test`, and `clippy` |
 | `$cx-common-module` | Reusable features, reusable classes, public entrypoints, and repeated logic convergence |
-| `$cx-evidence` | Pre-handoff evidence review |
+| `$cx-evidence` | Mandatory post-code review and pre-handoff evidence review |
 
 ## Prompt Contract
 
@@ -94,7 +97,7 @@ A strong coding-agent prompt should include:
 - Goal: behavior or result to change.
 - Context: target `docs/cx` scenario, task, change, files, branch, or environment.
 - Constraints: API, language rules, performance, compatibility, or style limits.
-- Required workflow: cx skills to use and whether TDD, research, versioning, or evidence review is needed.
+- Required workflow: cx skills to use and whether unit tests or TDD, research, versioning, or evidence review are explicitly requested.
 - Verification: commands, tests, screenshots, or checks expected.
 - Deliverables: code, documents, change records, evidence, or summary.
 

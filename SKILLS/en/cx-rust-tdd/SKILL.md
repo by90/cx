@@ -1,34 +1,37 @@
 ---
 name: cx-rust-tdd
-description: Use for Rust code implementation and TDD, including ownership-aware design, structs/enums/traits, Result-based errors, cargo test, rustfmt, clippy, GPUI/macOS real-device checks, and high-quality Rust code.
+description: Use for Rust code implementation, optional explicit TDD, ownership-aware design, structs/enums/traits, Result-based errors, cargo fmt, clippy, cargo test, GPUI/macOS real-device checks, and high-quality Rust code. Create unit or failing tests only when explicitly requested.
 version: 0.1.0
 ---
 
-# cx Rust Code And TDD
+# cx Rust Code And Explicit Tests
 
 ## Purpose
 
-Use this skill for Rust implementation work after the current `docs/cx` task and execution mode are known. It is a general Rust code-quality and TDD skill; for GPUI/macOS desktop UI work, it adds real-device verification discipline without replacing a dedicated UI component design process.
+Use this skill for Rust implementation work after the current `docs/cx` task is known. It is a general Rust code-quality skill; enter test-first flow only when the current request, task document, or change document explicitly asks for TDD, unit tests, or failing tests. For GPUI/macOS desktop UI work, it adds real-device verification discipline without replacing a dedicated UI component design process.
 
 ## Required Workflow
 
-1. Confirm the execution mode first; if the user did not explicitly choose per-task confirmation, direct mode proceeds into testing, implementation, and validation without a separate document-complete confirmation gate.
+1. Confirm that the current task edits one Rust production code file; if a second code file is needed, split another task first.
 2. Read the target use-case document, design document, current task document, current change document, and the relevant Rust modules.
-3. Map the current class/type measure to one narrow Rust test.
-4. Write the failing test first using `#[test]`, integration tests under `tests/`, or doc tests when the behavior is public API documentation.
-5. Run `cargo test <filter>` or the narrowest project command and record the red failure.
+3. By default, do not create or edit Rust unit tests; only when tests are explicitly requested, map the current class/type measure to one narrow Rust test.
+4. When tests are explicitly requested, write the failing test first using `#[test]`, integration tests under `tests/`, or doc tests when the behavior is public API documentation.
+5. When tests are explicitly requested, run `cargo test <filter>` or the narrowest project command and record the red failure.
 6. Implement the smallest Rust change.
-7. Run the narrow test, then `cargo test`.
+7. When tests are explicitly requested, run the narrow test and then `cargo test` as needed; otherwise run project-required build, formatting, or static checks.
 8. Run `cargo fmt --check` or `cargo fmt`.
 9. Run `cargo clippy --all-targets --all-features` when practical.
-10. Refactor only after tests are green.
-11. Record verification evidence.
+10. Refactor only after verification passes.
+11. After code and required verification are done, run `$cx-evidence` mandatory review. Focus on docs agreement, duplication smells, full Rust type modeling, minimal implementation, and business semantics.
+12. If review fails, do not mark the task complete; fix implementation or docs, then rerun verification and review.
+13. Record verification evidence and review decision.
 
 ## Minimal Implementation Discipline
 
 Iron rule: absolutely no unmaintainable pile-up code.
 
 - Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early.
+- Keep file, type, function, and variable names short and clear; avoid sentence-like identifiers, and extract responsibilities or reuse domain terms when names grow too long.
 - Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
 - Unless business rules explicitly require it, do not hide exceptions, silently fall back, or turn errors that would harm the product into defaults, empty results, skipped records, fake successful retries, or warnings; during development, let these errors stop execution.
 - Use a simple test: if the same bug shipped to the product would cause a problem, it must surface as a failure. Only add explicit handling when the business requires degradation, recovery, or user-visible guidance, and cover that path with tests.
@@ -51,7 +54,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Prefer `Result<T, E>` and explicit error enums for recoverable failures.
 - Avoid `unwrap`, `expect`, and `panic!` in production paths unless the invariant is local, proven, and documented.
 - Avoid cloning to appease the borrow checker. Decide ownership deliberately.
-- Keep functions small, direct, and minimal. Do not create bloated, long, hard-to-maintain code, and do not fragment logic into meaningless wrappers.
+- Keep functions small, direct, and minimal. Keep files cohesive and reasonably sized. Do not create bloated, long, hard-to-maintain code, and do not fragment logic into meaningless wrappers.
 - Keep modules cohesive and public APIs narrow.
 - Any potentially reusable feature, class, or logic must first invoke `$cx-common-module` to search existing implementation and design the public entrypoint.
 - Use `Option` for absence and `Result` for failure; do not encode errors as magic strings or sentinel values.
@@ -59,7 +62,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 
 ## Test Strategy
 
-- Unit-test pure logic close to the module with `#[cfg(test)]`.
+- When unit tests are explicitly requested, test pure logic close to the module with `#[cfg(test)]`.
 - Use integration tests for public workflows across modules.
 - Use doc tests for public examples that should compile.
 - Cover success, boundary, invalid input, error propagation, and ownership-sensitive behavior.
@@ -68,7 +71,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 
 ## GPUI/macOS Real-Device Checks
 
-- After Rust/GPUI desktop UI changes, run unit tests, `cargo fmt`, and `cargo clippy` as usual, then package, install, or launch the real app with the project workflow and observe the result with screenshots or Computer Use.
+- After Rust/GPUI desktop UI changes, run explicitly requested unit tests, `cargo fmt`, and `cargo clippy` as usual, then package, install, or launch the real app with the project workflow and observe the result with screenshots or Computer Use.
 - macOS Accessibility authorization must cover both the automation host and the tested app; common entries include `Codex`, `Codex Computer Use`, the tested `.app`, and the terminal or runtime host that launches click scripts. After changing permissions, restart the automation host and tested app first.
 - GPUI content buttons are often not fully exposed as `AXButton` nodes in the Accessibility tree; use `System Events` first for menu bar items, window controls, and page-menu actions, but do not assume it can locate every GPUI content-area button.
 - Before clicking GPUI content, save a screenshot under the project `temp/` directory, then confirm window logical coordinates, display bounds, and Retina scaling; screenshot pixel coordinates are not direct `CGEvent` logical points.
@@ -104,9 +107,10 @@ SWIFT
 
 ## Output
 
-- Current task to Rust test mapping.
-- Expected red failure command and output summary.
+- Current task to Rust code mapping, and test mapping only when tests are explicitly requested.
+- Expected red failure command and output summary when tests are explicitly requested; otherwise state that no unit test was created.
 - Minimal Rust implementation.
 - `cargo test` result.
 - Formatting and clippy result or a recorded reason they were not run.
+- `$cx-evidence` review decision. FAIL means the task remains incomplete.
 - For GPUI/macOS UI work, real app launch method, Accessibility permission status, click method, screenshot path, and observation conclusion.

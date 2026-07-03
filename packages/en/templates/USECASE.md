@@ -40,5 +40,6 @@ TODO: Describe the result the actor gets when this use case succeeds. One use ca
 ## Completion Conditions
 
 - All tasks are complete.
-- Required tests pass.
+- Explicitly declared verification passes; when unit tests are not declared, tests are not a default completion condition.
+- `$cx-evidence` review after code completion passes.
 - Changes are marked complete.

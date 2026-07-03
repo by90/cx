@@ -8,13 +8,14 @@ version: 0.1.0
 
 ## Purpose
 
-Turn repeated logic, stable data structures, reusable classes, generic capabilities, test harnesses, and UI state models into small, stable, tested reusable capabilities. AI-assisted coding often creates similar code in multiple places; this skill stops that drift by requiring search, calling-model design, API design, migration planning, and tests when duplication becomes meaningful.
+Turn repeated logic, stable data structures, reusable classes, generic capabilities, test harnesses, and UI state models into small, stable, verifiable reusable capabilities. AI-assisted coding often creates similar code in multiple places; this skill stops that drift by requiring search, calling-model design, API design, migration planning, and verification when duplication becomes meaningful.
 
 ## Minimal Implementation Discipline
 
 Iron rule: absolutely no unmaintainable pile-up code.
 
 - Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early.
+- Keep file, class, method, and variable names short and clear; avoid sentence-like identifiers, and extract responsibilities or reuse domain terms when names grow too long.
 - Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
 - Unless business rules explicitly require it, do not hide exceptions, silently fall back, or turn errors that would harm the product into defaults, empty results, skipped records, fake successful retries, or warnings; during development, let these errors stop execution.
 - Use a simple test: if the same bug shipped to the product would cause a problem, it must surface as a failure. Only add explicit handling when the business requires degradation, recovery, or user-visible guidance, and cover that path with tests.
@@ -39,7 +40,7 @@ Normal call style:
 Special-case entrypoint:
 Instance or state lifecycle:
 State source:
-How tests cover all source call sites:
+How verification covers all source call sites:
 Non-goals:
 ```
 
@@ -79,14 +80,15 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 
 - Search evidence and candidate comparison.
 - Public API proposal with public entrypoint, normal call style, special-case entrypoint, lifecycle, state source, inputs, outputs, error policy, and a minimal example.
-- Tests first, preferably covering real small data and edge cases.
+- Verification approach, preferably covering real small data and edge cases; use tests first only when unit tests or TDD are explicitly requested.
 - Backward-compatible migration plan describing which call sites move and which stay unchanged.
 - Reusable capability notes in the target `docs/cx` design document.
-- Task or change document updates for the tests that prove the reusable capability.
+- Task or change document updates for the verification that proves the reusable capability; record test mapping only when unit tests are explicitly requested.
+- `$cx-evidence` review decision after code is written, especially whether duplication smells were removed without over-abstracting or adding extra parameter passing.
 
 ## Code Constraints
 
-- Any reusable-capability code or tests added or edited by this skill must follow comprehensive comments: file-level explanations must state file purpose and main classes, functions, or test targets; classes/types need responsibility explanations; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; every line of business code and test business logic needs an adjacent intent comment.
+- Any reusable-capability code or explicitly requested tests added or edited by this skill must follow comprehensive comments: file-level explanations must state file purpose and main classes, functions, or test targets; classes/types need responsibility explanations; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; every line of business code and test business logic needs an adjacent intent comment.
 - Generic capabilities, reusable classes, reusable components, and common modules must be minimal, stable, and low-coupling. Do not abstract for its own sake, and do not copy repeated logic into multiple similar implementations.
 - Python reusable capabilities should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`.
 - Public APIs must use explicit OOP or static interfaces. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default.
