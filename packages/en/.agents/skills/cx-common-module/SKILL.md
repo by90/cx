@@ -84,7 +84,7 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 - Backward-compatible migration plan describing which call sites move and which stay unchanged.
 - Reusable capability notes in the target `docs/cx` design document.
 - Task or change document updates for the verification that proves the reusable capability; record test mapping only when unit tests are explicitly requested.
-- `$cx-evidence` review decision after code is written, especially whether duplication smells were removed without over-abstracting or adding extra parameter passing.
+- `$cx-review` decision after the deliverable is produced, especially whether duplication smells were removed without over-abstracting or adding extra parameter passing, plus `$cx-evidence` evidence review before handoff.
 
 ## Code Constraints
 

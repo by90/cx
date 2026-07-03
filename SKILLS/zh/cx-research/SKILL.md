@@ -31,6 +31,7 @@ version: 0.1.0
 8. 必须综合分析，不能只罗列。按研究方向、共识、冲突、成熟度和实现后果分组。
 9. 每个非显然主张都必须附链接引用。
 10. 明确哪些内容未知、过时、有争议或可能很快变化。
+11. 研究交付物完成后必须使用 `$cx-review` 做研究 review；review 不通过时不得把研究任务或变更标记完成。
 
 ## 模型选择研究
 
@@ -66,4 +67,5 @@ Source table:
 
 Recommendation:
 Open questions:
+Review decision:
 ```

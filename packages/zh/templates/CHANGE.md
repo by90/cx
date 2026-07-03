@@ -30,4 +30,4 @@ TODO
 
 ## Review 结论
 
-TODO：填写 `$cx-evidence` review 的 PASS/FAIL。FAIL 时本变更保持未完成。
+TODO：填写 `$cx-review` 对本变更交付物的 PASS/FAIL，并填写 `$cx-evidence` 证据审查结论。FAIL 时本变更保持未完成。

@@ -37,4 +37,5 @@ Codex discovers `.agents/skills` from the working directory upward. If two langu
 - `$cx-timeseries-modeling`
 - `$cx-rust-tdd`
 - `$cx-common-module`
+- `$cx-review`
 - `$cx-evidence`

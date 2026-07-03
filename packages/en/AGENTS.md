@@ -26,7 +26,7 @@ These rules override other rules, cx skills, templates, examples, and temporary 
 16. **Cross-platform encoding**: PowerShell scripts use UTF-8 with BOM; other source, Markdown, JSON, TOML, YAML, and text files use UTF-8 without BOM. When viewing, searching, or printing UTF-8-without-BOM files that contain Chinese in Windows or PowerShell, silently force UTF-8 read and output encoding by default, for example by setting `[Console]::InputEncoding`, `[Console]::OutputEncoding`, and `$OutputEncoding`, and by passing `-Encoding UTF8` to text commands. Do not treat mojibake console output as evidence that the file encoding is damaged, and do not patch against mojibake output. When exact location is needed, use project-level `uv` Python or its `.venv` interpreter to print line numbers and string representations in read-only mode. Apply edits with small `apply_patch` hunks anchored on functions, classes, headings, keys, and code structure. Unless the actual file encoding is abnormal, a patch fails, or the user asks for the reason, do not repeatedly describe encoding handling in routine progress updates or summaries.
 17. **Chinese first, English second**: when modifying cx workflow, skills, templates, examples, or install rules, finish the Chinese package first and then synchronize English.
 18. **Explicit tests and full OOP**: Python, PyTorch, and Rust projects do not use unit tests or TDD by default. Run test-first flow only when explicitly requested. State, lifecycle, invariants, and domain collaboration use full OOP or equivalent type modeling.
-19. **Mandatory review after code**: after production code is written, run local code review before considering the task complete. Review must check exact agreement with `00.use_case.md`, `00.design.md`, the task document, and the change document; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit. If review fails, the task remains incomplete until fixed and reviewed again.
+19. **Mandatory review after deliverables**: after code, documentation, tutorials, research, design, process changes, release notes, or any other deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete. Code review checks exact agreement with `00.use_case.md`, `00.design.md`, the task document, and the change document; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit. Documentation, tutorial, research, and design review check single source of truth, tutorial executability, source quality and synthesis, design feasibility, and business meaning. If review fails, the task, change, or deliverable remains incomplete until fixed and reviewed again.
 
 ## Repository Workflow
 
@@ -52,7 +52,7 @@ This repository uses a `docs/cx` use-case-driven flow. All cx project descriptio
 18. Use `$cx-tdd` only when TDD or unit tests are explicitly requested; add `$cx-pytorch-tdd` only for explicit Python/PyTorch tests. Use `$cx-rust-tdd` for Rust implementation, with Rust tests only when explicitly requested.
 19. Use `$cx-common-module` before adding reusable features, classes, or common entrypoints.
 20. Run the narrowest effective test first, then broader validation as needed, and record commands and results.
-21. After production code is complete, run `$cx-evidence` or an equivalent local code-review flow. Mark the task or change complete only after review passes.
+21. After any deliverable is produced, run `$cx-review` or an equivalent local review flow. Before handoff, run `$cx-evidence` to verify review decisions and evidence. Mark the task or change complete only after both pass.
 
 ## docs/cx Layout
 
@@ -88,8 +88,9 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 - `$cx-timeseries-modeling`: heterogeneous multivariate time-series modeling.
 - `$cx-rust-tdd`: Rust implementation, ownership design, and cargo test/fmt/clippy.
 - `$cx-common-module`: reusable features, reusable classes, and common API design.
-- `$cx-evidence`: pre-merge or pre-handoff evidence review.
-- Mandatory post-code review uses `$cx-evidence`; a failed review means the task is not complete.
+- `$cx-review`: mandatory local review after code, documentation, tutorial, research, design, or process-change deliverables.
+- `$cx-evidence`: pre-merge or pre-handoff evidence review that checks review decisions, verification evidence, and residual risk.
+- Mandatory post-deliverable review uses `$cx-review`; failed review or failed evidence review means the task is not complete.
 
 ## Python Rules
 

@@ -23,9 +23,9 @@ version: 0.1.0
 9. 运行 `cargo fmt --check` 或 `cargo fmt`。
 10. 可行时运行 `cargo clippy --all-targets --all-features`。
 11. 只有验证通过后才重构。
-12. 代码写完并完成必要验证后，必须使用 `$cx-evidence` 做强制 review；重点核对文档一致性、重复味道、完整 Rust 类型建模、极简实现和业务语义。
+12. 代码写完并完成必要验证后，必须使用 `$cx-review` 做代码交付物 review；重点核对文档一致性、重复味道、完整 Rust 类型建模、极简实现和业务语义。
 13. review 不通过时，当前任务不得标记完成；先修复实现或文档，再重新验证和 review。
-14. 在当前任务文档和变更文档中记录验证证据和 review 结论。
+14. 在当前任务文档和变更文档中记录验证证据、`$cx-review` 结论和 `$cx-evidence` 证据审查结论。
 
 ## 最小实现纪律
 
@@ -113,5 +113,5 @@ SWIFT
 - 最小 Rust 实现。
 - `cargo test` 结果。
 - 格式化和 clippy 结果，或未运行原因。
-- `$cx-evidence` review 结论；FAIL 时任务仍为未完成。
+- `$cx-review` 代码交付物 review 结论和 `$cx-evidence` 证据审查结论；FAIL 时任务仍为未完成。
 - 涉及 GPUI/macOS UI 时，真实应用启动方式、辅助功能授权状态、点击方式、截图路径和观察结论。

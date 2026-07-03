@@ -24,3 +24,4 @@
 - Unit tests are not default deliverables; add one matching unit-test file only when unit tests or TDD are explicitly requested.
 - The task measure is a class or type group.
 - Default implementation uses full OOP, minimal code, reuse first, and avoids bloated files, overly long identifiers, and duplicated logic.
+- Design, documentation, code, or other deliverables must pass `$cx-review`; before handoff they must pass `$cx-evidence` evidence review.

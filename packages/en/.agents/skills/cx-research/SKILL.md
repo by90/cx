@@ -31,6 +31,7 @@ Use multiple source classes and label them clearly:
 8. Synthesize, do not merely list. Group by research direction, agreement, conflict, maturity, and implementation consequence.
 9. Cite every non-obvious claim with a link.
 10. State what is unknown, stale, disputed, or likely to change.
+11. After the research deliverable is produced, run `$cx-review` research review. If review fails, do not mark the research task or change complete.
 
 ## Model Selection Research
 
@@ -66,4 +67,5 @@ Source table:
 
 Recommendation:
 Open questions:
+Review decision:
 ```

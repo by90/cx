@@ -43,4 +43,4 @@ TODO
 
 ## Review Decision
 
-TODO: Record `$cx-evidence` review PASS/FAIL. FAIL keeps this task incomplete.
+TODO: Record `$cx-review` PASS/FAIL for this task's deliverables and `$cx-evidence` evidence review. FAIL keeps this task incomplete.

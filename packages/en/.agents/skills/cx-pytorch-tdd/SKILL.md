@@ -24,7 +24,7 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 10. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable features, classes, or components.
 11. Follow the one-code-file boundary plus source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`; when tests are explicitly requested, tests mirror them under `tests/<subsystem>/`, and each source file maps to one `*_test.py`. Source files and explicitly requested unit tests must include file-level purpose notes, class notes, function parameter/return explanations, and line-by-line intent comments.
 12. After editing Python source or tests, run Black default-format checks, for example `python -m black --check src tests tools`, and avoid changing unrelated user code.
-13. After code and required verification are done, run `$cx-evidence` mandatory review. Focus on docs agreement, repeated tensor/data/config logic, full OOP, minimal implementation, no extra validation, no extra variable passing, and no redundant parameter or variable names.
+13. After code and required verification are done, run `$cx-review` code-deliverable review. Focus on docs agreement, repeated tensor/data/config logic, full OOP, minimal implementation, no extra validation, no extra variable passing, and no redundant parameter or variable names.
 14. If review fails, do not mark the task complete; fix implementation or docs, then rerun verification and review.
 
 ## Minimal Implementation Discipline

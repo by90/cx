@@ -39,6 +39,7 @@ Codex 会从当前工作目录向仓库根目录扫描 `.agents/skills`。如果
 - `$cx-timeseries-modeling`
 - `$cx-rust-tdd`
 - `$cx-common-module`
+- `$cx-review`
 - `$cx-evidence`
 
 一致名称让用户只写一套提示词、教程和自动化脚本，然后单独选择语言包。

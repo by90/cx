@@ -1,6 +1,6 @@
 ---
 name: cx-workflow
-description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, docs/cx use-case flow, change-first work selection, default one-task/one-code-file execution, explicit tests, full OOP, minimal reusable code, and mandatory post-code review before a task can be considered complete.
+description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, docs/cx use-case flow, change-first work selection, default one-task/one-code-file execution, explicit tests, full OOP, minimal reusable code, and mandatory review after every code, documentation, tutorial, research, design, or process deliverable.
 version: 0.1.0
 ---
 
@@ -31,8 +31,10 @@ Use this skill first when a user request needs workflow routing or several cx sk
 8. Python, PyTorch, and Rust work follow full OOP or equivalent type modeling for state, lifecycle, invariants, and domain collaboration.
 9. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse.
 10. Default execution is one-task/one-code-file: complete the current task document, edit only the bound production code file, report the result, and continue to another code file only when the user explicitly asks for multi-task continuation.
-11. After production code is written, run local code review before considering the task complete. If review fails, the task remains incomplete until the implementation or docs are fixed and reviewed again.
-12. Mandatory review uses `$cx-evidence` and checks exact agreement with the use-case, design, task, and change documents; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit.
+11. After any code, documentation, tutorial, research, design, process-change, or release-note deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete.
+12. If review fails, the task, change, or deliverable remains incomplete until the implementation, document, tutorial, research, design, or process record is fixed and reviewed again.
+13. Code review checks exact agreement with the use-case, design, task, and change documents; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit.
+14. Documentation, tutorial, research, and design review check single source of truth, tutorial executability, source quality and synthesis, design feasibility, and business meaning. Any failed required deliverable review blocks completion.
 
 ## Skill Selection
 
@@ -45,7 +47,8 @@ Use this skill first when a user request needs workflow routing or several cx sk
 - Use `$cx-timeseries-modeling` for heterogeneous multivariate time-series design.
 - Use `$cx-research` for model selection, papers, and cited synthesis.
 - Use `$cx-version` for release versioning.
-- Use `$cx-evidence` after code is written for mandatory local review, and before handoff, merge, release, or when compliance is uncertain.
+- Use `$cx-review` after code, documentation, tutorial, research, design, process-change, or release-note deliverables are produced.
+- Use `$cx-evidence` before handoff, merge, release, or when verification evidence, review decisions, or compliance are uncertain.
 
 ## Output
 
@@ -57,4 +60,4 @@ Return:
 - Selected skills and order.
 - Execution mode, including whether continuation beyond the current code file was explicitly requested.
 - Narrowest validation commands expected.
-- Review decision. FAIL means the task is not complete.
+- Review decision for each produced artifact type. FAIL means the task, change, or deliverable is not complete.

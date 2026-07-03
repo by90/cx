@@ -100,4 +100,4 @@ When this skill is used, return:
 - Current task document.
 - Current change document.
 - The execution mode, whether unit tests are explicitly requested, and whether continuation beyond the current code file is required.
-- Mandatory `$cx-evidence` review decision after code is written. FAIL means the task remains incomplete.
+- Mandatory `$cx-review` decision for each produced artifact type, plus `$cx-evidence` before handoff. FAIL means the task remains incomplete.

@@ -8,7 +8,7 @@
 
 cx 是工作流包，不是组件库。它规定人类和 AI 如何用 `docs/cx` 保存用例、设计、任务、变更和验证证据。默认节奏是先完成当前任务文档，再只编辑该任务绑定的一个生产代码文件；单元测试和 TDD 只有在用户请求、既有任务文档或变更文档明确声明时才进入任务范围。
 
-生产代码写完后必须先做 `$cx-evidence` review。review 重点核对文档一致性、重复味道、完整 OOP、极简实现和业务语义；review 不通过时任务仍为未完成。
+代码、文档、教程、研究、设计或流程变更等交付物完成后必须先做 `$cx-review`；交付前再做 `$cx-evidence` 证据审查。review 重点按交付物类型核对文档一致性、重复味道、完整 OOP、极简实现、教程可执行性、研究来源质量、设计可落地性和业务语义；任一不通过时任务或变更仍为未完成。
 
 所有 cx 文档只属于 `docs/cx`：
 
@@ -46,7 +46,7 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 功能或缺陷：
 
 ```text
-请使用 $cx-workflow，选择最小必要 cx skills。默认先用 $cx-story 在 docs/cx 下创建或更新用例、设计、当前任务和变更文档；完成当前任务文档后，只编辑该任务绑定的一个生产代码文件。默认不创建或修改单元测试；只有我明确要求 TDD、单元测试或失败测试时，才叠加 $cx-tdd。实现默认完整 OOP、极简、复用优先，避免过长文件、过长变量名和重复实现。代码写完后必须用 $cx-evidence review；review 不通过时任务不得标记完成。
+请使用 $cx-workflow，选择最小必要 cx skills。默认先用 $cx-story 在 docs/cx 下创建或更新用例、设计、当前任务和变更文档；完成当前任务文档后，只编辑该任务绑定的一个生产代码文件。默认不创建或修改单元测试；只有我明确要求 TDD、单元测试或失败测试时，才叠加 $cx-tdd。实现默认完整 OOP、极简、复用优先，避免过长文件、过长变量名和重复实现。代码、文档、教程、研究、设计或流程变更完成后必须用 $cx-review；交付前用 $cx-evidence 核验证据。review 不通过时任务不得标记完成。
 ```
 
 Python / PyTorch：
@@ -83,7 +83,8 @@ Rust：
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模和 PyTorch Forecasting 选型 |
 | `$cx-rust-tdd` | Rust 类型设计、所有权设计、可选显式测试和 cargo fmt/clippy/test |
 | `$cx-common-module` | 通用功能、可复用类和公共入口设计 |
-| `$cx-evidence` | 代码完成后的强制 review 和交付前证据审查 |
+| `$cx-review` | 代码、文档、教程、研究、设计和流程变更完成后的强制本地 review |
+| `$cx-evidence` | 交付前证据审查、review 结论核验和剩余风险 |
 
 ## 验证
 

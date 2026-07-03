@@ -4,7 +4,7 @@ cx is a Codex skill package for disciplined human-AI software development. Its c
 
 cx is not a component library or business implementation. It defines collaboration flow, document structure, task splitting, full OOP, minimal reuse-first implementation, release versioning, and delivery evidence.
 
-After code is written, local review is mandatory before a task can be considered complete. If review fails, the task stays incomplete until document mismatch, duplication smells, non-OOP design, bloated implementation, extra validation, extra variable passing, redundant naming, or business-semantic drift is fixed.
+After code, documentation, tutorials, research, design, process changes, release notes, or any other deliverable is produced, `$cx-review` is mandatory before the task, change, or deliverable can be considered complete. If review fails, the state stays incomplete until document mismatch, duplication smells, non-OOP design, bloated implementation, extra validation, extra variable passing, redundant naming, business-semantic drift, non-executable tutorials, weak research sources, or infeasible design is fixed.
 
 Current package version: `0.1.2`. cx is still experimental and has not declared a stable `1.0.0` workflow.
 
@@ -52,7 +52,7 @@ If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 10. If a main-success step needs its own actors, preconditions, steps, and conditional substeps, it is a sub-use case or separate use case and should move to its own scenario folder with an index in `docs/cx/00.project.md`.
 11. Default execution completes the current task document, edits only that task's production code file, reports the result, and continues to another code file only when the user explicitly requests multi-task continuation.
 12. By default, do not create, edit, or run unit tests. Use `$cx-tdd` only when the user request, existing task document, or change document explicitly asks for TDD, unit tests, or failing tests.
-13. After production code is written, `$cx-evidence` must run local code review; only review PASS allows the task or change to be marked complete.
+13. After any deliverable is produced, `$cx-review` must run the matching local review; before handoff, `$cx-evidence` verifies review decisions and evidence. Only both PASS allow the task or change to be marked complete.
 14. Only explicit per-task confirmation mode stops after each task and waits for review.
 15. `$cx-pytorch-tdd` is added only for explicit Python/PyTorch tests; `$cx-rust-tdd` handles Rust implementation and explicit tests; `$cx-common-module` adds reusable-entrypoint constraints.
 
@@ -88,7 +88,8 @@ All cx scenario, task, process, and change documents belong under `docs/cx`. Doc
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling and PyTorch Forecasting selection |
 | `$cx-rust-tdd` | Rust type design, ownership design, optional explicit tests, `cargo fmt`, `cargo test`, and `clippy` |
 | `$cx-common-module` | Reusable features, reusable classes, public entrypoints, and repeated logic convergence |
-| `$cx-evidence` | Mandatory post-code review and pre-handoff evidence review |
+| `$cx-review` | Mandatory local review after code, documentation, tutorial, research, design, or process-change deliverables |
+| `$cx-evidence` | Pre-handoff evidence review, review-decision checks, document agreement, and residual risk |
 
 ## Prompt Contract
 

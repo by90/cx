@@ -30,4 +30,4 @@ TODO
 
 ## Review Decision
 
-TODO: Record `$cx-evidence` review PASS/FAIL. FAIL keeps this change open.
+TODO: Record `$cx-review` PASS/FAIL for this change's deliverables and `$cx-evidence` evidence review. FAIL keeps this change open.

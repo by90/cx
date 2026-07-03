@@ -39,7 +39,7 @@ Each change must include:
 2. Do not create duplicate planning files outside `docs/cx`.
 3. If a change spans multiple tasks, list those tasks in order and execute one at a time.
 4. If a change also modifies the use-case document, make that part of the ordered task list.
-5. Mark a change complete only after task verification and `$cx-evidence` review PASS are recorded.
+5. Mark a change complete only after task verification, `$cx-review` PASS for each produced artifact type, and `$cx-evidence` handoff evidence review are recorded.
 6. Default execution stops at the current task and current production code-file boundary; continue through additional tasks only when the user explicitly requests multi-task continuation.
 
 ## Output

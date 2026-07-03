@@ -15,6 +15,7 @@ TODO
 - Default execution completes one task document and edits one production code file; split another task before editing a second code file.
 - Code stays minimal, reuse-first, low-duplication, and avoids bloated files or overly long identifiers.
 - All cx scenarios, tasks, process documents, and changes live under `docs/cx`.
+- Code, documentation, tutorials, research, design, or process-change deliverables must pass `$cx-review`, then pass `$cx-evidence` evidence review before handoff.
 
 ## Scenario Index
 

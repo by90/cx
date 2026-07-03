@@ -16,7 +16,7 @@ The use-case document defines the main success scenario plus conditional, altern
 8. After the task document is complete, implement that task's one production code file.
 9. Do not create or edit unit tests by default; use `$cx-tdd` and one matching unit-test file only when TDD, unit tests, or failing tests are explicitly requested.
 10. Run the narrowest validation and record command plus result.
-11. Run `$cx-evidence` mandatory review after code completion; if review fails, keep the task incomplete and return to fixing.
+11. Run `$cx-review` mandatory review after code, documentation, tutorial, research, design, or process-change deliverables; before handoff run `$cx-evidence`. If review or evidence review fails, keep the task incomplete and return to fixing.
 12. After review passes, report and stop at the current code-file boundary by default.
 
 ## Document Location
@@ -32,7 +32,7 @@ docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
 ## Recommended Prompt
 
 ```text
-Use $cx-workflow and $cx-story. First check whether the target docs/cx scenario has unfinished changes. Then read 00.use_case.md, 00.design.md, and the current task document. By default, complete the current task document and implement only the one production code file bound to that task. Do not create or edit unit tests by default. Use $cx-tdd only when I explicitly ask for TDD, unit tests, or failing tests. After code is written, run $cx-evidence review; if review fails, do not mark the task complete.
+Use $cx-workflow and $cx-story. First check whether the target docs/cx scenario has unfinished changes. Then read 00.use_case.md, 00.design.md, and the current task document. By default, complete the current task document and implement only the one production code file bound to that task. Do not create or edit unit tests by default. Use $cx-tdd only when I explicitly ask for TDD, unit tests, or failing tests. After code, documentation, tutorial, research, design, or process-change deliverables are produced, run $cx-review; before handoff run $cx-evidence. If review fails, do not mark the task complete.
 ```
 
 For Python ML work, use `$cx-story` by default; add `$cx-tdd` and `$cx-pytorch-tdd` only when tests are explicitly requested.

@@ -22,9 +22,9 @@ Use this skill for Rust implementation work after the current `docs/cx` task is 
 8. Run `cargo fmt --check` or `cargo fmt`.
 9. Run `cargo clippy --all-targets --all-features` when practical.
 10. Refactor only after verification passes.
-11. After code and required verification are done, run `$cx-evidence` mandatory review. Focus on docs agreement, duplication smells, full Rust type modeling, minimal implementation, and business semantics.
+11. After code and required verification are done, run `$cx-review` code-deliverable review. Focus on docs agreement, duplication smells, full Rust type modeling, minimal implementation, and business semantics.
 12. If review fails, do not mark the task complete; fix implementation or docs, then rerun verification and review.
-13. Record verification evidence and review decision.
+13. Record verification evidence, `$cx-review` decision, and `$cx-evidence` evidence decision.
 
 ## Minimal Implementation Discipline
 
@@ -112,5 +112,5 @@ SWIFT
 - Minimal Rust implementation.
 - `cargo test` result.
 - Formatting and clippy result or a recorded reason they were not run.
-- `$cx-evidence` review decision. FAIL means the task remains incomplete.
+- `$cx-review` code-deliverable decision and `$cx-evidence` evidence decision. FAIL means the task remains incomplete.
 - For GPUI/macOS UI work, real app launch method, Accessibility permission status, click method, screenshot path, and observation conclusion.

@@ -41,5 +41,6 @@ TODO: Describe the result the actor gets when this use case succeeds. One use ca
 
 - All tasks are complete.
 - Explicitly declared verification passes; when unit tests are not declared, tests are not a default completion condition.
-- `$cx-evidence` review after code completion passes.
+- `$cx-review` passes for code, documentation, design, change, or other deliverables.
+- `$cx-evidence` evidence review passes before handoff.
 - Changes are marked complete.

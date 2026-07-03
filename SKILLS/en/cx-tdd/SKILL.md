@@ -32,9 +32,9 @@ Read, in order:
 7. Implement the smallest change that passes.
 8. Refactor only within the current task boundary.
 9. Do not weaken assertions to make a test pass.
-10. After code passes tests, run `$cx-evidence` mandatory review for document agreement, duplication smells, full OOP, minimal implementation, and business semantics.
+10. After code passes explicitly requested tests, run `$cx-review` code-deliverable review for document agreement, duplication smells, full OOP, minimal implementation, and business semantics.
 11. If review fails, do not mark the task complete; fix implementation or docs, then rerun tests and review.
-12. Record verification commands, results, review decision, and residual gaps in the current task or change document.
+12. Record verification commands, results, `$cx-review` decision, `$cx-evidence` evidence decision, and residual gaps in the current task or change document.
 
 ## Python Expectations
 
@@ -59,5 +59,5 @@ Return:
 - Expected red failure.
 - Implementation summary.
 - Verification commands and results.
-- `$cx-evidence` review decision. FAIL means the task remains incomplete.
+- `$cx-review` code-deliverable decision and `$cx-evidence` evidence decision. FAIL means the task remains incomplete.
 - Execution mode, remaining risk, or next task gate.

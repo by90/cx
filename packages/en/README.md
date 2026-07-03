@@ -8,7 +8,7 @@ Do not install both English and Chinese packages into the same target project. S
 
 cx is a workflow pack, not a component library. It defines how humans and AI keep use cases, design notes, tasks, changes, and verification evidence under `docs/cx`. Default execution completes the current task document and then edits only the one production code file bound to that task. Unit tests and TDD enter scope only when the user request, existing task document, or change document explicitly asks for them.
 
-After production code is written, `$cx-evidence` review is mandatory. Review focuses on document agreement, duplication smells, full OOP, minimal implementation, and business semantics. If review fails, the task remains incomplete.
+After code, documentation, tutorials, research, design, or process-change deliverables are produced, `$cx-review` is mandatory. Before handoff, `$cx-evidence` verifies review decisions and evidence. Review focuses on artifact-specific agreement, duplication smells, full OOP, minimal implementation, tutorial executability, research source quality, design feasibility, and business semantics. If either review fails, the task or change remains incomplete.
 
 ```text
 docs/cx/00.project.md
@@ -42,7 +42,7 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 Feature or bug:
 
 ```text
-Use $cx-workflow and select the smallest required cx skills. First use $cx-story to create or update docs/cx use-case, design, current task, and change documents. After the current task document is complete, edit only the one production code file bound to that task. Do not create or edit unit tests by default. Use $cx-tdd only when I explicitly ask for TDD, unit tests, or failing tests. Use full OOP, minimal implementation, reuse first, and avoid bloated files, overly long identifiers, and duplicated logic. After code is written, run $cx-evidence review; if review fails, do not mark the task complete.
+Use $cx-workflow and select the smallest required cx skills. First use $cx-story to create or update docs/cx use-case, design, current task, and change documents. After the current task document is complete, edit only the one production code file bound to that task. Do not create or edit unit tests by default. Use $cx-tdd only when I explicitly ask for TDD, unit tests, or failing tests. Use full OOP, minimal implementation, reuse first, and avoid bloated files, overly long identifiers, and duplicated logic. After code, documentation, tutorial, research, design, or process-change deliverables are produced, run $cx-review; before handoff run $cx-evidence. If review fails, do not mark the task complete.
 ```
 
 Python / PyTorch:
@@ -79,7 +79,8 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling |
 | `$cx-rust-tdd` | Rust type design, ownership design, optional explicit tests, and cargo fmt/clippy/test |
 | `$cx-common-module` | Reusable features, reusable classes, and public API design |
-| `$cx-evidence` | Mandatory post-code review and pre-handoff evidence review |
+| `$cx-review` | Mandatory local review after code, documentation, tutorial, research, design, or process-change deliverables |
+| `$cx-evidence` | Pre-handoff evidence review, review-decision checks, and residual risk |
 
 ## Validation
 
