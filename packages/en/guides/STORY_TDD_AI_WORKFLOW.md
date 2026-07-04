@@ -12,7 +12,7 @@ The use-case document defines the main success scenario plus conditional, altern
 4. Use `$cx-story` to read `docs/cx` project documents and the target scenario.
 5. If unfinished changes exist, read `changes/` first and let them decide current work.
 6. If adding a use case, conditional substep, or task, update the use-case document, design document, or `tasks/`.
-7. If adjusting an existing task, write a `changes/` document with timestamp, task id, task name, previous state, and next action.
+7. If later adjustment is needed after implementation, write a `changes/` document with implementation time, related object, previous state, and next action.
 8. After the task document is complete, implement that task's one production code file.
 9. Do not create or edit unit tests by default; use `$cx-tdd` and one matching unit-test file only when TDD, unit tests, or failing tests are explicitly requested.
 10. Run the narrowest validation and record command plus result.
@@ -25,8 +25,8 @@ The use-case document defines the main success scenario plus conditional, altern
 docs/cx/00.project.md
 docs/cx/01.create_user/00.use_case.md
 docs/cx/01.create_user/00.design.md
-docs/cx/01.create_user/tasks/01.write_user_entity/00.task.md
-docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
+docs/cx/01.create_user/tasks/01.write_user_entity.md
+docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 ```
 
 ## Recommended Prompt

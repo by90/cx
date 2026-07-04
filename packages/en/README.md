@@ -14,11 +14,12 @@ After code, documentation, tutorials, research, design, or process-change delive
 docs/cx/00.project.md
 docs/cx/01.create_user/00.use_case.md
 docs/cx/01.create_user/00.design.md
-docs/cx/01.create_user/tasks/01.write_user_entity/00.task.md
-docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
+docs/cx/01.create_user/tasks/01.write_user_entity.md
+docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 ```
 
 Each task's basic measure is a class or type group. One task handles one task document and one production code file; split another task before editing a second code file. Code defaults to full OOP, minimal implementation, reuse first, low duplication, and no bloated files or overly long identifiers.
+Task files use `tasks/NN.task_name.md`; change files use `changes/change_name.md` without timestamps. Changes record only later changes after implementation.
 
 Use-case granularity follows user goals: one main success scenario folder carries one user-goal use case. The main success scenario runs from trigger to completed goal, usually in 3 to 9 main steps, and each step is one observable actor-system interaction. Conditional, alternate, and exception behavior must use substep numbering such as `1.1` or `2.1` under a concrete main step, and must say whether the flow returns to a step, ends this use case, or enters another use case. Do not put several home-screen buttons, mutually exclusive choices, or complete tasks into one main success scenario. If a complex conditional flow needs its own actors, steps, and completion criteria, split it into a separate use case and index it from the project document.
 
@@ -85,7 +86,7 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 ## Validation
 
 ```bash
-python -m unittest discover -s tests
+python -m unittest discover -v -s ./tests -p "*_test.py" -t .
 python tools/validate_skill_pack.py .
 python tools/validate_cx_pack.py .
 python tools/validate_single_source.py

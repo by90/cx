@@ -15,12 +15,13 @@ cx 是工作流包，不是组件库。它规定人类和 AI 如何用 `docs/cx`
 ```text
 docs/cx/00.项目说明.md
 docs/cx/01.创建用户/00.用例.md
-docs/cx/01.创建用户/00. 设计.md
-docs/cx/01.创建用户/tasks/01.编写用户实体/00.任务.md
-docs/cx/01.创建用户/changes/20260629T120000-任务01-编写用户实体.md
+docs/cx/01.创建用户/00.设计.md
+docs/cx/01.创建用户/tasks/01.编写用户实体.md
+docs/cx/01.创建用户/changes/调整用户实体约束.md
 ```
 
 每个任务的基本量具是类或类型组合。一个任务只处理一份任务文档和一个生产代码文件；需要第二个代码文件时先拆成下一个任务。默认完整 OOP、极简、复用优先，避免过长文件、过长变量名和重复实现。
+任务文件使用 `tasks/NN.中文任务名.md`；变更文件使用 `changes/中文变更名.md` 且不带时间戳。变更只记录已经实施后的后续变化。
 
 用例粒度必须围绕用户目标：一个主成功场景文件夹只承载一个用户目标用例。主成功场景从触发写到目标达成，通常 3 到 9 个主步骤；每一步是参与者和系统之间的可观察交互。条件、替代和异常必须用 `1.1`、`2.1` 这类子编号挂到具体主步骤下，并写明后续是返回某一步、结束本用例，还是进入其它独立用例。不要把首页上的多个按钮、多个互斥选择或多个完整任务塞进一个主成功场景。复杂条件流程如果需要自己的参与者、步骤和完成标准，应拆成单独用例，并在项目说明中维护索引。
 
@@ -89,7 +90,7 @@ Rust：
 ## 验证
 
 ```bash
-python -m unittest discover -s tests
+python -m unittest discover -v -s ./tests -p "*_test.py" -t .
 python tools/validate_skill_pack.py .
 python tools/validate_cx_pack.py .
 python tools/validate_single_source.py

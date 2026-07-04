@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import datetime as dt  # datetime provides default timestamps.
 import re  # re validates scenario names, task numbers, and filename fragments.
 from pathlib import Path  # Path builds cross-platform filesystem paths.
 
@@ -49,40 +48,22 @@ def safe_filename_part(value: str) -> str:
     return cleaned  # Return the safe filename part.
 
 
-def timestamp_text(timestamp: dt.datetime | str | None = None) -> str:
-    """Generate or normalize a timestamp as YYYYMMDDTHHMMSS."""
-
-    if timestamp is None:  # Use the current local time by default.
-        actual = dt.datetime.now()  # Read the current local time.
-        return actual.strftime("%Y%m%dT%H%M%S")  # Return a sortable timestamp.
-    if isinstance(timestamp, dt.datetime):  # Datetime values need formatting.
-        return timestamp.strftime("%Y%m%dT%H%M%S")  # Return a sortable timestamp.
-    compact = timestamp.strip().replace("-", "").replace(":", "")  # Remove common timestamp separators.
-    compact = compact.replace(" ", "T")  # Convert date-time space to the standard separator.
-    if not re.fullmatch(r"\d{8}T\d{6}", compact):  # The timestamp must be sortable.
-        raise ValueError("timestamp must look like 20260629T120000")  # Report the required timestamp format.
-    return compact  # Return the normalized timestamp.
-
-
 def change_path_for(
     root: Path,
     scenario: str,
     task_number: int | str,
     task_name: str,
-    timestamp: dt.datetime | str | None = None,
 ) -> Path:
     """Compute the change document path."""
 
     scenario_name = normalize_scenario_name(scenario)  # Normalize the scenario folder name.
-    task_id = normalize_task_number(task_number)  # Normalize the task number.
+    normalize_task_number(task_number)  # Validate the task number before writing a change under it.
     safe_task_name = safe_filename_part(task_name)  # Normalize the task name for filenames.
-    stamp = timestamp_text(timestamp)  # Generate or normalize the timestamp.
-    filename = f"{stamp}-task{task_id}-{safe_task_name}.md"  # Build the change filename.
+    filename = f"{safe_task_name}.md"  # Build the timestamp-free change filename.
     return root / "docs" / "cx" / scenario_name / "changes" / filename  # Return the full change path.
 
 
 def build_change_text(
-    timestamp: str,
     task_number: str,
     task_name: str,
     previous: str,
@@ -93,7 +74,6 @@ def build_change_text(
 
     return (  # Use fixed headings so AI can parse the handoff.
         "# Change\n\n"
-        f"## Timestamp\n{timestamp}\n\n"
         f"## Status\n{status}\n\n"
         f"## Task\n{task_number}\n\n"
         f"## Task Name\n{task_name}\n\n"
@@ -110,15 +90,13 @@ def create_change_document(
     previous: str,
     current: str,
     status: str = "open",
-    timestamp: dt.datetime | str | None = None,
 ) -> Path:
     """Create one change document and return its path."""
 
     task_id = normalize_task_number(task_number)  # Normalize the task number.
-    stamp = timestamp_text(timestamp)  # Normalize the timestamp.
-    path = change_path_for(root, scenario, task_id, task_name, stamp)  # Compute the target path.
+    path = change_path_for(root, scenario, task_id, task_name)  # Compute the target path.
     path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the changes directory exists.
-    text = build_change_text(stamp, task_id, task_name, previous, current, status)  # Render the change document.
+    text = build_change_text(task_id, task_name, previous, current, status)  # Render the change document.
     path.write_text(text, encoding="utf-8")  # Write UTF-8 Markdown.
     return path  # Return the generated path.
 

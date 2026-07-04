@@ -2,24 +2,23 @@
 """校验目标仓库是否遵循 docs/cx 用例、任务与变更的单一文档来源规则。
 
 本文件提供 `validate_single_source` 入口，用于检查 `docs/cx` 下的项目说明、主成功场景、
-任务文件夹和变更文件夹。主要类是 `ScenarioFolder` 和 `ValidationReport`，主要函数是
+任务文件和变更文件。主要类是 `ScenarioFolder` 和 `ValidationReport`，主要函数是
 `validate_single_source`。
 """
 
 from __future__ import annotations
 
-import re  # 使用正则表达式校验场景文件夹、任务文件夹和变更文件命名。
+import re  # 使用正则表达式校验场景文件夹、任务文件和变更文件命名。
 from dataclasses import dataclass  # 使用 dataclass 表达校验过程中传递的不可变结果对象。
 from pathlib import Path  # 使用 Path 以面向对象方式处理跨平台文件路径。
 
 
 SCENARIO_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # 主成功场景目录必须形如 01.创建用户。
-TASK_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # 任务目录必须形如 01.编写用户实体。
-CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}-任务\d{2}-.+\.md\Z")  # 变更文件名必须携带时间戳、任务号和任务名。
+TASK_DOCUMENT_RE = re.compile(r"\d{2}\..+\.md\Z")  # 任务文件必须形如 01.编写用户实体.md。
+TIMESTAMPED_CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}")  # 变更文件名禁止携带时间戳。
 LEGACY_CX_FILE_NAMES = {"B" + "DD.md", "ENGINEERING" + "_SPEC.md", "CHANGE" + "LOG.md", "GUIDE.md"}  # 旧 cx 文件不再允许出现。
 LEGACY_CX_TEXT_RE = re.compile(r"\bB" + r"DD\b|\bGher" + r"kin\b|ENGINEERING" + r"_SPEC|CHANGE" + r"LOG")  # 旧流程关键词不应进入新 cx 文档。
 CHANGE_REQUIRED_HEADINGS = (
-    "## 时间戳",
     "## 状态",
     "## 任务",
     "## 任务名称",
@@ -39,7 +38,7 @@ class ScenarioFolder:
     root_relative: str  # 保存类似 docs/cx/01.创建用户 的可读路径。
     directory: Path  # 保存主成功场景目录的真实文件系统路径。
     usecase_path: Path  # 保存 00.用例.md 的路径。
-    design_path: Path  # 保存 00. 设计.md 的路径。
+    design_path: Path  # 保存 00.设计.md 的路径。
     tasks_path: Path  # 保存 tasks 目录的路径。
     changes_path: Path  # 保存 changes 目录的路径。
 
@@ -107,7 +106,7 @@ class ScenarioScanner:
             root_relative=f"docs/cx/{directory.name}",  # 记录面向用户的相对路径。
             directory=directory,  # 保存真实目录路径。
             usecase_path=directory / "00.用例.md",  # 计算用例文档路径。
-            design_path=directory / "00. 设计.md",  # 计算设计文档路径。
+            design_path=directory / "00.设计.md",  # 计算设计文档路径。
             tasks_path=directory / "tasks",  # 计算任务目录路径。
             changes_path=directory / "changes",  # 计算变更目录路径。
         )
@@ -148,7 +147,7 @@ def validate_scenario_folder(scenario: ScenarioFolder) -> tuple[list[str], list[
     if not scenario.usecase_path.exists():  # 每个场景必须有用例文档。
         errors.append(f"missing {scenario.root_relative}/00.用例.md")  # 报告缺失用例文档。
     if not scenario.design_path.exists():  # 每个场景必须有设计文档。
-        errors.append(f"missing {scenario.root_relative}/00. 设计.md")  # 报告缺失设计文档。
+        errors.append(f"missing {scenario.root_relative}/00.设计.md")  # 报告缺失设计文档。
     if not scenario.tasks_path.is_dir():  # 每个场景必须有任务目录。
         errors.append(f"missing {scenario.root_relative}/tasks/")  # 报告缺失任务目录。
     if not scenario.changes_path.is_dir():  # 每个场景必须有变更目录。
@@ -164,26 +163,25 @@ def validate_scenario_folder(scenario: ScenarioFolder) -> tuple[list[str], list[
 def validate_task_root(scenario: ScenarioFolder) -> list[str]:
     """校验场景的 tasks 目录。
 
-    `scenario` 是所属主成功场景；返回值是任务目录相关错误。
+    `scenario` 是所属主成功场景；返回值是任务文件相关错误。
     """
 
-    errors: list[str] = []  # 收集任务目录错误。
+    errors: list[str] = []  # 收集任务文件错误。
     if not scenario.tasks_path.exists():  # tasks 缺失时上层已经报错。
         return errors  # 直接返回，避免继续扫描不存在目录。
-    for task_file in markdown_files(scenario.tasks_path):  # tasks 根目录不应直接放任务 Markdown。
-        errors.append(f"task document must live under a task folder, not {task_file.relative_to(scenario.directory).as_posix()}")  # 报告散落任务文档。
-    task_dirs = sorted(path for path in scenario.tasks_path.iterdir() if path.is_dir())  # 收集所有任务子目录。
-    if not task_dirs:  # 至少需要一个任务目录承接用例拆分。
-        errors.append(f"missing task folders under {scenario.root_relative}/tasks/")  # 报告任务列表为空。
-    for task_dir in task_dirs:  # 逐个校验任务文件夹。
-        if not TASK_FOLDER_RE.fullmatch(task_dir.name):  # 任务文件夹也必须两位编号。
-            errors.append(f"task folder must be named like tasks/01.编写用户实体: {scenario.root_relative}/tasks/{task_dir.name}")  # 报告任务命名错误。
-        if not (task_dir / "00.任务.md").exists():  # 每个任务目录必须有唯一任务文档。
-            errors.append(f"missing {scenario.root_relative}/tasks/{task_dir.name}/00.任务.md")  # 报告缺失任务文档。
-        for task_doc in markdown_files(task_dir):  # 任务目录内只能保留一份任务文档。
-            if task_doc.name != "00.任务.md":  # 额外 Markdown 会破坏单一任务说明。
-                errors.append(f"unexpected task document: {scenario.root_relative}/tasks/{task_dir.name}/{task_doc.name}")  # 报告额外任务文档。
-    return errors  # 返回任务目录错误。
+    task_files = markdown_files(scenario.tasks_path)  # 收集 tasks 目录下的任务 Markdown 文件。
+    task_dirs = sorted(path for path in scenario.tasks_path.iterdir() if path.is_dir())  # 收集旧式任务子目录。
+    for task_dir in task_dirs:  # 逐个拒绝旧式任务子目录。
+        errors.append(f"task documents must be files under tasks/, not directory: {scenario.root_relative}/tasks/{task_dir.name}")  # 报告旧式任务目录。
+    if not task_files:  # 至少需要一个任务文件承接用例拆分。
+        errors.append(f"missing task documents under {scenario.root_relative}/tasks/")  # 报告任务列表为空。
+    for task_file in task_files:  # 逐个校验任务文件名。
+        task_path = task_file.relative_to(scenario.directory).as_posix()  # 生成场景内相对路径。
+        if task_file.name == "00.任务.md":  # 泛名任务文件不能表达任务关注点。
+            errors.append(f"task document must be named like tasks/01.编写用户实体.md, not {task_path}")  # 报告泛名任务文件。
+        elif not TASK_DOCUMENT_RE.fullmatch(task_file.name):  # 任务文件必须使用编号加中文名。
+            errors.append(f"task document must be named like tasks/01.编写用户实体.md: {scenario.root_relative}/{task_path}")  # 报告任务命名错误。
+    return errors  # 返回任务文件错误。
 
 
 def validate_change_root(scenario: ScenarioFolder) -> list[str]:
@@ -199,8 +197,8 @@ def validate_change_root(scenario: ScenarioFolder) -> list[str]:
         if child.is_dir():  # 变更目录下不应再建子目录。
             errors.append(f"change documents must be files, not directory: {scenario.root_relative}/changes/{child.name}")  # 报告多余子目录。
     for change_file in markdown_files(scenario.changes_path):  # 逐个校验变更文档。
-        if not CHANGE_FILE_RE.fullmatch(change_file.name):  # 文件名必须可排序且可定位任务。
-            errors.append(f"change file must look like 20260629T120000-任务01-任务名称.md: {scenario.root_relative}/changes/{change_file.name}")  # 报告命名错误。
+        if TIMESTAMPED_CHANGE_FILE_RE.search(change_file.name):  # 变更文件名不能继续携带时间戳。
+            errors.append(f"change file must not contain timestamp: {scenario.root_relative}/changes/{change_file.name}")  # 报告命名错误。
         change_text = read_text(change_file)  # 读取变更文件内容。
         for heading in CHANGE_REQUIRED_HEADINGS:  # 检查所有必要章节。
             if heading not in change_text:  # 缺少章节会让 AI 无法判断当前工作。

@@ -24,28 +24,37 @@ Review whether the work is supported by the current `docs/cx` use case, design d
 2. Does the target scenario have a use-case document, design document, `tasks/`, and `changes/`?
 3. Did the agent inspect unfinished changes before choosing work?
 4. Does the current task map to one task document?
-5. Does the task name one production code file, and was any second code file split into another task?
-6. Is the task measure a class or type group?
-7. Was the execution mode recorded; did default work stop at the current task and code-file boundary unless continuation was explicitly requested?
-8. Were unit tests or TDD explicitly requested before any test file was created, edited, or run?
-9. When tests were explicitly requested, is there a failing-test-first record and mirrored test layout where applicable?
-10. Did Python use `uv`, and did Rust use `cargo fmt` plus `cargo test` only when relevant?
-11. Does every produced code, documentation, tutorial, research, design, process-change, or release-note artifact have a `$cx-review` PASS decision?
-12. If any artifact type lacks review, does it remain incomplete rather than being written as complete?
-13. Are verification commands and results recorded in the current task or change document?
-14. Are there stray planning documents outside `docs/cx`?
-15. Was reusable code checked through `$cx-common-module` before adding new common logic?
-16. Is the implementation full OOP where state, lifecycle, invariants, or domain collaboration are present?
-17. Is the code minimal and reusable, with no bloated files, overly long identifiers, sentence-like names, or duplicated logic?
-18. Does the implementation cover every expected behavior in the task document and avoid behavior outside the task scope?
-19. Does the implementation match the main success scenario, conditional substeps, success path, error exposure, and ending conditions?
-20. Does the implementation match the design document's reusable entrypoints, common-code usage, decisions, and non-goals?
-21. Are there no extra validations, prechecks, intermediate variables, parameters, variable-name duplicates, or parameter-name duplicates?
-22. Do documentation deliverables have a clear audience, goal, scope, status, single home, and no stale or unsupported claims?
-23. Are tutorial deliverables executable in order, with prerequisites, commands, expected outputs, and failure handling?
-24. Do research deliverables define the question, date window, inclusion/exclusion criteria, target reader, source quality, limits, and citations for non-obvious claims?
-25. Do design deliverables state target behavior, constraints, invariants, public entrypoints, reuse boundaries, non-goals, tradeoffs, and implementable task boundaries?
-26. Are all required artifact review decisions PASS; if not, does the task, change, or deliverable remain incomplete?
+5. Does each task file use `tasks/NN.task_name.md`, and is there no generic `00.task.md` task file?
+6. Does the task name one production code file, and was any second code file split into another task?
+7. Is the task measure a class or type group?
+8. Was the execution mode recorded; did default work stop at the current task and code-file boundary unless continuation was explicitly requested?
+9. Do documents state concrete facts, concrete actions, and concrete decisions, without filler, repeated goals, missing "what to do", or undefined invented terms?
+10. Do project documents, use cases, designs, and tasks avoid repeating the same goals across all documents?
+11. Do change documents record only later changes after implementation, and do change filenames have no timestamps?
+12. Were unit tests or TDD explicitly requested before any test file was created, edited, or run?
+13. When tests were explicitly requested, is there a failing-test-first record and mirrored test layout where applicable?
+14. Do Python `src/`, `tests/`, and every subdirectory under them contain blank `__init__.py` files?
+15. Do project imports use absolute imports from the repository root, and do tests avoid modifying `sys.path`?
+16. Are explicit Python unit tests discoverable from the VS Code test view, or was the equivalent command `uv run python -m unittest discover -v -s ./tests -p "*_test.py" -t .` run?
+17. Did Python use `uv`, and did Rust use `cargo fmt` plus `cargo test` only when relevant?
+18. Does every produced code, documentation, tutorial, research, design, process-change, or release-note artifact have a `$cx-review` PASS decision?
+19. If any artifact type lacks review, does it remain incomplete rather than being written as complete?
+20. Are verification commands and results recorded in the current task or change document?
+21. Are there stray planning documents outside `docs/cx`?
+22. Was reusable code checked through `$cx-common-module` before adding new common logic?
+23. Is the implementation full OOP where state, lifecycle, invariants, or domain collaboration are present?
+24. Is the code minimal and reusable, with no bloated files, overly long identifiers, sentence-like names, or duplicated logic?
+25. Are configuration defaults written as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`, and stored on same-named fields?
+26. Do common packages under `src/<subsystem>/` include package-local `readme.md` files that list public APIs and usage?
+27. Does the implementation cover every expected behavior in the task document and avoid behavior outside the task scope?
+28. Does the implementation match the main success scenario, conditional substeps, success path, error exposure, and ending conditions?
+29. Does the implementation match the design document's reusable entrypoints, common-code usage, decisions, and non-goals?
+30. Are there no extra validations, prechecks, intermediate variables, parameters, variable-name duplicates, or parameter-name duplicates?
+31. Do documentation deliverables have a clear audience, goal, scope, status, single home, and no stale or unsupported claims?
+32. Are tutorial deliverables executable in order, with prerequisites, commands, expected outputs, and failure handling?
+33. Do research deliverables define the question, date window, inclusion/exclusion criteria, target reader, source quality, limits, and citations for non-obvious claims?
+34. Do design deliverables state target behavior, constraints, invariants, public entrypoints, reuse boundaries, non-goals, tradeoffs, and implementable task boundaries?
+35. Are all required artifact review decisions PASS; if not, does the task, change, or deliverable remain incomplete?
 
 ## Output
 

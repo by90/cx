@@ -1,6 +1,6 @@
 # Change
 
-## Timestamp
+## Implementation Time
 
 TODO
 
@@ -8,11 +8,7 @@ TODO
 
 open
 
-## Task
-
-TODO
-
-## Task Name
+## Related Object
 
 TODO
 
@@ -23,6 +19,10 @@ TODO
 ## What Should Happen Now
 
 TODO
+
+## File Naming
+
+Change files live under `changes/`, use a descriptive change name, and do not include timestamps. Changes record only later changes after implementation.
 
 ## Verification
 

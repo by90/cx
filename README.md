@@ -44,8 +44,8 @@ If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 2. `$cx-story` maintains use cases, design notes, tasks, and changes under `docs/cx`.
 3. Each main success scenario has one folder, such as `docs/cx/01.create_user/`.
 4. Each scenario folder contains `00.use_case.md`, `00.design.md`, `tasks/`, and `changes/`.
-5. Each task is a folder, such as `tasks/01.write_user_entity/00.task.md`.
-6. Each change is written under `changes/<timestamp>-task<id>-<task_name>.md`; AI checks unfinished changes before choosing work.
+5. Each task is one Markdown file, such as `tasks/01.write_user_entity.md`.
+6. Each change is written under `changes/<change_name>.md` without a timestamp in the filename; changes record only later changes after implementation. AI checks unfinished changes before choosing work.
 7. One task handles one task document and one production code file. Split another task before editing a second code file. Add one matching unit-test file only when unit tests or TDD are explicitly requested.
 8. One main success scenario folder carries one user-goal use case. The main success scenario usually has 3 to 9 main steps from trigger to completed goal and does not bundle several mutually exclusive choices, page buttons, or complete tasks.
 9. Conditional, alternate, and exception behavior must use substep numbering such as `1.1` or `2.1` under a concrete main step, and must say whether the flow returns to a step, ends this use case, or enters another use case.
@@ -65,9 +65,9 @@ docs/cx/01.create_user/
 docs/cx/01.create_user/00.use_case.md
 docs/cx/01.create_user/00.design.md
 docs/cx/01.create_user/tasks/
-docs/cx/01.create_user/tasks/01.write_user_entity/00.task.md
+docs/cx/01.create_user/tasks/01.write_user_entity.md
 docs/cx/01.create_user/changes/
-docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
+docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 ```
 
 All cx scenario, task, process, and change documents belong under `docs/cx`. Documents elsewhere are unrelated to cx.

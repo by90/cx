@@ -27,20 +27,25 @@ Read, in order:
 2. The task measure is a class or type group.
 3. One task changes one production code file and one matching unit-test file.
 4. Python tests mirror `src`: `src/subsystem/name.py` maps to `tests/subsystem/name_test.py`.
-5. Rust uses built-in tests and `cargo test`.
-6. Write the failing test first and report the expected failure.
-7. Implement the smallest change that passes.
-8. Refactor only within the current task boundary.
-9. Do not weaken assertions to make a test pass.
-10. After code passes explicitly requested tests, run `$cx-review` code-deliverable review for document agreement, duplication smells, full OOP, minimal implementation, and business semantics.
-11. If review fails, do not mark the task complete; fix implementation or docs, then rerun tests and review.
-12. Record verification commands, results, `$cx-review` decision, `$cx-evidence` evidence decision, and residual gaps in the current task or change document.
+5. Python `src/`, `tests/`, and every subdirectory under them must contain blank `__init__.py` files.
+6. Project imports use absolute imports from the repository root, for example `from src.config.config import Config`; tests must not modify `sys.path`.
+7. Explicit Python unit tests must be discoverable and runnable from the VS Code test view; use unittest discovery arguments `-v -s ./tests -p *_test.py -t .`.
+8. Rust uses built-in tests and `cargo test`.
+9. Write the failing test first and report the expected failure.
+10. Implement the smallest change that passes.
+11. Refactor only within the current task boundary.
+12. Do not weaken assertions to make a test pass.
+13. After code passes explicitly requested tests, run `$cx-review` code-deliverable review for document agreement, duplication smells, full OOP, minimal implementation, and business semantics.
+14. If review fails, do not mark the task complete; fix implementation or docs, then rerun tests and review.
+15. Record verification commands, results, `$cx-review` decision, `$cx-evidence` evidence decision, and residual gaps in the current task or change document.
 
 ## Python Expectations
 
 - Use `uv` managed Python.
 - Use `unittest` unless the project already uses another framework.
 - Use full OOP for state, lifecycle, invariants, and domain collaboration.
+- Constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields.
+- Common packages under `src/<subsystem>/` include package-local `readme.md` files that explain public APIs and usage.
 - Do not use dynamic reflection by default.
 - Do not add command-line parameters to target-project scripts.
 

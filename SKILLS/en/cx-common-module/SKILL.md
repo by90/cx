@@ -23,7 +23,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Do not put per-item data-validity checks inside large loops, training loops, hot paths, or batch processing to fall back or slow the system down. Handle data validity at entrypoints, data preparation, test fixtures, or separate diagnostic tasks, and never use those checks to replace real failures.
 - By default, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
 - Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
-- Prefer expressing defaults through function or constructor parameters; do not promote simple paths, filenames, or one-off defaults to module-level constants.
+- Prefer expressing defaults through function or constructor parameters. Configuration defaults should be written directly as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field, for example `self.batch_size = batch_size`.
 - Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
 - Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
 - Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
@@ -41,6 +41,7 @@ Special-case entrypoint:
 Instance or state lifecycle:
 State source:
 How verification covers all source call sites:
+readme public API section:
 Non-goals:
 ```
 
@@ -50,6 +51,7 @@ The abstraction boundary must answer four questions:
 2. Does the caller need to know one less thing?
 3. When adding a peer capability, config section, field, or data source, can we change data declarations rather than control-flow code?
 4. Does a helper have at least two real call sites, or truly isolate real complexity?
+5. Does this common package include a package-local `readme.md` that explains public APIs and usage?
 
 If the answers do not support abstraction, inline the logic or keep the direct implementation.
 
@@ -80,6 +82,7 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 
 - Search evidence and candidate comparison.
 - Public API proposal with public entrypoint, normal call style, special-case entrypoint, lifecycle, state source, inputs, outputs, error policy, and a minimal example.
+- Package-local `readme.md` that lists public APIs and usage; do not list instance config sections, internal fields, or implementation steps as public API documentation.
 - Verification approach, preferably covering real small data and edge cases; use tests first only when unit tests or TDD are explicitly requested.
 - Backward-compatible migration plan describing which call sites move and which stay unchanged.
 - Reusable capability notes in the target `docs/cx` design document.
@@ -90,7 +93,7 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 
 - Any reusable-capability code or explicitly requested tests added or edited by this skill must follow comprehensive comments: file-level explanations must state file purpose and main classes, functions, or test targets; classes/types need responsibility explanations; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; every line of business code and test business logic needs an adjacent intent comment.
 - Generic capabilities, reusable classes, reusable components, and common modules must be minimal, stable, and low-coupling. Do not abstract for its own sake, and do not copy repeated logic into multiple similar implementations.
-- Python reusable capabilities should express default behavior with type annotations and default parameters. Do not stack long parameter-case branches inside `__init__`.
+- Python reusable capabilities should express default behavior with type annotations and default parameters. Configuration defaults should be written directly as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field, for example `self.batch_size = batch_size`. Do not stack long `None` or parameter-case branches inside `__init__`.
 - Public APIs must use explicit OOP or static interfaces. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default.
 
 ## Registry Fields

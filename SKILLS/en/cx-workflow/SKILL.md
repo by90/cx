@@ -24,17 +24,21 @@ Use this skill first when a user request needs workflow routing or several cx sk
 1. Development tasks are use-case driven and live under `docs/cx`.
 2. Every main success scenario has one folder.
 3. Every scenario folder has a use-case document, design document, `tasks/`, and `changes/`.
-4. A task folder starts at `01.` and owns one task document.
-5. A task's basic measure is a class or type group.
-6. A task touches one task document and one production code file; if a second code file is needed, split the next task first.
-7. Unit tests are not default deliverables. Create, edit, or run unit tests only when the current user request, existing task document, or change document explicitly asks for unit tests, TDD, failing tests, or red-green-refactor.
-8. Python, PyTorch, and Rust work follow full OOP or equivalent type modeling for state, lifecycle, invariants, and domain collaboration.
-9. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse.
-10. Default execution is one-task/one-code-file: complete the current task document, edit only the bound production code file, report the result, and continue to another code file only when the user explicitly asks for multi-task continuation.
-11. After any code, documentation, tutorial, research, design, process-change, or release-note deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete.
-12. If review fails, the task, change, or deliverable remains incomplete until the implementation, document, tutorial, research, design, or process record is fixed and reviewed again.
-13. Code review checks exact agreement with the use-case, design, task, and change documents; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit.
-14. Documentation, tutorial, research, and design review check single source of truth, tutorial executability, source quality and synthesis, design feasibility, and business meaning. Any failed required deliverable review blocks completion.
+4. cx documents state concrete facts, concrete actions, and concrete decisions. Avoid filler, repeated goals, missing "what to do", and undefined invented terms.
+5. A task is one Markdown file under `tasks/`, starts at `01.`, and does not use a generic `00.task.md` filename.
+6. A change is one Markdown file under `changes/`, has no timestamp in the filename, and records only later changes after implementation.
+7. A task's basic measure is a class or type group.
+8. A task touches one task document and one production code file; if a second code file is needed, split the next task first.
+9. Unit tests are not default deliverables. Create, edit, or run unit tests only when the current user request, existing task document, or change document explicitly asks for unit tests, TDD, failing tests, or red-green-refactor.
+10. Python, PyTorch, and Rust work follow full OOP or equivalent type modeling for state, lifecycle, invariants, and domain collaboration.
+11. Python constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
+12. Common packages under `src/<subsystem>/` must include package-local `readme.md` files that explain public APIs and usage.
+13. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse.
+14. Default execution is one-task/one-code-file: complete the current task document, edit only the bound production code file, report the result, and continue to another code file only when the user explicitly asks for multi-task continuation.
+15. After any code, documentation, tutorial, research, design, process-change, or release-note deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete.
+16. If review fails, the task, change, or deliverable remains incomplete until the implementation, document, tutorial, research, design, or process record is fixed and reviewed again.
+17. Code review checks exact agreement with the use-case, design, task, and change documents; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit.
+18. Documentation, tutorial, research, and design review check single source of truth, tutorial executability, source quality and synthesis, design feasibility, and business meaning. Any failed required deliverable review blocks completion.
 
 ## Skill Selection
 

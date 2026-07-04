@@ -2,7 +2,7 @@
 """Validate the docs/cx use-case, task, and change single-source policy.
 
 This file exposes `validate_single_source` for checking project-level docs, scenario folders,
-task folders, and change folders under `docs/cx`. Main classes are `ScenarioFolder` and
+task documents, and change documents under `docs/cx`. Main classes are `ScenarioFolder` and
 `ValidationReport`.
 """
 
@@ -14,12 +14,11 @@ from pathlib import Path  # Use Path for object-oriented cross-platform filesyst
 
 
 SCENARIO_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # A main success scenario folder looks like 01.create_user.
-TASK_FOLDER_RE = re.compile(r"\d{2}\..+\Z")  # A task folder looks like 01.write_user_entity.
-CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}-task\d{2}-.+\.md\Z")  # A change file carries timestamp, task id, and task name.
+TASK_DOCUMENT_RE = re.compile(r"\d{2}\..+\.md\Z")  # A task document looks like 01.write_user_entity.md.
+TIMESTAMPED_CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}")  # Change filenames must not carry timestamps.
 LEGACY_CX_FILE_NAMES = {"B" + "DD.md", "ENGINEERING" + "_SPEC.md", "CHANGE" + "LOG.md", "GUIDE.md"}  # Old cx files are not allowed.
 LEGACY_CX_TEXT_RE = re.compile(r"\bB" + r"DD\b|\bGher" + r"kin\b|ENGINEERING" + r"_SPEC|CHANGE" + r"LOG")  # Old workflow words are not allowed in cx docs.
 CHANGE_REQUIRED_HEADINGS = (
-    "## Timestamp",
     "## Status",
     "## Task",
     "## Task Name",
@@ -145,19 +144,18 @@ def validate_task_root(scenario: ScenarioFolder) -> list[str]:
     errors: list[str] = []  # Collect task errors.
     if not scenario.tasks_path.exists():  # The caller already reports a missing tasks directory.
         return errors  # Stop scanning this missing directory.
-    for task_file in markdown_files(scenario.tasks_path):  # Task docs must not live directly under tasks.
-        errors.append(f"task document must live under a task folder, not {task_file.relative_to(scenario.directory).as_posix()}")  # Report a stray task doc.
-    task_dirs = sorted(path for path in scenario.tasks_path.iterdir() if path.is_dir())  # Collect task subfolders.
-    if not task_dirs:  # A scenario needs at least one task folder.
-        errors.append(f"missing task folders under {scenario.root_relative}/tasks/")  # Report an empty task list.
-    for task_dir in task_dirs:  # Validate each task folder.
-        if not TASK_FOLDER_RE.fullmatch(task_dir.name):  # Task folders use the same two-digit style.
-            errors.append(f"task folder must be named like tasks/01.write_user_entity: {scenario.root_relative}/tasks/{task_dir.name}")  # Report bad task naming.
-        if not (task_dir / "00.task.md").exists():  # Each task folder needs one task document.
-            errors.append(f"missing {scenario.root_relative}/tasks/{task_dir.name}/00.task.md")  # Report a missing task document.
-        for task_doc in markdown_files(task_dir):  # Only one task Markdown file is allowed.
-            if task_doc.name != "00.task.md":  # Extra Markdown files break the single-task-document rule.
-                errors.append(f"unexpected task document: {scenario.root_relative}/tasks/{task_dir.name}/{task_doc.name}")  # Report the extra file.
+    task_files = markdown_files(scenario.tasks_path)  # Collect task Markdown files directly under tasks/.
+    task_dirs = sorted(path for path in scenario.tasks_path.iterdir() if path.is_dir())  # Collect old-style task directories.
+    for task_dir in task_dirs:  # Reject old-style task directories.
+        errors.append(f"task documents must be files under tasks/, not directory: {scenario.root_relative}/tasks/{task_dir.name}")  # Report the old task folder.
+    if not task_files:  # A scenario needs at least one task document.
+        errors.append(f"missing task documents under {scenario.root_relative}/tasks/")  # Report an empty task list.
+    for task_file in task_files:  # Validate each task document.
+        task_path = task_file.relative_to(scenario.directory).as_posix()  # Build the scenario-relative task path.
+        if task_file.name == "00.task.md":  # Generic task filenames hide the task concern.
+            errors.append(f"task document must be named like tasks/01.write_user_entity.md, not {task_path}")  # Report the generic task file.
+        elif not TASK_DOCUMENT_RE.fullmatch(task_file.name):  # Task files must use a numbered name.
+            errors.append(f"task document must be named like tasks/01.write_user_entity.md: {scenario.root_relative}/{task_path}")  # Report bad task naming.
     return errors  # Return task errors.
 
 
@@ -171,8 +169,8 @@ def validate_change_root(scenario: ScenarioFolder) -> list[str]:
         if child.is_dir():  # Changes should be files, not nested directories.
             errors.append(f"change documents must be files, not directory: {scenario.root_relative}/changes/{child.name}")  # Report nested change dirs.
     for change_file in markdown_files(scenario.changes_path):  # Validate each change document.
-        if not CHANGE_FILE_RE.fullmatch(change_file.name):  # The file name must sort and identify a task.
-            errors.append(f"change file must look like 20260629T120000-task01-task_name.md: {scenario.root_relative}/changes/{change_file.name}")  # Report bad change naming.
+        if TIMESTAMPED_CHANGE_FILE_RE.search(change_file.name):  # Change filenames must stay timestamp-free.
+            errors.append(f"change file must not contain timestamp: {scenario.root_relative}/changes/{change_file.name}")  # Report bad change naming.
         change_text = read_text(change_file)  # Read the change document.
         for heading in CHANGE_REQUIRED_HEADINGS:  # Check every required heading.
             if heading not in change_text:  # Missing headings prevent AI from resuming work safely.

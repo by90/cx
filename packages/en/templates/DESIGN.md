@@ -12,6 +12,18 @@
 | --- | --- | --- |
 | TODO | TODO | TODO |
 
+## Public APIs
+
+- Public entrypoint: TODO
+- Normal call style: TODO
+- Special-case entrypoint: TODO
+- Package readme: TODO; common packages must list public APIs and usage.
+
+## Default Parameters
+
+- Configuration default: TODO; for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`.
+- Field storage: TODO; use `self.xx = xx` inside the function body.
+
 ## Design Decisions
 
 | Decision | Reason | Impact |

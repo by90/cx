@@ -25,12 +25,12 @@ class TestNewChange(unittest.TestCase):
                 "编写用户实体",
                 "尚未实现用户实体。",
                 "先写用户实体测试，再实现实体类。",
-                timestamp="20260629T120000",
             )
             text = path.read_text(encoding="utf-8")  # 读取生成的变更文档。
 
-        self.assertEqual(path.name, "20260629T120000-任务01-编写用户实体.md")  # 文件名必须包含时间戳、任务号和任务名。
+        self.assertEqual(path.name, "编写用户实体.md")  # 文件名必须只使用变更名，不带时间戳。
         self.assertIn("docs\\cx\\01.创建用户\\changes", str(path))  # 路径必须位于指定场景 changes 目录。
+        self.assertNotIn("时间戳", text)  # 变更正文不能继续保留旧式时间戳章节。
         self.assertIn("## 之前做了什么\n尚未实现用户实体。", text)  # 文档必须记录之前状态。
         self.assertIn("## 现在应该如何\n先写用户实体测试，再实现实体类。", text)  # 文档必须记录下一步动作。
 
@@ -49,11 +49,10 @@ class TestNewChange(unittest.TestCase):
                 "补充条件子步骤",
                 "已有主成功场景。",
                 "补充条件子步骤并更新任务。",
-                timestamp="20260629T121500",
             )
 
         self.assertEqual(path.parent, root / "docs" / "cx" / "01.创建用户" / "changes")  # 父目录必须只包含一层 docs/cx。
-        self.assertEqual(path.name, "20260629T121500-任务02-补充条件子步骤.md")  # 文件名必须使用传入任务号。
+        self.assertEqual(path.name, "补充条件子步骤.md")  # 文件名必须只使用变更名。
 
     def test_rejects_bad_scenario_name(self) -> None:
         """场景名不符合 01.创建用户 格式时应拒绝。
@@ -71,7 +70,6 @@ class TestNewChange(unittest.TestCase):
                     "编写用户实体",
                     "无。",
                     "实现。",
-                    timestamp="20260629T120000",
                 )
 
     def test_rejects_bad_task_number(self) -> None:
@@ -90,7 +88,6 @@ class TestNewChange(unittest.TestCase):
                     "编写用户实体",
                     "无。",
                     "实现。",
-                    timestamp="20260629T120000",
                 )
 
 

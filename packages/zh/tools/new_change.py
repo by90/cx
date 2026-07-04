@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import datetime as dt  # datetime 用于生成默认时间戳。
 import re  # re 用于校验场景、任务编号和文件名片段。
 from pathlib import Path  # Path 用于以面向对象方式拼接跨平台路径。
 
@@ -62,47 +61,26 @@ def safe_filename_part(value: str) -> str:
     return cleaned  # 返回安全文件名片段。
 
 
-def timestamp_text(timestamp: dt.datetime | str | None = None) -> str:
-    """生成或规范化变更时间戳。
-
-    `timestamp` 可以为空、datetime 或字符串；返回值是 `YYYYMMDDTHHMMSS` 格式文本。
-    """
-
-    if timestamp is None:  # 调用方未传时间时使用当前本地时间。
-        actual = dt.datetime.now()  # 获取当前本地时间。
-        return actual.strftime("%Y%m%dT%H%M%S")  # 返回文件名友好的时间戳。
-    if isinstance(timestamp, dt.datetime):  # datetime 对象需要格式化。
-        return timestamp.strftime("%Y%m%dT%H%M%S")  # 返回文件名友好的时间戳。
-    compact = timestamp.strip().replace("-", "").replace(":", "")  # 移除常见时间分隔符。
-    compact = compact.replace(" ", "T")  # 允许 `YYYYMMDD HHMMSS` 转为标准形式。
-    if not re.fullmatch(r"\d{8}T\d{6}", compact):  # 时间戳必须稳定可排序。
-        raise ValueError("timestamp must look like 20260629T120000")  # 报告明确的时间戳格式。
-    return compact  # 返回规范化时间戳。
-
-
 def change_path_for(
     root: Path,
     scenario: str,
     task_number: int | str,
     task_name: str,
-    timestamp: dt.datetime | str | None = None,
 ) -> Path:
     """计算变更文档路径。
 
     `root` 是仓库根目录，`scenario` 是主成功场景，`task_number` 是任务号，`task_name` 是任务名，
-    `timestamp` 是可选时间戳；返回值是目标变更文档路径。
+    返回值是目标变更文档路径。
     """
 
     scenario_name = normalize_scenario_name(scenario)  # 规范化场景文件夹名。
-    task_id = normalize_task_number(task_number)  # 规范化任务编号。
+    normalize_task_number(task_number)  # 校验任务编号，避免调用方把变更挂到无效任务上。
     safe_task_name = safe_filename_part(task_name)  # 规范化任务名称文件名片段。
-    stamp = timestamp_text(timestamp)  # 生成或规范化时间戳。
-    filename = f"{stamp}-任务{task_id}-{safe_task_name}.md"  # 组合变更文件名。
+    filename = f"{safe_task_name}.md"  # 变更文件名只使用中文变更名，不带时间戳。
     return root / "docs" / "cx" / scenario_name / "changes" / filename  # 返回完整变更文件路径。
 
 
 def build_change_text(
-    timestamp: str,
     task_number: str,
     task_name: str,
     previous: str,
@@ -111,13 +89,12 @@ def build_change_text(
 ) -> str:
     """渲染变更文档内容。
 
-    `timestamp` 是文件时间戳，`task_number` 是任务号，`task_name` 是任务名，`previous` 是之前状态，
+    `task_number` 是任务号，`task_name` 是任务名，`previous` 是之前状态，
     `current` 是现在应该如何处理，`status` 是变更状态；返回值是 Markdown 文本。
     """
 
     return (  # 使用固定章节保证 AI 可以稳定解析。
         "# 变更\n\n"
-        f"## 时间戳\n{timestamp}\n\n"
         f"## 状态\n{status}\n\n"
         f"## 任务\n{task_number}\n\n"
         f"## 任务名称\n{task_name}\n\n"
@@ -134,20 +111,17 @@ def create_change_document(
     previous: str,
     current: str,
     status: str = "未完成",
-    timestamp: dt.datetime | str | None = None,
 ) -> Path:
     """创建一份变更文档。
 
     `root` 是仓库根目录，`scenario` 是主成功场景，`task_number` 是任务号，`task_name` 是任务名，
-    `previous` 是之前状态，`current` 是现在应该如何处理，`status` 是变更状态，`timestamp` 是可选
-    时间戳；返回值是写入的变更文件路径。
+    `previous` 是之前状态，`current` 是现在应该如何处理，`status` 是变更状态；返回值是写入的变更文件路径。
     """
 
     task_id = normalize_task_number(task_number)  # 规范化任务编号。
-    stamp = timestamp_text(timestamp)  # 规范化时间戳。
-    path = change_path_for(root, scenario, task_id, task_name, stamp)  # 计算目标文件路径。
+    path = change_path_for(root, scenario, task_id, task_name)  # 计算目标文件路径。
     path.parent.mkdir(parents=True, exist_ok=True)  # 确保 changes 目录存在。
-    text = build_change_text(stamp, task_id, task_name, previous, current, status)  # 渲染变更文档内容。
+    text = build_change_text(task_id, task_name, previous, current, status)  # 渲染变更文档内容。
     path.write_text(text, encoding="utf-8")  # 以 UTF-8 无 BOM 写入 Markdown。
     return path  # 返回生成的文件路径。
 

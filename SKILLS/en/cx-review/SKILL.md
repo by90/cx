@@ -25,6 +25,7 @@ Run local review after any deliverable is produced and before marking a task or 
 - No repeated checks, transformations, config reads, field passing, similar helpers, or several locals naming the same concept.
 - Full OOP is used when state, lifecycle, invariants, or domain collaboration are present.
 - Implementation is minimal: no extra validation, fallbacks, exception wrapping, variable passing, parameters, redundant names, bloated files, or abstractions without real reuse.
+- Constructors and functions use default parameters for configuration defaults, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
 
 ### Documentation
 
@@ -32,6 +33,11 @@ Run local review after any deliverable is produced and before marking a task or 
 - Content matches project notes, use cases, design, tasks, changes, code behavior, and verification evidence.
 - No scattered documents, duplicate explanations, stale claims, conflicting rules, vague TODOs, or unsupported conclusions.
 - Structure is short and actionable instead of repeating background or narrative filler.
+- Documents state concrete facts, concrete actions, and concrete decisions, with no filler, repeated goals, missing "what to do", or undefined invented terms.
+- Project documents, use cases, designs, and tasks each own their own content; the same goals are not repeated across all of them.
+- Use cases express business scenarios, main success scenarios, conditional substeps, and sub-use cases, not test plans or implementation tasks.
+- Task files use `tasks/NN.task_name.md`, change files use `changes/change_name.md` without timestamps, and change documents record only later changes after implementation.
+- Common packages under `src/<subsystem>/` have package-local `readme.md` files that list public APIs and usage, not instance config sections, internal fields, or implementation steps as public-interface documentation.
 
 ### Tutorial
 

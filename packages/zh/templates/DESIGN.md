@@ -1,4 +1,4 @@
-# 00. 设计.md
+# 00.设计.md
 
 ## 可复用代码
 
@@ -11,6 +11,18 @@
 | 能力 | 建议入口 | 复用理由 |
 | --- | --- | --- |
 | TODO | TODO | TODO |
+
+## 公共接口
+
+- 公共入口：TODO
+- 常规调用方式：TODO
+- 特殊场景入口：TODO
+- 包内 readme：TODO；通用包必须列出公共接口和使用方式。
+
+## 默认参数
+
+- 配置默认值：TODO；例如 `path=Config.default_config_file()` 或 `batch_size=config.train.batch_size`。
+- 字段承载：TODO；函数体内使用 `self.xx = xx`。
 
 ## 设计决策
 

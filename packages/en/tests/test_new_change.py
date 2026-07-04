@@ -22,12 +22,12 @@ class TestNewChange(unittest.TestCase):
                 "write_user_entity",
                 "No user entity exists yet.",
                 "Write the user entity test first, then implement the entity class.",
-                timestamp="20260629T120000",
             )
             text = path.read_text(encoding="utf-8")  # Read the generated document.
 
-        self.assertEqual(path.name, "20260629T120000-task01-write_user_entity.md")  # The filename must carry timestamp, task id, and task name.
+        self.assertEqual(path.name, "write_user_entity.md")  # The filename must use the change name without a timestamp.
         self.assertIn("docs\\cx\\01.create_user\\changes", str(path))  # The path must target the scenario changes directory.
+        self.assertNotIn("Timestamp", text)  # The generated document must not keep the old timestamp heading.
         self.assertIn("## What Was Done Before\nNo user entity exists yet.", text)  # The document must preserve previous state.
         self.assertIn("## What Should Happen Now\nWrite the user entity test first, then implement the entity class.", text)  # The document must preserve next action.
 
@@ -43,11 +43,10 @@ class TestNewChange(unittest.TestCase):
                 "add_conditional_substep",
                 "The main success scenario exists.",
                 "Add the conditional substep and update tasks.",
-                timestamp="20260629T121500",
             )
 
         self.assertEqual(path.parent, root / "docs" / "cx" / "01.create_user" / "changes")  # The prefix must not be duplicated.
-        self.assertEqual(path.name, "20260629T121500-task02-add_conditional_substep.md")  # The filename must preserve the task id.
+        self.assertEqual(path.name, "add_conditional_substep.md")  # The filename must use the change name only.
 
     def test_rejects_bad_scenario_name(self) -> None:
         """Bad scenario names should be rejected."""
@@ -62,7 +61,6 @@ class TestNewChange(unittest.TestCase):
                     "write_user_entity",
                     "None.",
                     "Implement.",
-                    timestamp="20260629T120000",
                 )
 
     def test_rejects_bad_task_number(self) -> None:
@@ -78,7 +76,6 @@ class TestNewChange(unittest.TestCase):
                     "write_user_entity",
                     "None.",
                     "Implement.",
-                    timestamp="20260629T120000",
                 )
 
 

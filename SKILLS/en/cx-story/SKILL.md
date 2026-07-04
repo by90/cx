@@ -1,6 +1,6 @@
 ---
 name: cx-story
-description: Use for use-case-driven story discovery, main success scenario folders, task folders, change folders, single-current-document discipline, unfinished-change-first execution, and limiting each task to one task document plus one production code file; add a unit-test file only when tests are explicitly requested.
+description: Use for use-case-driven story discovery, main success scenario folders, task documents, change documents, single-current-document discipline, unfinished-change-first execution, and limiting each task to one task document plus one production code file; add a unit-test file only when tests are explicitly requested.
 version: 0.1.0
 ---
 
@@ -9,6 +9,18 @@ version: 0.1.0
 ## Purpose
 
 Use this skill before implementation and validation. cx uses use-case-driven story documents instead of the old scenario-expression workflow. Reusable-code scenarios and business scenarios use the same structure: a main success scenario plus conditional substeps attached to concrete main-success steps.
+
+## Current Hard Rules
+
+1. Documents must state concrete facts, concrete actions, and concrete decisions. Avoid filler, repeated goals, missing "what to do", and undefined invented terms.
+2. Project documents contain project goals, key terms, design constraints, and use-case indexes. Number goals with `1. 2. 3.` and state the target result plus why it is needed.
+3. Use cases contain actors, preconditions, triggers, main success scenario, step-attached conditional substeps, sub-use cases, and observable completion. Do not write test plans, implementation tasks, or repeated project goals in use-case bodies.
+4. Design documents contain file scope, public entrypoints, reusable capabilities, design decisions, tradeoff reasons, and verification. Task documents contain what to do, file scope, task measure, verification, and status.
+5. Define new terms on first use and prefer user/project terms.
+6. `tasks/` contains one Markdown file per task, named `NN.task_name.md`; do not create generic `00.task.md` files.
+7. `changes/` contains one Markdown file per later implemented change, without timestamps in filenames. Do not create change documents for unimplemented planning.
+8. Common packages under `src/<subsystem>/` must include a package-local `readme.md` that explains public APIs and usage.
+9. Python configuration defaults should be written as function or constructor default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field.
 
 ## docs/cx Layout
 
@@ -21,12 +33,12 @@ docs/cx/01.create_user/
 docs/cx/01.create_user/00.use_case.md
 docs/cx/01.create_user/00.design.md
 docs/cx/01.create_user/tasks/
-docs/cx/01.create_user/tasks/01.write_user_entity/00.task.md
+docs/cx/01.create_user/tasks/01.write_user_entity.md
 docs/cx/01.create_user/changes/
-docs/cx/01.create_user/changes/20260629T120000-task01-write_user_entity.md
+docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 ```
 
-Chinese projects may use Chinese file names such as `00.项目说明.md`, `00.用例.md`, and `00. 设计.md`. English projects use the same folder responsibilities with English names.
+Chinese projects may use Chinese file names such as `00.项目说明.md`, `00.用例.md`, and `00.设计.md`. English projects use the same folder responsibilities with English names.
 
 ## Workflow Rules
 
@@ -34,7 +46,7 @@ Chinese projects may use Chinese file names such as `00.项目说明.md`, `00.�
 2. Read the target main success scenario's use-case document, design document, tasks, and changes.
 3. Unless the work is adding a new task, conditional substep, or use case, inspect unfinished changes first and decide the current work from those changes.
 4. A use case contains one main success scenario and conditional, alternate, or exception substeps attached to concrete main-success steps.
-5. A task is a folder under `tasks/` and starts at `01.`.
+5. A task is one Markdown file under `tasks/` and starts at `01.`.
 6. A task document's basic measure is a class or type group. It may cover one class or a tightly collaborating set of classes or types.
 7. A single task touches one task document and one production code file. If another code file is needed, split another task first.
 8. Unit tests are not default task deliverables. Add one matching unit-test file only when the user request, existing task document, or change document explicitly asks for unit tests or TDD.
@@ -79,11 +91,10 @@ The design document explains:
 
 ## Change Documents
 
-Each change document must explain:
+Each change document records a later change after implementation and must explain:
 
-- Timestamp.
-- Task number.
-- Task name.
+- Implementation time.
+- Related task or document.
 - What was done before.
 - What should be done now.
 - Status.

@@ -8,7 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Replaced the previous behavior-discovery documentation workflow with `$cx-story`, `docs/cx`, use-case documents, task folders, and change folders.
+- Added stricter cx documentation rules for concrete wording, defined terms, task-file naming, post-implementation change documents, package-local readme files, default-parameter configuration usage, absolute imports, and VS Code unittest discovery.
+- Replaced the previous behavior-discovery documentation workflow with `$cx-story`, `docs/cx`, use-case documents, task documents, and change documents.
 - Replaced the old document-complete confirmation gate with an execution-mode choice: direct completion is the default, while per-task confirmation is opt-in at work start.
 - Strengthened the package rule that Chinese workflow changes are completed first and then synchronized into the English package.
 - Added a Python development iron rule requiring target-project scripts to avoid command-line arguments and route adjustable behavior through config-subsystem items with defaults.
