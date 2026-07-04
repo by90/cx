@@ -21,6 +21,10 @@
       "path": ".agents/skills/cx-changelog/SKILL.md"
     },
     {
+      "name": "cx-design",
+      "path": ".agents/skills/cx-design/SKILL.md"
+    },
+    {
       "name": "cx-version",
       "path": ".agents/skills/cx-version/SKILL.md"
     },

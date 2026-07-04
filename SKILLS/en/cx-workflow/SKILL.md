@@ -1,6 +1,6 @@
 ---
 name: cx-workflow
-description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, docs/cx use-case flow, change-first work selection, default one-task/one-code-file execution, explicit tests, full OOP, minimal reusable code, and mandatory review after every code, documentation, tutorial, research, design, or process deliverable.
+description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, docs/cx use-case flow, change-first work selection, default one-task/one-code-file execution, explicit tests, full object-oriented design, minimal reusable code, and mandatory review after every code, documentation, tutorial, research, design, or process deliverable.
 version: 0.1.0
 ---
 
@@ -35,20 +35,23 @@ Use this skill first when a user request needs workflow routing or several cx sk
 7. A task's basic measure is a class or type group.
 8. A task touches one task document and one production code file; if a second code file is needed, split the next task first.
 9. Unit tests are not default deliverables. Create, edit, or run unit tests only when the current user request, existing task document, or change document explicitly asks for unit tests, TDD, failing tests, or red-green-refactor.
-10. Python, PyTorch, and Rust work follow full OOP or equivalent type modeling for state, lifecycle, invariants, and domain collaboration.
-11. Python constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
-12. Common packages under `src/<subsystem>/` must include package-local `readme.md` files that explain public APIs and usage.
-13. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse. If an implementation turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines, enter deletion-first refactoring before it can be complete.
-14. Default execution is one-task/one-code-file: complete the current task document, edit only the bound production code file, report the result, and continue to another code file only when the user explicitly asks for multi-task continuation.
-15. After any code, documentation, tutorial, research, design, process-change, or release-note deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete.
-16. If review fails, the task, change, or deliverable remains incomplete until the implementation, document, tutorial, research, design, or process record is fixed and reviewed again.
-17. Code review checks exact agreement with the use-case, design, task, and change documents; duplication smells; full OOP; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit.
-18. Documentation, tutorial, research, and design review check single source of truth, tutorial executability, source quality and synthesis, design feasibility, and business meaning. Any failed required deliverable review blocks completion.
+10. Python, PyTorch, and Rust work follow full object-oriented design or equivalent type modeling for state, lifecycle, invariants, and domain collaboration.
+11. Architecture choices, class splits, responsibility boundaries, domain objects, database-access boundaries, field enums, inheritance/composition decisions, and implementation-path choices use `$cx-design` before coding.
+12. Python constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
+13. Common packages under `src/<subsystem>/` must include package-local `readme.md` files that explain functional entrypoints and usage.
+14. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse. If an implementation turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines, enter deletion-first refactoring before it can be complete.
+15. Default execution is one-task/one-code-file: complete the current task document, edit only the bound production code file, report the result, and continue to another code file only when the user explicitly asks for multi-task continuation.
+16. After any code, documentation, tutorial, research, design, process-change, or release-note deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete.
+17. If review fails, the task, change, or deliverable remains incomplete until the implementation, document, tutorial, research, design, or process record is fixed and reviewed again.
+18. Code review checks exact agreement with the use-case, design, task, and change documents; duplication smells; full object-oriented design; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit.
+19. Documentation, tutorial, research, and design review check single source of truth, tutorial executability, source quality and synthesis, design feasibility, and business meaning. Any failed required deliverable review blocks completion.
+20. When modifying cx workflow, skills, templates, examples, install rules, or global `AGENTS.md` templates, modify only the cx source repository; after every modification, commit and push `main`, then run the matching install script so local global cx skills and `AGENTS.md` are updated from the remote source.
 
 ## Skill Selection
 
 - Use `$cx-story` for use cases, main success scenarios, conditional substeps, tasks, and changes.
 - Use `$cx-tdd` only when the user or current docs explicitly ask for TDD, unit tests, failing tests, or red-green-refactor.
+- Use `$cx-design` for object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, database-access boundaries, field enums, or implementation-path tradeoffs.
 - Use `$cx-common-module` before adding reusable code, reusable classes, shared utilities, stable APIs, or common state.
 - Use `$cx-pytorch-tdd` only for explicitly requested Python, PyTorch, Lightning, tensor, training, or ML tests.
 - Use `$cx-rust-tdd` for Rust implementation and explicit Rust tests when requested.

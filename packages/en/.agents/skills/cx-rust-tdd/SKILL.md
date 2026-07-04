@@ -20,7 +20,7 @@ Use this skill for Rust implementation work after the current `docs/cx` task is 
 1. Confirm that the current task edits one Rust production code file; if a second code file is needed, split another task first.
 2. Read the target use-case document, design document, current task document, current change document, and the relevant Rust modules.
 3. By default, do not create or edit Rust unit tests; only when tests are explicitly requested, map the current class/type measure to one narrow Rust test.
-4. When tests are explicitly requested, write the failing test first using `#[test]`, integration tests under `tests/`, or doc tests when the behavior is public API documentation.
+4. When tests are explicitly requested, write the failing test first using `#[test]`, integration tests under `tests/`, or doc tests when the behavior is functional entrypoint documentation.
 5. When tests are explicitly requested, run `cargo test <filter>` or the narrowest project command and record the red failure.
 6. Implement the smallest Rust change.
 7. When tests are explicitly requested, run the narrow test and then `cargo test` as needed; otherwise run project-required build, formatting, or static checks.
@@ -45,7 +45,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - By default, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
 - Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
 - Prefer expressing defaults through function or constructor parameters; do not promote simple paths, filenames, or one-off defaults to module-level constants.
-- Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
+- Keep only the functional entrypoint needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
 - During project development, never keep compatibility interfaces, old entrypoints, aliases, adapter layers, bridge functions, or new/old coexistence branches for old code. Do not optimize for old/new code compatibility; remove all unused code, old paths, obsolete tests, and stale documents after the change.
 - Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
 - Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
@@ -60,8 +60,8 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Avoid `unwrap`, `expect`, and `panic!` in production paths unless the invariant is local, proven, and documented.
 - Avoid cloning to appease the borrow checker. Decide ownership deliberately.
 - Keep functions small, direct, and minimal. Keep files cohesive and reasonably sized. Do not create bloated, long, hard-to-maintain code, and do not fragment logic into meaningless wrappers.
-- Keep modules cohesive and public APIs narrow.
-- Any potentially reusable feature, class, or logic must first invoke `$cx-common-module` to search existing implementation and design the public entrypoint.
+- Keep modules cohesive and functional entrypoints narrow.
+- Any potentially reusable feature, class, or logic must first invoke `$cx-common-module` to search existing implementation and design the functional entrypoint.
 - Use `Option` for absence and `Result` for failure; do not encode errors as magic strings or sentinel values.
 - Document unsafe code with `SAFETY:` comments and tests around the safe boundary. Do not add unsafe code unless there is no safe design.
 

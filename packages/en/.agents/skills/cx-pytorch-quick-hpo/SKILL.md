@@ -41,7 +41,7 @@ Find candidate configurations worth sending to full-data tuning with a smaller b
 
 1. Confirm the target `docs/cx` use case, design document, task, or change defines the business objective, data boundary, label target, and validation path. If not, return to `$cx-workflow` to recommend `$cx-story`, `$cx-research`, or `$cx-timeseries-modeling`.
 2. Before startup or resume, confirm resource-monitor paths, the five-minute sampling method, and the top-10 candidate report fields. If the project lacks a shared resource monitor, add the public monitor and narrow tests first; do not replace structured artifacts with terminal spam.
-3. Use `$cx-common-module` to check whether training entrypoints, backtest entrypoints, config hooks, recipes, resource monitoring, metric aggregation, and output persistence already have public entrypoints. If not, define the calling model first.
+3. Use `$cx-common-module` to check whether training entrypoints, backtest entrypoints, config hooks, recipes, resource monitoring, metric aggregation, and output persistence already have functional entrypoints. If not, define the calling model first.
 4. Use `$cx-pytorch-tdd` to verify standalone training, standalone backtesting, config clone/override hooks, trial-to-config mapping, resource monitoring, metric parsing, and output persistence paths.
 5. Run field contribution research and small experiments before field candidates are tuned. Do not search model capacity while field semantics are still unclear.
 6. Use one fixed model to validate field combinations, window length, and label definitions, then produce data recipe candidates.

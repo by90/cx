@@ -34,7 +34,7 @@ Not declared. Fill this only when the user request, existing task document, or c
 - Task files are named `NN.task_name.md`; do not use `00.task.md`.
 - After this task document is complete, edit only one production code file.
 - Do not create or edit unit tests by default.
-- Use full OOP, minimal code, reuse first, and avoid bloated files, overly long identifiers, and duplicated logic.
+- Use full object-oriented design, minimal code, reuse first, and avoid bloated files, overly long identifiers, and duplicated logic.
 - Constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`.
 
 ## Verification Command

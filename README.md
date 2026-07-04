@@ -2,9 +2,9 @@
 
 cx is a Codex skill package for disciplined human-AI software development. Its core goal is to make AI first anchor work in `docs/cx` use cases, design notes, tasks, and change documents, then implement Python, PyTorch, and Rust projects by default with one task document and one production code file. Unit tests and TDD enter scope only when explicitly requested.
 
-cx is not a component library or business implementation. It defines collaboration flow, document structure, task splitting, full OOP, minimal reuse-first implementation, release versioning, and delivery evidence.
+cx is not a component library or business implementation. It defines collaboration flow, document structure, task splitting, full object-oriented design, minimal reuse-first implementation, release versioning, and delivery evidence.
 
-After code, documentation, tutorials, research, design, process changes, release notes, or any other deliverable is produced, `$cx-review` is mandatory before the task, change, or deliverable can be considered complete. If review fails, the state stays incomplete until document mismatch, duplication smells, non-OOP design, bloated implementation, extra validation, extra variable passing, redundant naming, business-semantic drift, non-executable tutorials, weak research sources, or infeasible design is fixed.
+After code, documentation, tutorials, research, design, process changes, release notes, or any other deliverable is produced, `$cx-review` is mandatory before the task, change, or deliverable can be considered complete. If review fails, the state stays incomplete until document mismatch, duplication smells, non-object-oriented design, bloated implementation, extra validation, extra variable passing, redundant naming, business-semantic drift, non-executable tutorials, weak research sources, or infeasible design is fixed.
 
 Current package version: `0.1.2`. cx is still experimental and has not declared a stable `1.0.0` workflow.
 
@@ -82,12 +82,13 @@ All cx scenario, task, process, and change documents belong under `docs/cx`. Doc
 | `$cx-changelog` | `changes/` documents, release notes, and audit trails |
 | `$cx-version` | Project-local `tools/semver.py`, `VERSION`, `docs/VERSIONS.md`, release tags, and release validation |
 | `$cx-research` | Model selection, paper research, source filtering, and cited synthesis |
+| `$cx-design` | Object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, and data-access boundaries |
 | `$cx-pytorch-tdd` | Python, PyTorch, Lightning, tensors, training, and ML tests |
 | `$cx-pytorch-quick-hpo` | Quick PyTorch tuning, field contribution research, feature sets, and candidates |
 | `$cx-pytorch-full-hpo` | Full PyTorch tuning, full-data training, evaluation, backtesting, and candidate selection |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling and PyTorch Forecasting selection |
 | `$cx-rust-tdd` | Rust type design, ownership design, optional explicit tests, `cargo fmt`, `cargo test`, and `clippy` |
-| `$cx-common-module` | Reusable features, reusable classes, public entrypoints, and repeated logic convergence |
+| `$cx-common-module` | Reusable features, reusable classes, functional entrypoints, and repeated logic convergence |
 | `$cx-review` | Mandatory local review after code, documentation, tutorial, research, design, or process-change deliverables |
 | `$cx-evidence` | Pre-handoff evidence review, review-decision checks, document agreement, and residual risk |
 

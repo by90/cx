@@ -19,7 +19,7 @@ Turn repeated logic, stable data structures, reusable classes, generic capabilit
 
 Iron rule: absolutely no unmaintainable pile-up code. This applies to source code, tests, scripts, tools, examples, and workflow-generated code; common modules cannot use "reuse", "stability", or "future extension" as reasons to bloat.
 
-- Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early. Prove real call sites before extracting a public entrypoint.
+- Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early. Prove real call sites before extracting a functional entrypoint.
 - Stable infrastructure starts as one field group, one constructor, and the fewest public methods. If callers can use arrays, tensors, standard slicing, standard-library errors, configuration default parameters, or explicit construction directly, do not wrap it.
 - If a public class or public function adds protocol inheritance, convenience wrappers, clone methods, rebuild methods, padding methods, negative-index compatibility, fallback validation, debug entrypoints, or future-extension entrypoints for completeness, delete them unless the current calling model requires them.
 - Keep file, class, method, and variable names short and clear; avoid sentence-like identifiers, and extract responsibilities or reuse domain terms when names grow too long.
@@ -31,10 +31,10 @@ Iron rule: absolutely no unmaintainable pile-up code. This applies to source cod
 - By default, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
 - Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
 - Prefer expressing defaults through function or constructor parameters. Configuration defaults should be written directly as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field, for example `self.batch_size = batch_size`.
-- Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
+- Keep only the functional entrypoint needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
 - Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
 - Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
-- A generic capability, reusable feature, or reusable class should first abstract the public entrypoint, call style, lifecycle, state source, and test isolation; do not first abstract one-off file reads, one-off validation, single-field conversion, or future-maybe internal steps.
+- A generic capability, reusable feature, or reusable class should first abstract the functional entrypoint, call style, lifecycle, state source, and test isolation; do not first abstract one-off file reads, one-off validation, single-field conversion, or future-maybe internal steps.
 - Common-module review must ask whether the code can be deleted first. Behavior callers can express directly with arrays, tensors, standard slicing, constructors, configuration default parameters, or library-native errors does not belong in a common module.
 - Refactoring should delete code, reduce branches, and shrink the public surface, not move logic into more small functions.
 
@@ -49,7 +49,7 @@ Special-case entrypoint:
 Instance or state lifecycle:
 State source:
 How verification covers all source call sites:
-readme public API section:
+readme functional entrypoint section:
 Non-goals:
 ```
 
@@ -59,7 +59,7 @@ The abstraction boundary must answer four questions:
 2. Does the caller need to know one less thing?
 3. When adding a peer capability, config section, field, or data source, can we change data declarations rather than control-flow code?
 4. Does a helper have at least two real call sites, or truly isolate real complexity?
-5. Does this common package include a package-local `readme.md` that explains public APIs and usage?
+5. Does this common package include a package-local `readme.md` that explains functional entrypoints and usage?
 
 If the answers do not support abstraction, inline the logic or keep the direct implementation.
 
@@ -89,8 +89,8 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 ## Required output
 
 - Search evidence and candidate comparison.
-- Public API proposal with public entrypoint, normal call style, special-case entrypoint, lifecycle, state source, inputs, outputs, error policy, and a minimal example.
-- Package-local `readme.md` that lists public APIs and usage; do not list instance config sections, internal fields, or implementation steps as public API documentation.
+- Public API proposal with functional entrypoint, normal call style, special-case entrypoint, lifecycle, state source, inputs, outputs, error policy, and a minimal example.
+- Package-local `readme.md` that lists functional entrypoints and usage; do not list instance config sections, internal fields, or implementation steps as functional entrypoint documentation.
 - Verification approach, preferably covering real small data and edge cases; use tests first only when unit tests or TDD are explicitly requested.
 - Backward-compatible migration plan describing which call sites move and which stay unchanged.
 - Reusable capability notes in the target `docs/cx` design document.
@@ -102,7 +102,7 @@ Do not extract when the abstraction is speculative and has only one unclear use.
 - Any reusable-capability code or explicitly requested tests added or edited by this skill must follow comprehensive comments: file-level explanations must state file purpose and main classes, functions, or test targets; classes/types need responsibility explanations; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; every line of business code and test business logic needs an adjacent intent comment.
 - Generic capabilities, reusable classes, reusable components, and common modules must be minimal, stable, and low-coupling. Do not abstract for its own sake, and do not copy repeated logic into multiple similar implementations.
 - Python reusable capabilities should express default behavior with type annotations and default parameters. Configuration defaults should be written directly as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field, for example `self.batch_size = batch_size`. Do not stack long `None` or parameter-case branches inside `__init__`.
-- Public APIs must use explicit OOP or static interfaces. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default.
+- Public APIs must use explicit object-oriented design or static interfaces. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default.
 
 ## Registry Fields
 

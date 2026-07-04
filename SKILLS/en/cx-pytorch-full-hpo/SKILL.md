@@ -36,7 +36,7 @@ Validate quick-HPO candidates on complete data, select the best through third-be
 ## Required Workflow
 
 1. Read the quick-HPO best recipe, top candidates, field recommendations, window length, label definition, training hyperparameters, and convergence evidence.
-2. Use `$cx-common-module` to check whether full-data recipes, model saving, test evaluation, and backtest calls already have public entrypoints. If not, define the calling model first.
+2. Use `$cx-common-module` to check whether full-data recipes, model saving, test evaluation, and backtest calls already have functional entrypoints. If not, define the calling model first.
 3. Use `$cx-pytorch-tdd` to verify full-data config construction, in-memory config overrides, training entrypoint, test-stage entrypoint, backtest entrypoint, and output persistence.
 4. Before starting the rank-1 candidate, confirm that resource monitoring, five-minute sampling, and candidate report fields can be written as structured artifacts. If missing, add the shared monitor and summary entrypoints first.
 5. Train the rank-1 candidate with complete data and run test-set evaluation inside the training workflow. Every 5 minutes, report current epoch, `val_loss`, improvement count, candidate duration, and resource usage. After training, record `val_loss`, `test_loss`, resource metrics, and business metrics.

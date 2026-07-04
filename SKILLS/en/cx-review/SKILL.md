@@ -1,6 +1,6 @@
 ---
 name: cx-review
-description: Use for mandatory local review after code, documentation, tutorials, research, design, process changes, or any other deliverable is produced. Reviews by artifact type for document agreement, business semantics, duplication smells, full OOP, minimal implementation, source quality, tutorial executability, design feasibility, and completion status. If review fails, the task, change, or deliverable is not complete.
+description: Use for mandatory local review after code, documentation, tutorials, research, design, process changes, or any other deliverable is produced. Reviews by artifact type for document agreement, business semantics, duplication smells, full object-oriented design, minimal implementation, source quality, tutorial executability, design feasibility, and completion status. If review fails, the task, change, or deliverable is not complete.
 version: 0.1.0
 ---
 
@@ -30,10 +30,10 @@ Run local review after any deliverable is produced and before marking a task or 
 - Implementation matches the use case, design, task, and change documents exactly, with no missing behavior, scope creep, or changed business meaning.
 - Bloated code is a P1 finding. Any source code, tests, scripts, tools, examples, or workflow-generated code that turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines fails review and must first delete useless entrypoints, branches, tests, and abstractions.
 - No repeated checks, transformations, config reads, field passing, similar helpers, or several locals naming the same concept.
-- Full OOP is used when state, lifecycle, invariants, or domain collaboration are present.
+- Full object-oriented design is used when state, lifecycle, invariants, or domain collaboration are present.
 - Implementation is minimal: no extra validation, fallbacks, exception wrapping, variable passing, parameters, redundant names, bloated files, convenience wrappers, protocol inheritance, clone methods, rebuild methods, future-extension entrypoints, debug entrypoints, or abstractions without real reuse.
 - Constructors and functions use default parameters for configuration defaults, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
-- Deletion checklist is complete: delete public entrypoints without real call sites; delete wrappers callers can replace with arrays, tensors, standard slicing, constructors, or configuration defaults; delete test-only entrypoints; delete compatibility branches that hide errors; delete helpers that do not isolate real complexity.
+- Deletion checklist is complete: delete functional entrypoints without real call sites; delete wrappers callers can replace with arrays, tensors, standard slicing, constructors, or configuration defaults; delete test-only entrypoints; delete compatibility branches that hide errors; delete helpers that do not isolate real complexity.
 
 ### Documentation
 
@@ -46,7 +46,7 @@ Run local review after any deliverable is produced and before marking a task or 
 - Project documents, use cases, designs, and tasks each own their own content; the same goals are not repeated across all of them.
 - Use cases express business scenarios, main success scenarios, conditional substeps, and sub-use cases, not test plans or implementation tasks.
 - Task files use `tasks/NN.task_name.md`, change files use `changes/change_name.md` without timestamps, and change documents record only later changes after implementation.
-- Common packages under `src/<subsystem>/` have package-local `readme.md` files that list public APIs and usage, not instance config sections, internal fields, or implementation steps as public-interface documentation.
+- Common packages under `src/<subsystem>/` have package-local `readme.md` files that list functional entrypoints and usage, not instance config sections, internal fields, or implementation steps as functional documentation.
 
 ### Tutorial
 

@@ -1,6 +1,6 @@
 ---
 name: cx-tdd
-description: Use only when the current user request, existing task document, or change document explicitly asks for TDD, unit tests, failing tests, or red-green-refactor. Works from docs/cx changes and tasks with one task document, one production code file, one matching unit-test file, full OOP, and verification evidence.
+description: Use only when the current user request, existing task document, or change document explicitly asks for TDD, unit tests, failing tests, or red-green-refactor. Works from docs/cx changes and tasks with one task document, one production code file, one matching unit-test file, full object-oriented design, and verification evidence.
 version: 0.1.0
 ---
 
@@ -40,7 +40,7 @@ Read, in order:
 10. Implement the smallest change that passes.
 11. Refactor only within the current task boundary.
 12. Do not weaken assertions to make a test pass.
-13. After code passes explicitly requested tests, run `$cx-review` code-deliverable review for document agreement, duplication smells, full OOP, minimal implementation, and business semantics.
+13. After code passes explicitly requested tests, run `$cx-review` code-deliverable review for document agreement, duplication smells, full object-oriented design, minimal implementation, and business semantics.
 14. If review fails, do not mark the task complete; fix implementation or docs, then rerun tests and review.
 15. Record verification commands, results, `$cx-review` decision, `$cx-evidence` evidence decision, and residual gaps in the current task or change document.
 
@@ -48,11 +48,11 @@ Read, in order:
 
 - Use `uv` managed Python.
 - Use `unittest` unless the project already uses another framework.
-- Use full OOP for state, lifecycle, invariants, and domain collaboration.
+- Use full object-oriented design for state, lifecycle, invariants, and domain collaboration.
 - TDD cannot justify preserving bloated entrypoints, useless tests, or future-extension wrappers. Tests should pin only behavior required by the current use case, not convenience wrappers, negative-index compatibility, clone methods, rebuild methods, padding methods, fallback validation, or future-extension entrypoints.
 - If an implementation turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines, the task remains incomplete until it is deleted back to the smallest functional entrypoint.
 - Constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields.
-- Common packages under `src/<subsystem>/` include package-local `readme.md` files that explain public APIs and usage.
+- Common packages under `src/<subsystem>/` include package-local `readme.md` files that explain functional entrypoints and usage.
 - Do not use dynamic reflection by default.
 - Do not add command-line parameters to target-project scripts.
 

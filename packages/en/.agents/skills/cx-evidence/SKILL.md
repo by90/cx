@@ -48,11 +48,11 @@ Review whether the work is supported by the current `docs/cx` use case, design d
 20. Are verification commands and results recorded in the current task or change document?
 21. Are there stray planning documents outside `docs/cx`?
 22. Was reusable code checked through `$cx-common-module` before adding new common logic?
-23. Is the implementation full OOP where state, lifecycle, invariants, or domain collaboration are present?
+23. Is the implementation full object-oriented design where state, lifecycle, invariants, or domain collaboration are present?
 24. Is the code minimal and reusable, with no bloated files, overly long identifiers, sentence-like names, or duplicated logic?
 25. Has all bloated code been removed from source code, tests, scripts, tools, examples, and workflow-generated code: no behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor is expanded into hundreds or thousands of lines; and no unrequired protocol inheritance, convenience wrappers, clone methods, rebuild methods, padding methods, negative-index compatibility, fallback validation, debug entrypoints, future-extension entrypoints, or test-only entrypoints remain?
 26. Are configuration defaults written as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`, and stored on same-named fields?
-27. Do common packages under `src/<subsystem>/` include package-local `readme.md` files that list public APIs and usage?
+27. Do common packages under `src/<subsystem>/` include package-local `readme.md` files that list functional entrypoints and usage?
 28. Does the implementation cover every expected behavior in the task document and avoid behavior outside the task scope?
 29. Does the implementation match the main success scenario, conditional substeps, success path, error exposure, and ending conditions?
 30. Does the implementation match the design document's reusable entrypoints, common-code usage, decisions, and non-goals?
@@ -60,7 +60,7 @@ Review whether the work is supported by the current `docs/cx` use case, design d
 32. Do documentation deliverables have a clear audience, goal, scope, status, single home, and no stale or unsupported claims?
 33. Are tutorial deliverables executable in order, with prerequisites, commands, expected outputs, and failure handling?
 34. Do research deliverables define the question, date window, inclusion/exclusion criteria, target reader, source quality, limits, and citations for non-obvious claims?
-35. Do design deliverables state target behavior, constraints, invariants, public entrypoints, reuse boundaries, non-goals, tradeoffs, and implementable task boundaries?
+35. Do design deliverables state target behavior, constraints, invariants, functional entrypoints, reuse boundaries, non-goals, tradeoffs, and implementable task boundaries?
 36. Are all required artifact review decisions PASS; if not, does the task, change, or deliverable remain incomplete?
 37. Do conversation summaries, cx documents, review decisions, and verification evidence follow the language rules? In Chinese-package work, is any retained English term, abbreviation, or proper name explained in Chinese in the same sentence or an adjacent sentence?
 

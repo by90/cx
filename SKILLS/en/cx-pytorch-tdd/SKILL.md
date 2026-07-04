@@ -29,7 +29,7 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 10. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable features, classes, or components.
 11. Follow the one-code-file boundary plus source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`; when tests are explicitly requested, tests mirror them under `tests/<subsystem>/`, and each source file maps to one `*_test.py`. Source files and explicitly requested unit tests must include file-level purpose notes, class notes, function parameter/return explanations, and line-by-line intent comments.
 12. After editing Python source or tests, run Black default-format checks, for example `python -m black --check src tests tools`, and avoid changing unrelated user code.
-13. After code and required verification are done, run `$cx-review` code-deliverable review. Focus on docs agreement, repeated tensor/data/config logic, full OOP, minimal implementation, no extra validation, no extra variable passing, and no redundant parameter or variable names.
+13. After code and required verification are done, run `$cx-review` code-deliverable review. Focus on docs agreement, repeated tensor/data/config logic, full object-oriented design, minimal implementation, no extra validation, no extra variable passing, and no redundant parameter or variable names.
 14. If review fails, do not mark the task complete; fix implementation or docs, then rerun verification and review.
 
 ## Minimal Implementation Discipline
@@ -46,7 +46,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - By default, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
 - Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
 - Prefer expressing defaults through function or constructor parameters; do not promote simple paths, filenames, or one-off defaults to module-level constants.
-- Keep only the public API needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
+- Keep only the functional entrypoint needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
 - During project development, never keep compatibility interfaces, old entrypoints, aliases, adapter layers, bridge functions, or new/old coexistence branches for old code. Do not optimize for old/new code compatibility; remove all unused code, old paths, obsolete tests, and stale documents after the change.
 - Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
 - Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.

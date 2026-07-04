@@ -20,11 +20,11 @@ Use this skill before implementation and validation. cx uses use-case-driven sto
 1. Documents must state concrete facts, concrete actions, and concrete decisions. Avoid filler, repeated goals, missing "what to do", and undefined invented terms.
 2. Project documents contain project goals, key terms, design constraints, and use-case indexes. Number goals with `1. 2. 3.` and state the target result plus why it is needed.
 3. Use cases contain actors, preconditions, triggers, main success scenario, step-attached conditional substeps, sub-use cases, and observable completion. Do not write test plans, implementation tasks, or repeated project goals in use-case bodies.
-4. Design documents contain file scope, public entrypoints, reusable capabilities, design decisions, tradeoff reasons, and verification. Task documents contain what to do, file scope, task measure, verification, and status.
+4. Design documents contain file scope, functional entrypoints, reusable capabilities, design decisions, tradeoff reasons, and verification. Task documents contain what to do, file scope, task measure, verification, and status.
 5. Define new terms on first use and prefer user/project terms.
 6. `tasks/` contains one Markdown file per task, named `NN.task_name.md`; do not create generic `00.task.md` files.
 7. `changes/` contains one Markdown file per later implemented change, without timestamps in filenames. Do not create change documents for unimplemented planning.
-8. Common packages under `src/<subsystem>/` must include a package-local `readme.md` that explains public APIs and usage.
+8. Common packages under `src/<subsystem>/` must include a package-local `readme.md` that explains functional entrypoints and usage.
 9. Python configuration defaults should be written as function or constructor default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field.
 
 ## docs/cx Layout
