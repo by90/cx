@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Evidence Review
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Review whether the work is supported by the current `docs/cx` use case, design document, task document, change document, explicit-test scope, artifact-specific `$cx-review` decisions, business semantics, and verification evidence. This is a task, change, and handoff evidence gate. Any P0/P1/P2 finding, missing required review, or failed required review means the task, change, or deliverable remains incomplete until fixed and reviewed again.
@@ -17,6 +22,7 @@ Review whether the work is supported by the current `docs/cx` use case, design d
 3. Business semantics: deliverables carry the right business meaning, not merely valid formatting or runnable commands.
 4. Verification evidence: commands, screenshots, sources, manual checks, or other evidence truly cover the current deliverables; unit tests count only when explicitly requested.
 5. Completion status: no missing-evidence, unreviewed, review-failed, user-unconfirmed, or blocked work is written as complete.
+6. Language evidence: conversation summaries, cx documents, review decisions, and verification evidence use the package language without mixed-language fragments. Chinese-package work explains retained English in Chinese.
 
 ## Checklist
 
@@ -44,17 +50,19 @@ Review whether the work is supported by the current `docs/cx` use case, design d
 22. Was reusable code checked through `$cx-common-module` before adding new common logic?
 23. Is the implementation full OOP where state, lifecycle, invariants, or domain collaboration are present?
 24. Is the code minimal and reusable, with no bloated files, overly long identifiers, sentence-like names, or duplicated logic?
-25. Are configuration defaults written as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`, and stored on same-named fields?
-26. Do common packages under `src/<subsystem>/` include package-local `readme.md` files that list public APIs and usage?
-27. Does the implementation cover every expected behavior in the task document and avoid behavior outside the task scope?
-28. Does the implementation match the main success scenario, conditional substeps, success path, error exposure, and ending conditions?
-29. Does the implementation match the design document's reusable entrypoints, common-code usage, decisions, and non-goals?
-30. Are there no extra validations, prechecks, intermediate variables, parameters, variable-name duplicates, or parameter-name duplicates?
-31. Do documentation deliverables have a clear audience, goal, scope, status, single home, and no stale or unsupported claims?
-32. Are tutorial deliverables executable in order, with prerequisites, commands, expected outputs, and failure handling?
-33. Do research deliverables define the question, date window, inclusion/exclusion criteria, target reader, source quality, limits, and citations for non-obvious claims?
-34. Do design deliverables state target behavior, constraints, invariants, public entrypoints, reuse boundaries, non-goals, tradeoffs, and implementable task boundaries?
-35. Are all required artifact review decisions PASS; if not, does the task, change, or deliverable remain incomplete?
+25. Has all bloated code been removed from source code, tests, scripts, tools, examples, and workflow-generated code: no behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor is expanded into hundreds or thousands of lines; and no unrequired protocol inheritance, convenience wrappers, clone methods, rebuild methods, padding methods, negative-index compatibility, fallback validation, debug entrypoints, future-extension entrypoints, or test-only entrypoints remain?
+26. Are configuration defaults written as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`, and stored on same-named fields?
+27. Do common packages under `src/<subsystem>/` include package-local `readme.md` files that list public APIs and usage?
+28. Does the implementation cover every expected behavior in the task document and avoid behavior outside the task scope?
+29. Does the implementation match the main success scenario, conditional substeps, success path, error exposure, and ending conditions?
+30. Does the implementation match the design document's reusable entrypoints, common-code usage, decisions, and non-goals?
+31. Are there no extra validations, prechecks, intermediate variables, parameters, variable-name duplicates, or parameter-name duplicates?
+32. Do documentation deliverables have a clear audience, goal, scope, status, single home, and no stale or unsupported claims?
+33. Are tutorial deliverables executable in order, with prerequisites, commands, expected outputs, and failure handling?
+34. Do research deliverables define the question, date window, inclusion/exclusion criteria, target reader, source quality, limits, and citations for non-obvious claims?
+35. Do design deliverables state target behavior, constraints, invariants, public entrypoints, reuse boundaries, non-goals, tradeoffs, and implementable task boundaries?
+36. Are all required artifact review decisions PASS; if not, does the task, change, or deliverable remain incomplete?
+37. Do conversation summaries, cx documents, review decisions, and verification evidence follow the language rules? In Chinese-package work, is any retained English term, abbreviation, or proper name explained in Chinese in the same sentence or an adjacent sentence?
 
 ## Output
 

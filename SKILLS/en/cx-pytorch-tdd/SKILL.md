@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Python / PyTorch / Lightning Explicit Tests
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataModules, training loops, metrics, and model tests only when testing is explicitly requested. Default implementation does not create or edit unit tests.

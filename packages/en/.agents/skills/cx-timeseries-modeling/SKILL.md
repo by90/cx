@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Heterogeneous Time-Series Modeling
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Handle multivariate time series where each field has a different meaning. Do not treat fields as image pixels, homogeneous channels, or ordinary tokens by default. Model field semantics before choosing convolution, attention, RNNs, N-HiTS, TFT, or other models.

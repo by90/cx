@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Workflow Router
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Use this skill first when a user request needs workflow routing or several cx skills. It decides the smallest useful skill set and the execution order.
@@ -33,7 +38,7 @@ Use this skill first when a user request needs workflow routing or several cx sk
 10. Python, PyTorch, and Rust work follow full OOP or equivalent type modeling for state, lifecycle, invariants, and domain collaboration.
 11. Python constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
 12. Common packages under `src/<subsystem>/` must include package-local `readme.md` files that explain public APIs and usage.
-13. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse.
+13. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse. If an implementation turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines, enter deletion-first refactoring before it can be complete.
 14. Default execution is one-task/one-code-file: complete the current task document, edit only the bound production code file, report the result, and continue to another code file only when the user explicitly asks for multi-task continuation.
 15. After any code, documentation, tutorial, research, design, process-change, or release-note deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete.
 16. If review fails, the task, change, or deliverable remains incomplete until the implementation, document, tutorial, research, design, or process record is fixed and reviewed again.

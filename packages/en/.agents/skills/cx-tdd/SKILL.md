@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Explicit TDD
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Use this skill after the current task is known and TDD, unit tests, failing tests, or red-green-refactor are explicitly requested. Default implementation does not use this skill and does not create unit tests.
@@ -44,6 +49,8 @@ Read, in order:
 - Use `uv` managed Python.
 - Use `unittest` unless the project already uses another framework.
 - Use full OOP for state, lifecycle, invariants, and domain collaboration.
+- TDD cannot justify preserving bloated entrypoints, useless tests, or future-extension wrappers. Tests should pin only behavior required by the current use case, not convenience wrappers, negative-index compatibility, clone methods, rebuild methods, padding methods, fallback validation, or future-extension entrypoints.
+- If an implementation turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines, the task remains incomplete until it is deleted back to the smallest functional entrypoint.
 - Constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields.
 - Common packages under `src/<subsystem>/` include package-local `readme.md` files that explain public APIs and usage.
 - Do not use dynamic reflection by default.

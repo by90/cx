@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Research Workflow
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Use this skill when the task is research rather than implementation: choosing a model, understanding a model family, comparing architectures, surveying recent AI papers, or collecting expert interpretations from papers and technical blogs.

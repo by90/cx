@@ -17,7 +17,7 @@ When this repository changes workflow rules, skills, templates, or examples, com
 
 ## Document Language
 
-A target project installs one language package only. With the English package installed, cx-generated and cx-maintained documents should use English. With the Chinese package installed, those documents must use Simplified Chinese. Code identifiers, commands, API names, library names, and external proper names may remain in their source language.
+A target project installs one language package only. With the English package installed, cx-generated and cx-maintained documents should use English. With the Chinese package installed, those documents must use Simplified Chinese. Prose in conversations, explanations, plans, summaries, review decisions, and evidence records should use the package language without mixed-language fragments. In Chinese-package work, unavoidable English identifiers, commands, API names, library names, protocols, standards, and external proper names must be explained in Chinese in the same sentence or an adjacent sentence. In English-package work, unavoidable non-English terms should be explained in English.
 
 ## Why Not Install Both
 

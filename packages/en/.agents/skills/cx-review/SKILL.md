@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Deliverable Review
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Run local review after any deliverable is produced and before marking a task or change complete. Deliverables include code, use-case documents, task documents, change documents, design documents, tutorials, research reports, release notes, and workflow rules. Any P0/P1/P2 finding means review fails; the task, change, or deliverable must remain incomplete until fixed and reviewed again.
@@ -16,16 +21,19 @@ Run local review after any deliverable is produced and before marking a task or 
 2. Review against the user request, `docs/cx` project notes, use case, design, task, change, and relevant sources; do not only inspect surface formatting.
 3. If review fails, return concrete findings, evidence, and fixes. Do not mark the task, change, or deliverable complete.
 4. After review passes, record the PASS decision, review scope, verification evidence, and residual risk in the current task or change document. If no target cx document exists, state it in the final summary.
+5. Review must check whether conversation summaries, documents, tutorials, research, designs, process records, review decisions, and verification evidence follow the language rules. In Chinese-package work, unexplained English in Chinese prose is a P2 or higher finding.
 
 ## Review Types
 
 ### Code
 
 - Implementation matches the use case, design, task, and change documents exactly, with no missing behavior, scope creep, or changed business meaning.
+- Bloated code is a P1 finding. Any source code, tests, scripts, tools, examples, or workflow-generated code that turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines fails review and must first delete useless entrypoints, branches, tests, and abstractions.
 - No repeated checks, transformations, config reads, field passing, similar helpers, or several locals naming the same concept.
 - Full OOP is used when state, lifecycle, invariants, or domain collaboration are present.
-- Implementation is minimal: no extra validation, fallbacks, exception wrapping, variable passing, parameters, redundant names, bloated files, or abstractions without real reuse.
+- Implementation is minimal: no extra validation, fallbacks, exception wrapping, variable passing, parameters, redundant names, bloated files, convenience wrappers, protocol inheritance, clone methods, rebuild methods, future-extension entrypoints, debug entrypoints, or abstractions without real reuse.
 - Constructors and functions use default parameters for configuration defaults, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
+- Deletion checklist is complete: delete public entrypoints without real call sites; delete wrappers callers can replace with arrays, tensors, standard slicing, constructors, or configuration defaults; delete test-only entrypoints; delete compatibility branches that hide errors; delete helpers that do not isolate real complexity.
 
 ### Documentation
 
@@ -34,6 +42,7 @@ Run local review after any deliverable is produced and before marking a task or 
 - No scattered documents, duplicate explanations, stale claims, conflicting rules, vague TODOs, or unsupported conclusions.
 - Structure is short and actionable instead of repeating background or narrative filler.
 - Documents state concrete facts, concrete actions, and concrete decisions, with no filler, repeated goals, missing "what to do", or undefined invented terms.
+- Chinese-package documents use complete Chinese prose; any retained English term, abbreviation, or proper name is explained in Chinese in the same sentence or an adjacent sentence.
 - Project documents, use cases, designs, and tasks each own their own content; the same goals are not repeated across all of them.
 - Use cases express business scenarios, main success scenarios, conditional substeps, and sub-use cases, not test plans or implementation tasks.
 - Task files use `tasks/NN.task_name.md`, change files use `changes/change_name.md` without timestamps, and change documents record only later changes after implementation.

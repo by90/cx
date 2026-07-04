@@ -6,15 +6,22 @@ version: 0.1.0
 
 # cx Reusable Feature, Reusable Class, And Common Module Extraction
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Turn repeated logic, stable data structures, reusable classes, generic capabilities, test harnesses, and UI state models into small, stable, verifiable reusable capabilities. AI-assisted coding often creates similar code in multiple places; this skill stops that drift by requiring search, calling-model design, API design, migration planning, and verification when duplication becomes meaningful.
 
 ## Minimal Implementation Discipline
 
-Iron rule: absolutely no unmaintainable pile-up code.
+Iron rule: absolutely no unmaintainable pile-up code. This applies to source code, tests, scripts, tools, examples, and workflow-generated code; common modules cannot use "reuse", "stability", or "future extension" as reasons to bloat.
 
-- Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early.
+- Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early. Prove real call sites before extracting a public entrypoint.
+- Stable infrastructure starts as one field group, one constructor, and the fewest public methods. If callers can use arrays, tensors, standard slicing, standard-library errors, configuration default parameters, or explicit construction directly, do not wrap it.
+- If a public class or public function adds protocol inheritance, convenience wrappers, clone methods, rebuild methods, padding methods, negative-index compatibility, fallback validation, debug entrypoints, or future-extension entrypoints for completeness, delete them unless the current calling model requires them.
 - Keep file, class, method, and variable names short and clear; avoid sentence-like identifiers, and extract responsibilities or reuse domain terms when names grow too long.
 - Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
 - Unless business rules explicitly require it, do not hide exceptions, silently fall back, or turn errors that would harm the product into defaults, empty results, skipped records, fake successful retries, or warnings; during development, let these errors stop execution.
@@ -28,6 +35,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
 - Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
 - A generic capability, reusable feature, or reusable class should first abstract the public entrypoint, call style, lifecycle, state source, and test isolation; do not first abstract one-off file reads, one-off validation, single-field conversion, or future-maybe internal steps.
+- Common-module review must ask whether the code can be deleted first. Behavior callers can express directly with arrays, tensors, standard slicing, constructors, configuration default parameters, or library-native errors does not belong in a common module.
 - Refactoring should delete code, reduce branches, and shrink the public surface, not move logic into more small functions.
 
 ## Calling Model Gate

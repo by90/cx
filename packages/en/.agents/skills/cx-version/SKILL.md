@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Release Version Management
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Use this skill when preparing, reviewing, or explaining a project release. The release mechanism must be standardized and should use the target project's non-interactive version tool first:

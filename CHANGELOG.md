@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added `$cx-timeseries-modeling` for heterogeneous multivariate time-series design with PyTorch Forecasting as the primary reference framework.
 - Added a development-stage no-legacy-compatibility iron rule to AGENTS, `$cx-pytorch-tdd`, and `$cx-rust-tdd`.
 - Added a `$cx-workflow` skills command officer rule requiring task analysis and a recommended minimal cx skill combination before execution.
+- Added package-wide language rules that require package-language prose and Chinese explanations for retained English terms in Chinese-package conversations and documents.
+- Added a cross-package iron rule that treats bloated source, tests, scripts, tools, examples, and workflow-generated code as incomplete until deleted back to the smallest functional entrypoint.
 
 ## [0.1.2] - 2026-05-27
 

@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Change Documents
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Maintain `changes/` under each `docs/cx` scenario. A change document records later changes after implementation. It must not duplicate the whole use case or replace initial planning.

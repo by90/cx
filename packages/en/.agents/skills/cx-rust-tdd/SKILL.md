@@ -6,6 +6,11 @@ version: 0.1.0
 
 # cx Rust Code And Explicit Tests
 
+## Language Rules
+
+- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
+- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+
 ## Purpose
 
 Use this skill for Rust implementation work after the current `docs/cx` task is known. It is a general Rust code-quality skill; enter test-first flow only when the current request, task document, or change document explicitly asks for TDD, unit tests, or failing tests. For GPUI/macOS desktop UI work, it adds real-device verification discipline without replacing a dedicated UI component design process.
