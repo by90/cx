@@ -78,6 +78,9 @@ Iron rule: absolutely no unmaintainable pile-up code.
 - Prefer real but reduced unit-test data.
 - For database behavior, prefer a small SQLite database or fixture instead of mocking the data-access layer.
 - Use mocks sparingly, only for boundaries such as external services, time, randomness, expensive hardware, or uncontrollable side effects.
+- Unit-test assertions must state that one actual value equals one known constant fact. Expected values must come from manual confirmation, real small samples, fixed fixtures, or frozen database facts. Do not recompute another calculation, query, transformation, aggregation, ordering, formula, or equivalent business algorithm on the expected side and compare both results.
+- For lists, arrays, tensors, query results, dataset samples, and other ordered collections, check the first item, the last item, and one middle item against known constant facts by default, plus length, shape, dtype, and device when relevant. Do not compare a full collection against another fully computed collection just to look complete.
+- Only when the current request or task document explicitly requires full collection verification may a test check every item. Limit-up and limit-down price calculation tests are an explicit exception and may cover a full market-data sample; even then, expected limit prices, abnormal codes, and expected states must be known constant facts or manually confirmed facts, not values recomputed with the same limit-price algorithm in the test.
 
 ## Tensor test checklist
 
