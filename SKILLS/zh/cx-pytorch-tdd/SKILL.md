@@ -24,6 +24,7 @@ version: 0.1.0
 5. API 行为可能受版本影响时，查询 PyTorch 和 Lightning 官方最新文档。
 6. 训练、数据准备、诊断和迁移脚本不得接收命令行参数；需要调整 batch、device、路径、seed、epoch、model variant 或诊断开关时，必须在 config 子系统定义带默认值的配置项，默认运行使用这些默认值。
 6.1 构造函数和普通函数优先用默认参数表达配置默认值，例如 `batch_size=config.train.batch_size`；函数体内用同名字段承载参数，例如 `self.batch_size = batch_size`，不要用 `None` 分支重复表达已有配置默认值。
+6.2 数值类型、分级类型、类别类型、序号类型、行号类型和索引类型必须来自 config 子系统中的类型对象。PyTorch 训练侧应在模型配置中保存 `torch.dtype` 类型对象；除配置默认值测试外，测试和实现不得在数据准备、张量构造、组批、训练、推理、损失计算或测试夹具中直接写硬编码 `torch.float32`、`torch.float64`、`torch.float16`、`torch.bfloat16`、`torch.int64`、`torch.int32`、`np.float32`、`np.float64`、`np.int64`、`np.int32` 或等价类型。
 7. 明确要求单元测试时使用 Python `unittest`；不要引入 `pytest`，除非项目已有明确例外。
 8. 测试必须确定性、小规模、CPU 优先，除非目标行为就是 GPU 行为。
 9. tensor 变换可以优先写成纯函数；只要涉及数据集状态、模型状态、训练状态、配置生命周期或领域不变量，就必须使用明确 OOP 建模。
@@ -83,6 +84,7 @@ version: 0.1.0
 ## Tensor 测试清单
 
 - 断言 shape、dtype 和 device。
+- dtype 断言必须对比 config 子系统中的类型对象；只有配置默认值测试可以直接断言具体框架类型常量。
 - 测试空输入、单项、多项和变长输入。
 - 涉及 padding、mask、length 时必须测试语义。
 - 测试确定性和重要边界条件。

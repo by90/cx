@@ -23,14 +23,15 @@ Use this for Python ML code, PyTorch tensor utilities, LightningModules, DataMod
 4. Before creating or rebuilding an environment, visit the official Python downloads page and the PyTorch Start Locally page to choose the current official stable Python, PyTorch, and CUDA combination. Do not default to nightly, prerelease, or unofficial wheels.
 5. When API behavior may be version-sensitive, check current official PyTorch and Lightning documentation.
 6. Training, data-preparation, diagnostic, and migration scripts must not accept command-line arguments. When batch, device, path, seed, epoch, model variant, or diagnostic switches must be adjustable, define config-subsystem items with defaults, and let default runs use those defaults.
-7. When unit tests are explicitly requested, use Python `unittest`. Do not introduce `pytest` unless the repository has an explicit exception.
-8. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
-9. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
-10. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable features, classes, or components.
-11. Follow the one-code-file boundary plus source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`; when tests are explicitly requested, tests mirror them under `tests/<subsystem>/`, and each source file maps to one `*_test.py`. Source files and explicitly requested unit tests must include file-level purpose notes, class notes, function parameter/return explanations, and line-by-line intent comments.
-12. After editing Python source or tests, run Black default-format checks, for example `python -m black --check src tests tools`, and avoid changing unrelated user code.
-13. After code and required verification are done, run `$cx-review` code-deliverable review. Focus on docs agreement, repeated tensor/data/config logic, full object-oriented design, minimal implementation, no extra validation, no extra variable passing, and no redundant parameter or variable names.
-14. If review fails, do not mark the task complete; fix implementation or docs, then rerun verification and review.
+7. Numeric types, level types, category types, id types, row-id types, and index types must come from type objects in the config subsystem. PyTorch training code should store `torch.dtype` type objects in model config; except for tests that assert config defaults, tests and implementation must not directly hard-code `torch.float32`, `torch.float64`, `torch.float16`, `torch.bfloat16`, `torch.int64`, `torch.int32`, `np.float32`, `np.float64`, `np.int64`, `np.int32`, or equivalent types in data preparation, tensor construction, batching, training, inference, loss computation, or test fixtures.
+8. When unit tests are explicitly requested, use Python `unittest`. Do not introduce `pytest` unless the repository has an explicit exception.
+9. Keep tests deterministic, tiny, and CPU-first unless GPU behavior is the subject.
+10. Prefer pure functions for tensor transformations and isolate Lightning orchestration.
+11. Before adding a dataset, tensor container, indexed series, or test harness, add `$cx-common-module` and search for existing reusable features, classes, or components.
+12. Follow the one-code-file boundary plus source/test layout and commenting rules from `$cx-tdd`: source files live under `src/<subsystem>/`; when tests are explicitly requested, tests mirror them under `tests/<subsystem>/`, and each source file maps to one `*_test.py`. Source files and explicitly requested unit tests must include file-level purpose notes, class notes, function parameter/return explanations, and line-by-line intent comments.
+13. After editing Python source or tests, run Black default-format checks, for example `python -m black --check src tests tools`, and avoid changing unrelated user code.
+14. After code and required verification are done, run `$cx-review` code-deliverable review. Focus on docs agreement, repeated tensor/data/config logic, full object-oriented design, minimal implementation, no extra validation, no extra variable passing, and no redundant parameter or variable names.
+15. If review fails, do not mark the task complete; fix implementation or docs, then rerun verification and review.
 
 ## Minimal Implementation Discipline
 
@@ -81,6 +82,7 @@ Iron rule: absolutely no unmaintainable pile-up code.
 ## Tensor test checklist
 
 - Assert shape, dtype, and device when relevant.
+- dtype assertions must compare against type objects from the config subsystem; only tests for config defaults may assert concrete framework type constants directly.
 - Test empty input, single item, multiple items, and variable-length input.
 - Test padding, mask, and length semantics when applicable.
 - Test deterministic behavior and important edge cases.
