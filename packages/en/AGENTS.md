@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## Startup Requirement: Windows Chinese Encoding
+
+Before reading, searching, writing, or displaying Chinese files in Windows PowerShell, set the current command channel to `UTF-8`. `PowerShell` is the Windows command shell name, and `UTF-8` is the encoding standard; these names are kept to match real commands and standards.
+
+In Windows PowerShell 5.1, run these commands first:
+
+```powershell
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+[Console]::InputEncoding = $utf8NoBom
+[Console]::OutputEncoding = $utf8NoBom
+$OutputEncoding = $utf8NoBom
+```
+
+If Chinese terminal output shows mojibake, do not judge file content from that output. Use `apply_patch`, structured search, explicitly encoded read commands, or saved `UTF-8` scripts for Chinese prose. State the mojibake fact and handling method only once; then continue directly instead of repeating the same warning before every file operation.
+
 ## Decision Prompts
 
 When facing architecture tradeoffs, API design, dependency choices, implementation paths, performance or compatibility tradeoffs, release strategy, repeated defects, or project risk, prefer one of these decision frames: first principles, inversion, five whys, second-order thinking, regret minimization, opportunity cost, or premortem analysis.

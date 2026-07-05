@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## 启动必做：Windows 中文编码
+
+在 Windows PowerShell 中读取、搜索、写入或展示中文文件前，必须先把当前命令通道设置为 `UTF-8`。`PowerShell` 是 Windows 命令外壳名称，`UTF-8` 是统一编码名称；本处保留原文是为了对应真实命令和编码标准。
+
+在 Windows PowerShell 5.1 中先执行以下命令：
+
+```powershell
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+[Console]::InputEncoding = $utf8NoBom
+[Console]::OutputEncoding = $utf8NoBom
+$OutputEncoding = $utf8NoBom
+```
+
+如果当前终端输出的中文出现乱码，禁止通过该输出判断文件内容是否正确；只能通过 `apply_patch`、结构化搜索、带明确编码的读取命令或已保存为 `UTF-8` 的脚本处理中文正文。发现乱码时只说明一次事实和处理方式；后续直接执行，不要在每次文件操作前重复输出同类提示。
+
 ## 决策提示词
 
 遇到架构取舍、接口设计、依赖选择、实现路径、性能与兼容性权衡、发布策略、反复缺陷或项目风险时，优先把问题套入以下 7 类提示词，让 agent 按明确框架追问、拆解并给出可执行结论。

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Added a startup encoding rule to the English and Chinese AGENTS templates so Windows PowerShell sessions set UTF-8 before handling Chinese files and avoid repeated mojibake warnings.
 - Added stricter cx documentation rules for concrete wording, defined terms, task-file naming, post-implementation change documents, package-local readme files, default-parameter configuration usage, absolute imports, and VS Code unittest discovery.
 - Replaced the previous behavior-discovery documentation workflow with `$cx-story`, `docs/cx`, use-case documents, task documents, and change documents.
 - Replaced the old document-complete confirmation gate with an execution-mode choice: direct completion is the default, while per-task confirmation is opt-in at work start.
