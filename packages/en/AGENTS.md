@@ -15,6 +15,12 @@ $OutputEncoding = $utf8NoBom
 
 If Chinese terminal output shows mojibake, do not judge file content from that output. Use `apply_patch`, structured search, explicitly encoded read commands, or saved `UTF-8` scripts for Chinese prose. State the mojibake fact and handling method only once; then continue directly instead of repeating the same warning before every file operation.
 
+## Startup Requirement: Windows PowerShell 5.1 Command Compatibility
+
+In native Windows Codex App sessions, write commands for Windows PowerShell 5.1 by default unless the current shell has already been confirmed as PowerShell 7 or newer. `Codex App` is the local desktop application name, and `PowerShell 7` is the newer shell name; these names are kept to match the real product and version.
+
+Do not use `&&` or `||`, because Windows PowerShell 5.1 does not support those command connectors. When commands must run in sequence, use separate command calls. When the next command depends on the previous command succeeding, run them step by step and check the exit result. Do not discover shell capability by trying a command, letting it fail, and then rewriting it.
+
 ## Decision Prompts
 
 When facing architecture tradeoffs, API design, dependency choices, implementation paths, performance or compatibility tradeoffs, release strategy, repeated defects, or project risk, prefer one of these decision frames: first principles, inversion, five whys, second-order thinking, regret minimization, opportunity cost, or premortem analysis.
