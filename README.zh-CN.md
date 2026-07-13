@@ -97,7 +97,6 @@ docs/cx/01.创建用户/changes/调整用户实体约束.md
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模、协变量、泄漏检查和 PyTorch Forecasting 选型 |
 | `$cx-rust-tdd` | Rust 类型设计、所有权设计、可选显式测试、`cargo fmt`、`cargo test` 和 `clippy` |
 | `$cx-common-module` | 可复用功能、可复用类、功能入口和重复逻辑收敛 |
-| `$cx-review` | 代码、文档、教程、研究、设计和流程变更完成后的强制本地 review |
 | `$cx-review` | 交付物质量审查、完成证据门禁、文档一致性和剩余风险 |
 
 ## 提示词契约
