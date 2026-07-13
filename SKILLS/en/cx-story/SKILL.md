@@ -22,6 +22,7 @@ Express user goals through main-success scenarios while keeping project, use-cas
 ## Layout
 
 ```text
+AGENTS.md
 docs/cx/
 docs/cx/00.project.md
 docs/cx/docs/
@@ -35,6 +36,7 @@ docs/cx/01.create_user/tasks/01.validate_request.md
 docs/cx/01.create_user/changes/
 ```
 
+- The project-root `AGENTS.md` supplements global rules and navigates current-project common-package tutorials.
 - `docs/cx/docs/` stores topics for common packages and stable technical processes.
 - `docs/cx/notes/` stores current conclusions for explicit research questions.
 - Each numbered top-level story folder represents one user goal.
@@ -60,14 +62,16 @@ docs/cx/01.create_user/changes/
 
 ## Work priority
 
-1. Use `$cx-doc` to read relevant topic documents.
-2. Search registered common packages, public interfaces, and real callers.
-3. Read the project context, target use case, design, and original task.
-4. Check `changes/`; use the earliest still-relevant unfinished change as the current instruction.
-5. Without an active change, follow the current original task.
-6. For a change or code error in an existing story, use `$cx-changelog` and commit the change file before implementation.
-7. Rewrite durable documents and implementation to current state, then use `$cx-review` for quality and completion evidence.
-8. Delete the change file and commit the deletion only after review passes.
+1. Read the project-root `AGENTS.md`. When initializing a project, create it from `$cx-doc`'s `assets/AGENTS.md` and tailor it to project goals, languages, toolchain, and common packages.
+2. Read every common-package tutorial linked for the current domain and `docs/cx/docs/00.index.md`.
+3. Search registered common packages, public interfaces, and real callers.
+4. Read the project context, target use case, design, and original task.
+5. Check `changes/`; use the earliest still-relevant unfinished change as the current instruction.
+6. Without an active change, follow the current original task.
+7. For a change or code error in an existing story, use `$cx-changelog` and commit the change file before implementation.
+8. Update tutorials, the topic index, and project `AGENTS.md` navigation when a common package is added or changed.
+9. Rewrite durable documents and implementation to current state, then use `$cx-review` for quality and completion evidence.
+10. Delete the change file and commit the deletion only after review passes.
 
 ## Durable document sections
 
@@ -80,6 +84,7 @@ Task: source, goal, file scope, task measure, current implementation requirement
 ## Completion criteria
 
 - Use case, design, tasks, topic documents, and implementation state only current facts.
+- The project-root `AGENTS.md` matches project goals, languages, toolchain, and common packages and navigates every common-package tutorial.
 - Task files in an existing story did not change because of a change or error.
 - All declared verification succeeded.
 - Both `$cx-review` stages passed.

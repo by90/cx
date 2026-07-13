@@ -52,6 +52,8 @@ These rules override other rules, cx skills, templates, examples, and temporary 
 21. **Global numeric type rule**: every new or edited `NumPy` array, PyTorch tensor, model input, indicator matrix, intermediate result, training datum, level value, category value, entity id, time id, row id, group offset, and index array must use type objects from the project config. Projects should define config items for continuous numeric type, level/category type, and index type, and performance paths must use those type objects directly instead of parsing strings inside loops, data loading, indicator computation, batching, training, inference, loss computation, or test fixtures. Except in config definitions, tests that assert config defaults, and config documentation that explains defaults, do not hard-code `np.float32`, `np.float64`, `np.float16`, `np.int64`, `np.int32`, `np.int8`, `torch.float32`, `torch.float64`, `torch.float16`, `torch.bfloat16`, `torch.int64`, `torch.int32`, or equivalent numeric types in production paths, test fixtures, or documentation examples. If a project uses a `NumPy` data layer and `NumPy` has no native `bfloat16`, do not use a third-party package to extend `NumPy` for that type; ML code may choose `torch.bfloat16` through PyTorch model config.
 22. **cx source repository modification rule**: when modifying cx workflow, skills, templates, examples, install rules, or global `AGENTS.md` templates, modify only the cx source repository as the durable source. Do not hand-edit the local global install directory as the final result. After every modification, commit and push `main`, then run the matching install script so local global cx skills and `AGENTS.md` are updated from the remote source.
 23. **Current state and Git history**: project, use-case, design, task, topic, research, and interface documents state only current valid facts. Never preserve an old solution, old/new comparison, migration process, completed change, or development process in durable documents. Only the active unfinished change file may state old/new differences. Commit that file before work; delete it after unified review passes and commit the deletion. Git commits, tags, and releases are the only history source.
+24. **Project AGENTS.md**: in addition to the global `AGENTS.md`, every project root has a project `AGENTS.md` tailored to project goals, primary languages, toolchain, directories, run entries, verification commands, and common packages. It supplements project facts without copying, weakening, or overriding global rules. Initialize or fix it from `$cx-doc`'s `assets/AGENTS.md`.
+25. **Common-package tutorials**: every common package, reusable component, and stable public interface has an independent numbered caller tutorial under `docs/cx/docs/`. Project `AGENTS.md` registers its domain, tutorial link, public entry, and read-first condition. Read every matching tutorial before entering a domain. If tutorial or navigation is missing, use `$cx-doc` to add it before planning, designing, or coding.
 
 ## Repository Workflow
 
@@ -63,8 +65,8 @@ This repository uses a `docs/cx` use-case-driven flow. All cx project descriptio
 4. Design documents contain file scope, functional entrypoints, reusable capabilities, design decisions, tradeoff reasons, and verification. Task documents contain what to do, file scope, task measure, verification, and status.
 5. `changes/` stores only current unfinished work instructions. For a requirement change, design change, implementation change, or code error in an existing story, create or update the change file and commit it before implementation.
 6. Define new terms on first use and prefer user/project terms.
-7. Before planning or code changes, read relevant `docs/cx/docs/` topics, then project context, the target use case, design, original task, and unfinished changes.
-8. Start by reading topic documents and searching registered common packages, then use unfinished changes to decide current work.
+7. Before planning or code changes, read the project-root `AGENTS.md`, then every common-package tutorial linked for the current domain, followed by project context, the target use case, design, original task, and unfinished changes.
+8. Start by following project `AGENTS.md` to search registered common packages, tutorials, public entries, and real callers, then use unfinished changes to decide current work.
 9. Each main success scenario has one folder, such as `docs/cx/01.create_user/`.
 10. Each scenario folder contains `00.use_case.md`, `00.design.md`, `tasks/`, and `changes/`.
 11. The use-case document expresses the main success scenario and conditional, alternate, or exception substeps attached to concrete main steps.
@@ -81,8 +83,8 @@ This repository uses a `docs/cx` use-case-driven flow. All cx project descriptio
 22. Use `$cx-workflow` for routing and skill selection.
 23. Use `$cx-story` for use cases, main-success scenarios, conditional substeps, fixed task sets, and current state. Use `$cx-changelog` for temporary changes.
 24. When TDD or unit tests are explicitly requested, use `$cx-tdd` as the single main workflow. Add `$cx-pytorch-tdd` for Python, PyTorch, or Lightning tests, and add `$cx-rust-tdd` for Rust tests. Do not use either language test skill without an explicit test requirement.
-25. Before reusable features, classes, or common entries, use `$cx-doc` to read topic documents and `$cx-common-module` to search registered capabilities and real callers.
-26. Every common package, stable interface, protocol, data process, feature system, and technical direction has an independent numbered topic document under `docs/cx/docs/`.
+25. Before reusable features, classes, or common entries, use `$cx-doc` to read caller tutorials linked by project `AGENTS.md` and `$cx-common-module` to search registered capabilities and real callers.
+26. Every common package and stable interface has an independent numbered caller tutorial under `docs/cx/docs/`; protocols, data processes, feature systems, and technical direction have independent numbered topic documents. Project `AGENTS.md` links every common-package tutorial.
 27. Every research effort saves its question-specific current conclusion under `docs/cx/notes/` and explains it plainly.
 28. Run the narrowest effective verification first, then broader validation as needed, and record commands and results in the original task.
 29. After any deliverable, use `$cx-review` for artifact quality and the completion-evidence gate. A failure in either stage keeps the task unfinished and the current change file present.
@@ -90,6 +92,7 @@ This repository uses a `docs/cx` use-case-driven flow. All cx project descriptio
 ## docs/cx Layout
 
 ```text
+AGENTS.md
 docs/cx/
 docs/cx/00.project.md
 docs/cx/docs/
@@ -118,7 +121,7 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 - `$cx-story`: use cases, main-success scenarios, conditional substeps, fixed task sets, and current task documents.
 - `$cx-tdd`: explicit test-first implementation and verification evidence.
 - `$cx-changelog`: registration, commit, execution, and completion deletion of temporary `changes/` files.
-- `$cx-doc`: topic documents, common-package documentation, stable technical processes, and research notes.
+- `$cx-doc`: common-package caller tutorials, stable topic documents, research notes, and project `AGENTS.md` tutorial navigation.
 - `$cx-version`: project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and annotated tags.
 - `$cx-research`: model selection, paper research, source filtering, and cited synthesis.
 - `$cx-design`: object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, database-access boundaries, field enums, and implementation-path tradeoffs.
@@ -139,7 +142,7 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 - `NumPy`, PyTorch, indicator matrices, training data, level values, category values, ids, row ids, and index arrays must use type objects from the config subsystem; except in config definitions, tests that assert config defaults, and config documentation that explains defaults, do not hard-code numeric types in business code, performance paths, test fixtures, or documentation examples.
 - Use full object-oriented design for domain logic. Tiny purely stateless logic may remain as short functions; state, lifecycle, invariants, and domain collaboration use object-oriented design.
 - Constructors and functions express configuration defaults with default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`, and store parameters on same-named fields.
-- Common packages must have independent numbered topic documents under `docs/cx/docs/` that explain current public entries and usage. Other documents link to the topic without copying details.
+- Common packages must have independent numbered caller tutorials under `docs/cx/docs/` that state goal, scenarios, prerequisites, public entry, inputs, outputs, a minimal runnable example, steps, expected results, common failures, constraints, and verification. Other documents link to the tutorial without copying details.
 - Do not add command-line argument parsing to target-project scripts; use config items with defaults.
 - Do not default to dynamic reflection.
 - When Python unit tests are explicitly requested, use `unittest`. Do not introduce `pytest` unless the current user request explicitly requires it.

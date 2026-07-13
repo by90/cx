@@ -12,6 +12,9 @@ TODO
 
 ## Technical Constraints
 
+- The project root has an `AGENTS.md` created from `$cx-doc`'s `assets/AGENTS.md` and tailored to project goals, languages, toolchain, and common packages. It supplements global rules only.
+- Every common package, reusable component, and stable public interface has an independent numbered caller tutorial under `docs/cx/docs/`, and project `AGENTS.md` registers its domain, tutorial link, public entry, and read-first condition.
+- Before entering a domain, read every tutorial linked for that domain in project `AGENTS.md`, then plan, design, or code.
 - Python, PyTorch, and Rust work do not use unit tests or TDD by default; create or edit unit tests only when the user request, task document, or change document explicitly asks for them.
 - State, lifecycle, invariants, and domain collaboration use full object-oriented design or equivalent type modeling.
 - Establish the task set once when a new story is created. After creation, task count, number, filename, and identity stay fixed.
@@ -19,7 +22,7 @@ TODO
 - Task files use `tasks/NN.task_name.md`; do not use `00.task.md`.
 - Change files use `changes/change_name.md` only for unfinished work. Commit the file before implementation, delete it after review, and commit the deletion.
 - Code stays minimal, reuse-first, low-duplication, and avoids bloated files or overly long identifiers.
-- Common packages and stable technical processes have independent numbered topic documents under `docs/cx/docs/`; read existing topics before work.
+- Common packages have independent numbered caller tutorials under `docs/cx/docs/`; stable technical processes have independent numbered topic documents.
 - Every research effort saves its question-specific current conclusion and plain-language explanation under `docs/cx/notes/`.
 - All cx scenarios, tasks, process documents, and changes live under `docs/cx`.
 - Every durable document describes only current state, with no old solution, comparison, or completed change. Git preserves history.

@@ -1,8 +1,8 @@
 # 00.design.md
 
-## Topic Documents and Reusable Code
+## Tutorials, Topic Documents, and Reusable Code
 
-| Topic document | Capability | Existing entry | Usage |
+| Tutorial or topic document | Capability | Existing entry | Domain read-first condition |
 | --- | --- | --- | --- |
 | `docs/cx/docs/NN.topic.md` | TODO | TODO | TODO |
 
@@ -17,7 +17,7 @@
 - Functional entrypoint: TODO
 - Normal call style: TODO
 - Special-case entrypoint: TODO
-- Topic document: TODO; every common package has an independent numbered document under `docs/cx/docs/`.
+- Caller tutorial: TODO; every common package has an independent numbered tutorial under `docs/cx/docs/` linked by project `AGENTS.md`.
 
 ## Default Parameters
 

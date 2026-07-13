@@ -1,6 +1,6 @@
 ---
 name: cx-workflow
-description: Use as the cx workflow router and end-to-end orchestrator. Start by reading docs/cx/docs topics and registered common packages, then locate the current story, fixed tasks, and temporary changes and choose the smallest skill set. Durable documents keep only current state, and cx-review handles both quality and completion evidence.
+description: Use as the cx workflow router and end-to-end orchestrator. Start by reading the project AGENTS.md, current-domain common-package tutorials, and registered public entries, then locate the current story, fixed tasks, and temporary changes and choose the smallest skill set. Durable documents keep only current state, and cx-review handles both quality and completion evidence.
 version: 0.1.0
 ---
 
@@ -22,24 +22,25 @@ Understand established project knowledge and reusable capabilities before decidi
 ## Startup order
 
 1. Create a visible conversation checklist for multi-step work.
-2. Read `docs/cx/docs/00.index.md` and relevant topic documents.
-3. Search documented common packages, public entries, source locations, and real callers.
-4. Read project context, the current use case, design, and original task.
-5. Check the story `changes/` directory.
-6. Follow an unfinished change when present; otherwise follow the current original task.
-7. For a requirement change, design change, implementation change, or code error in an existing story, create or update the change file and commit it before implementation.
-8. Choose the smallest necessary skill set and proceed.
+2. Read the project-root `AGENTS.md`. If it is missing or does not reflect project goals, languages, and common packages, first create or fix it from `$cx-doc`'s `assets/AGENTS.md`.
+3. Read every tutorial registered for the current domain, then check `docs/cx/docs/00.index.md`.
+4. Search documented common packages, public entries, source locations, and real callers.
+5. Read project context, the current use case, design, and original task.
+6. Check the story `changes/` directory.
+7. Follow an unfinished change when present; otherwise follow the current original task.
+8. For a requirement change, design change, implementation change, or code error in an existing story, create or update the change file and commit it before implementation.
+9. Choose the smallest necessary skill set and proceed.
 
 ## Common-capability gate
 
 Before adding a class, function, component, data structure, protocol implementation, or tool:
 
-1. Read related topic documents under `docs/cx/docs/`.
+1. Identify the current domain from project `AGENTS.md` and read all registered common-package tutorials.
 2. Search registered common packages and stable interfaces.
 3. Search source and real callers to confirm documentation is current.
 4. Record the reason to adopt or reject each relevant candidate.
 5. Design a new entry only when no existing capability satisfies the goal.
-6. Add or update the topic document and index with any new common capability.
+6. Add a caller tutorial and update the index and project `AGENTS.md` navigation with any new common capability.
 
 Ignoring a registered common package and adding similar implementation is duplication and must fail `$cx-review`.
 
@@ -54,7 +55,8 @@ Ignoring a registered common package and adding similar implementation is duplic
 
 ## Topic documents and research
 
-- Use `$cx-doc` for common packages, protocols, data processes, feature systems, metric definitions, and technical direction.
+- Use `$cx-doc` for caller tutorials and register each common package's domain, tutorial link, public entry, and read-first condition in project `AGENTS.md`.
+- Use `$cx-doc` for protocols, data processes, feature systems, metric definitions, and technical direction.
 - Use `$cx-research` for research and save its question-specific synthesized conclusion under `docs/cx/notes/`.
 - Answer the research question first, then explain evidence, limits, and work impact plainly.
 - Do not commit search scratchpads, excerpt piles, or candidate-process notes.

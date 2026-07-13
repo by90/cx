@@ -26,14 +26,16 @@ Run two consecutive stages in one skill: determine whether artifacts are correct
 
 - Implementation exactly matches the current use case, design, original task, and unfinished change.
 - Explicit objects or equivalent types represent state, lifecycle, invariants, and domain collaboration.
-- The agent read relevant `docs/cx/docs/` topics and searched registered common packages, public entries, and real callers.
+- The agent read current-domain common-package tutorials from project `AGENTS.md` and searched registered public entries and real callers.
 - Unless the user explicitly requests a specific validation or error behavior in the current request, code does not add validation that raises an error and does not catch, translate, wrap, swallow, skip, or fall back from errors. The original type, message, and stack stop execution.
 - Code, interfaces, parameters, configuration, paths, callers, documentation, examples, and declared tests express only the latest intent. No old entry, alias, adapter, bridge, compatibility branch, compatibility behavior, or old trace remains.
 - No duplicated logic, bloated code, needless parameters, needless variables, convenience wrapper, debug entry, or speculative extension remains.
 
 ### Current-state documents
 
-- Project, use-case, design, task, topic, and research documents each have a distinct responsibility.
+- The project-root `AGENTS.md`, project, use-case, design, task, topic, and research documents each have a distinct responsibility.
+- Project `AGENTS.md` is tailored to project goals, languages, toolchain, and common packages and supplements rather than copies global rules.
+- Project `AGENTS.md` lists every common package's domain, tutorial link, public entry, and read-first condition, and every link is valid.
 - Every durable document states only the current goal, design, task, interface, or conclusion.
 - No durable document contains an old solution, comparison, migration narrative, completed change, draft, backup, or parallel version.
 - An existing story did not change task count or task identity because of a requirement change, implementation change, or code error.
@@ -43,14 +45,17 @@ Run two consecutive stages in one skill: determine whether artifacts are correct
 
 - Design starts from target behavior, constraints, data boundaries, lifecycle, and invariants.
 - Entries, object responsibilities, collaboration, state sources, reuse boundaries, non-goals, and verification are explicit.
-- Common packages and stable technical processes have independent topic documents under `docs/cx/docs/`.
+- Common packages have independent caller tutorials under `docs/cx/docs/`, and stable technical processes have independent topic documents.
 - The design maps to the original task set without creating tasks for implementation changes.
 
 ### Tutorial
 
+- The tutorial explains real work from the caller's perspective rather than cataloging internal classes, fields, or implementation steps.
+- Goal, scenarios, prerequisites, public entry, inputs, outputs, minimal runnable example, steps, expected results, failure handling, constraints, and verification are complete.
 - Preconditions, steps, commands, inputs, expected results, and failure handling are executable in order.
 - Commands, paths, labels, and interfaces match current project state.
 - No outdated step, historical alternative, or hidden prerequisite remains.
+- Every common package has exactly one current tutorial and project `AGENTS.md` links it correctly.
 
 ### Research
 
@@ -76,7 +81,7 @@ Verify:
 4. Unit tests are evidence only when explicitly declared by the user, current task, or active change.
 5. No unrun, failed, or missing verification is reported as successful.
 6. Durable documents contain only current state and no old/new difference outside unfinished changes.
-7. No required topic document or registered common capability was ignored.
+7. No tutorial required by project `AGENTS.md`, topic document, or registered common capability was ignored.
 8. All callers use the current entry without compatibility code.
 9. No failed review, unresolved finding, or blocker is marked complete.
 10. The active change file can be deleted without losing current knowledge because durable documents are updated.
