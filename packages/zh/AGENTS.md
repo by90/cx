@@ -148,7 +148,7 @@ $OutputEncoding = $utf8NoBom
 21. 任务文档的基本量具是类或类型组合，可以是一个类，也可以是一组紧密协作的类或类型。
 22. 流程处理、任务分流和不确定应使用哪个 cx skill 时，优先使用 `$cx-workflow`。
 23. 用例、主成功场景、条件子步骤、固定任务集合和当前状态维护使用 `$cx-story`；临时变更文件使用 `$cx-changelog`。
-24. 明确声明 TDD 或单元测试时使用 `$cx-tdd`；明确声明 Python 或 PyTorch 单元测试时叠加 `$cx-pytorch-tdd`；Rust 实现使用 `$cx-rust-tdd`，但 Rust 单元测试只在明确声明时创建。
+24. 明确声明 TDD 或单元测试时先使用 `$cx-tdd` 执行唯一主流程；Python、PyTorch 或 Lightning 测试再叠加 `$cx-pytorch-tdd`，Rust 测试再叠加 `$cx-rust-tdd`。没有明确测试要求时不使用两个语言测试技能。
 25. 通用功能、可复用功能或可复用类实现前，必须先使用 `$cx-common-module` 搜索和设计功能入口。
 26. 修改后先运行最窄的有效测试，再按需要运行更宽的验证，并记录命令和结果。
 27. 通用包、稳定公共接口、协议、数据过程、特征体系和技术转向必须使用 `$cx-doc` 在 `docs/cx/docs/` 下维护独立编号专题文档；工作开始时先读取这些文档，再搜索源码和真实调用点。
@@ -200,11 +200,11 @@ coding-agent 提示词应说明：
 - `$cx-version`：用项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md` 和带注释 tag 管理目标项目发布版本。
 - `$cx-research`：模型选择、AI 论文研究、来源筛选和带引用综合分析。
 - `$cx-design`：面向对象设计、职责拆分、领域对象、类命名、继承组合、数据库访问边界、字段枚举和实现路径取舍。
-- `$cx-pytorch-tdd`：Python、PyTorch、Lightning、tensor、训练与机器学习测试。
+- `$cx-pytorch-tdd`：在 `$cx-tdd` 主流程上补充 Python、PyTorch 和 Lightning 的测试工具、布局、真实数据与张量检查。
 - `$cx-pytorch-quick-hpo`：PyTorch 快速调参、字段贡献研究、特征组合、窗口长度、标签、训练超参和模型容量初筛。
 - `$cx-pytorch-full-hpo`：PyTorch 全量调参、完整数据训练、测试集评估、回测、top 3 候选比较和候选模型选择。
 - `$cx-timeseries-modeling`：异构多变量时间序列建模、字段语义分层、协变量、泄漏检查和 PyTorch Forecasting 选型。
-- `$cx-rust-tdd`：Rust 实现、所有权设计和 cargo test/fmt/clippy。
+- `$cx-rust-tdd`：在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实数据夹具和 `cargo` 检查。
 - `$cx-common-module`：通用功能、可复用功能、可复用类、可复用能力抽取和功能入口设计。
 - `$cx-review`：代码、文档、教程、研究、设计和流程变更完成后的强制本地 review。
 - 交付物完成后的统一审查使用 `$cx-review`；质量审查或完成证据门禁不通过时不得宣称任务完成，也不得删除当前变更文件。
@@ -224,15 +224,15 @@ coding-agent 提示词应说明：
 - 禁止默认使用 `getattr`、`setattr`、`delattr`、monkey patch、动态注入方法或字符串分发；只有没有明确静态面向对象接口时才允许，并且必须记录理由、隔离实现和测试。
 - 代码必须保持短小、直接、可读，避免过长文件、过长变量名和句子式标识符；发现可复用功能、类或逻辑时，先使用 `$cx-common-module` 搜索已有实现和可复用能力登记。
 - 代码格式遵循 Black 默认规范；修改 Python 源码或测试后必须运行 `python -m black --check src tests tools` 或项目等价命令。
-- 明确声明 Python 单元测试时，使用 Python 自带的 `unittest`，不要引入 `pytest`，除非项目已经明确采用它。
+- 明确声明 Python 单元测试时，使用 Python 自带的 `unittest`，禁止引入 `pytest`；只有用户当前请求明确要求时才例外。
 - 明确声明单元测试时，单元测试目录必须镜像 `src` 目录结构，并与源代码文件一一对应：`src/config/cnn_config.py` 的测试文件必须是 `tests/config/cnn_config_test.py`。
-- `src/`、`tests/` 及其所有子目录必须有空白 `__init__.py`，让源码和测试都成为稳定 Python 包。
+- `src/` 及其子目录必须有空白 `__init__.py`。`tests/__init__.py` 必须集中读取测试数据库并构造共享真实数据对象，不得留空；`tests/` 的其它包目录保留空白 `__init__.py`。
 - 项目内导入必须使用从仓库根包开始的绝对导入，例如 `from src.config.config import Config`；测试不得通过修改 `sys.path` 解决导入问题。
 - 明确声明单元测试时，VS Code 测试视图必须能发现并运行测试；`unittest` 发现参数使用 `-v -s ./tests -p *_test.py -t .`。
 - PyTorch 和 Lightning 接口或版本相关行为必须查官方最新文档。
 - tensor 测试要覆盖 shape、dtype、device、确定性和边界场景。
 - 训练测试必须很小：优先 CPU、小 batch、小模型、`fast_dev_run` 或有限 batch。
-- 明确声明单元测试时，尽量使用真实的小型测试数据；涉及数据库时优先使用缩小的 SQLite 数据库或 fixture，只有外部服务、时间、随机性等边界难以真实控制时才少量使用 mock。
+- 明确声明数据相关单元测试时，必须使用测试数据库真实数据；`tests/__init__.py` 只读取一次并提供共享对象，各测试文件不得重复读取。除非用户当前请求明确要求，禁止 mock 测试。
 
 ## Windows 工具链规则
 
@@ -243,8 +243,9 @@ coding-agent 提示词应说明：
 
 ## Rust / GPUI 规则
 
-- 明确声明 Rust 单元测试时，使用语言内置测试机制和 `cargo test`，不要引入额外测试框架，除非项目已经明确采用。
-- Rust 修改后运行 `cargo fmt` 和 `cargo test`，可行时运行 `cargo clippy --all-targets --all-features`。
+- 明确声明 Rust 单元测试时，使用语言内置测试机制和 `cargo test`，禁止引入额外测试框架；只有用户当前请求明确要求时才例外。
+- Rust 修改后运行 `cargo fmt`；只有明确声明单元测试或 TDD 时才运行 `cargo test`，可行时运行 `cargo clippy --all-targets --all-features`。
+- Rust 数据相关测试必须通过统一测试夹具模块读取测试数据库真实数据，并使用一次初始化机制共享；各测试模块不得重复读取数据库。除非用户当前请求明确要求，禁止 mock 或伪造仓库测试。
 - 用 struct/enum/trait 和明确 `Result` 错误表达领域状态。
 - 生产路径避免 `unwrap`、`expect` 和 `panic!`，除非不变量局部、已证明并记录。
 - 将纯状态、reducer 和渲染代码分离。

@@ -6,9 +6,11 @@ Do not install both English and Chinese packages into the same target project. S
 
 ## Core Contract
 
-cx is a workflow pack, not a component library. It defines how humans and AI keep use cases, design notes, tasks, changes, and verification evidence under `docs/cx`. Default execution completes the current task document and then edits only the one production code file bound to that task. Unit tests and TDD enter scope only when the user request, existing task document, or change document explicitly asks for them.
+cx is a workflow pack, not a component library. It requires agents to read `docs/cx/docs/` topic documents and registered common capabilities before using current use cases, designs, fixed tasks, and temporary changes. Durable documents keep only the latest state and Git preserves history.
 
-After code, documentation, tutorials, research, design, or process-change deliverables are produced, `$cx-review` is mandatory. Before handoff, `$cx-evidence` verifies review decisions and evidence. Review focuses on artifact-specific agreement, duplication smells, full object-oriented design, minimal implementation, tutorial executability, research source quality, design feasibility, and business semantics. If either review fails, the task or change remains incomplete.
+Development code implements only the latest intent. Unless the user explicitly requests a specific validation or error behavior, preserve the original error type, message, and stack and stop execution. Delete every old interface, alias, adapter, bridge, compatibility branch, and related trace, and move all callers to the current entry.
+
+After code, documentation, tutorials, research, design, or process deliverables, `$cx-review` runs artifact-quality review and the completion-evidence gate. A failure in either stage keeps the task unfinished and the active change file present.
 
 ```text
 docs/cx/00.project.md
@@ -18,8 +20,8 @@ docs/cx/01.create_user/tasks/01.write_user_entity.md
 docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 ```
 
-Each task's basic measure is a class or type group. One task handles one task document and one production code file; split another task before editing a second code file. Code defaults to full object-oriented design, minimal implementation, reuse first, low duplication, and no bloated files or overly long identifiers.
-Task files use `tasks/NN.task_name.md`; change files use `changes/change_name.md` without timestamps. Changes record only later changes after implementation.
+Establish the task set once for a new story. After creation, task count, numbers, filenames, and identities remain fixed. Requirement changes, implementation changes, and code errors rewrite the original task rather than creating fix or modification tasks.
+Change files under `changes/` guide unfinished work only. Commit them before implementation, delete them after review, and commit the deletion.
 
 Use-case granularity follows user goals: one main success scenario folder carries one user-goal use case. The main success scenario runs from trigger to completed goal, usually in 3 to 9 main steps, and each step is one observable actor-system interaction. Conditional, alternate, and exception behavior must use substep numbering such as `1.1` or `2.1` under a concrete main step, and must say whether the flow returns to a step, ends this use case, or enters another use case. Do not put several home-screen buttons, mutually exclusive choices, or complete tasks into one main success scenario. If a complex conditional flow needs its own actors, steps, and completion criteria, split it into a separate use case and index it from the project document.
 
@@ -43,19 +45,19 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 Feature or bug:
 
 ```text
-Use $cx-workflow and select the smallest required cx skills. First use $cx-story to create or update docs/cx use-case, design, current task, and change documents. After the current task document is complete, edit only the one production code file bound to that task. Do not create or edit unit tests by default. Use $cx-tdd only when I explicitly ask for TDD, unit tests, or failing tests. Use full object-oriented design, minimal implementation, reuse first, and avoid bloated files, overly long identifiers, and duplicated logic. After code, documentation, tutorial, research, design, or process-change deliverables are produced, run $cx-review; before handoff run $cx-evidence. If review fails, do not mark the task complete.
+Use $cx-workflow and select the smallest required cx skills. First use $cx-doc to read docs/cx/docs topic documents and search registered common packages and real callers, then use $cx-story to locate the current use case, design, and original task. For a change, implementation-direction shift, or code error in an existing story, use $cx-changelog to create and commit a temporary change file, then rewrite the original task and implementation. Durable documents state only current facts. Do not create or edit unit tests unless I explicitly request them. Unless I explicitly request a specific validation or error behavior in the current request, do not add validation that raises an error and do not catch, translate, wrap, swallow, or fall back from errors; preserve the original error and stop execution. Implement only the latest interface and delete every compatibility trace. After deliverables, run both $cx-review stages; delete and commit the active change file only after both pass.
 ```
 
 Python / PyTorch:
 
 ```text
-Use $cx-story. Use a uv-managed Python interpreter. Use full object-oriented design for state, lifecycle, invariants, and domain collaboration. Do not write unit tests by default. Use $cx-tdd and $cx-pytorch-tdd only when I explicitly ask for Python/PyTorch unit tests, TDD, or tensor tests; then use unittest with deterministic tiny data and avoid dynamic reflection such as getattr/setattr unless no static API works.
+Use $cx-story. Use a uv-managed Python interpreter. Use full object-oriented design for state, lifecycle, invariants, and domain collaboration. Do not write unit tests by default. Only when I explicitly ask for Python, PyTorch, or Lightning unit tests, TDD, or tensor tests, use $cx-tdd first and then add $cx-pytorch-tdd. Use unittest. For data-related tests, let tests/__init__.py load the test database once and share real objects. Do not use mock tests unless I explicitly request them.
 ```
 
 Rust:
 
 ```text
-Use $cx-story and $cx-rust-tdd. Model state with structs/enums/traits, and by default edit only the Rust code file bound to the current task. Do not write unit tests by default. Only when I explicitly ask for Rust unit tests or TDD, write the failing #[test] or integration test first and run cargo test. Always run cargo fmt, and run clippy when practical.
+Use $cx-story. Model state with structs, enums, and traits, and by default edit only the Rust code file bound to the current task. Only when I explicitly ask for Rust unit tests or TDD, use $cx-tdd first and then add $cx-rust-tdd. Data-related tests use one shared fixture to load real test-database records once. Do not use mock tests unless I explicitly request them. Run cargo fmt after Rust changes and clippy when practical; run cargo test only when tests are explicitly required.
 ```
 
 Release:
@@ -69,20 +71,20 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 | Skill | Purpose |
 | --- | --- |
 | `$cx-workflow` | Workflow routing and skill selection |
-| `$cx-story` | Use cases, main success scenarios, conditional substeps, tasks, and changes |
+| `$cx-story` | Use cases, main-success scenarios, conditional substeps, fixed tasks, and current state |
 | `$cx-tdd` | Explicit test-first work, narrow failing tests, minimal implementation, and refactor |
-| `$cx-changelog` | `changes/` documents and release-note consistency |
+| `$cx-changelog` | Registration, commit, execution, and completion deletion of temporary change files |
+| `$cx-doc` | Topic documents, common-package documentation, and research notes |
 | `$cx-version` | Project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and release tags |
 | `$cx-research` | Model selection, model mechanisms, recent papers, and cited synthesis |
 | `$cx-design` | Object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, and data-access boundaries |
-| `$cx-pytorch-tdd` | Explicit Python, PyTorch, and Lightning tests |
+| `$cx-pytorch-tdd` | Adds Python, PyTorch, and Lightning rules to the `$cx-tdd` main workflow |
 | `$cx-pytorch-quick-hpo` | Quick PyTorch tuning and candidate screening |
 | `$cx-pytorch-full-hpo` | Full PyTorch tuning, evaluation, backtesting, and release candidates |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling |
-| `$cx-rust-tdd` | Rust type design, ownership design, optional explicit tests, and cargo fmt/clippy/test |
+| `$cx-rust-tdd` | Adds Rust built-in tests, shared real-data fixtures, and `cargo` checks to `$cx-tdd` |
 | `$cx-common-module` | Reusable features, reusable classes, and functional entrypoint design |
-| `$cx-review` | Mandatory local review after code, documentation, tutorial, research, design, or process-change deliverables |
-| `$cx-evidence` | Pre-handoff evidence review, review-decision checks, and residual risk |
+| `$cx-review` | Artifact-quality review, the completion-evidence gate, and residual risk |
 
 ## Validation
 

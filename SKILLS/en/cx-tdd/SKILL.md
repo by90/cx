@@ -1,78 +1,69 @@
 ---
 name: cx-tdd
-description: Use only when the current user request, existing task document, or change document explicitly asks for TDD, unit tests, failing tests, or red-green-refactor. Works from docs/cx changes and tasks with one task document, one production code file, one matching unit-test file, full object-oriented design, and verification evidence.
+description: Use only when the current user request, existing task, or change document explicitly requires TDD, unit tests, failing tests, or red-green-refactor. Owns the single test-first workflow, task boundary, assertion discipline, real-data rules, minimal implementation, review, and completion evidence. Language-specific skills may only add toolchain, file-layout, and language-specific checks.
 version: 0.1.0
 ---
 
-# cx Explicit TDD
-
-## Language Rules
-
-- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
-- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+# cx Explicit TDD Main Workflow
 
 ## Purpose
 
-Use this skill after the current task is known and TDD, unit tests, failing tests, or red-green-refactor are explicitly requested. Default implementation does not use this skill and does not create unit tests.
+This skill is the single main workflow for test-first work in every language. Language-specific skills such as `$cx-pytorch-tdd` and `$cx-rust-tdd` must follow it and may only add language-specific details without copying or redefining the workflow.
 
-## Inputs
+When TDD, unit tests, failing tests, or red-green-refactor are not explicitly required, do not use this skill and do not create, edit, or run unit tests.
 
-Read, in order:
+## Required Workflow
 
-1. Target scenario's use-case document.
-2. Target scenario's design document.
-3. Current unfinished change document.
-4. Current task document.
-5. The one code file named by the task.
-6. The one matching unit-test file required by the explicit test request.
+1. Confirm that the current user request, original task, or unfinished change explicitly requires tests; otherwise return to the `$cx-workflow` default implementation path.
+2. Read the target use case, design, original task, unfinished change, bound production file, and matching test file.
+3. Use one class or one cohesive type group as the current task measure.
+4. Bind one task to one production file and one matching test file; split the task boundary before exceeding it.
+5. Use the language-specific skill to determine the framework, file layout, shared fixture, and narrowest test command.
+6. Write the narrowest failing test that proves only the current behavior.
+7. Run that test, confirm it fails because the current behavior is missing, and record the failure evidence.
+8. Write the smallest production change that makes the test pass.
+9. Repeat the narrow test until it passes.
+10. Refactor only after the test passes and keep it passing throughout refactoring.
+11. Run broader verification only when shared behavior changed.
+12. Use `$cx-review` for artifact-quality review and then the completion-evidence gate.
+13. If either stage fails, keep the work unfinished, fix it, and rerun tests and review.
+14. After both stages pass, update the original task to its current completed state and delete the temporary change file whose work is complete.
 
-## Rules
+## Assertion Discipline
 
-1. Confirm that the current request, task document, or change document explicitly asks for TDD, unit tests, failing tests, or red-green-refactor; otherwise return to `$cx-workflow` default one-code-file implementation.
-2. The task measure is a class or type group.
-3. One task changes one production code file and one matching unit-test file.
-4. Python tests mirror `src`: `src/subsystem/name.py` maps to `tests/subsystem/name_test.py`.
-5. Python `src/`, `tests/`, and every subdirectory under them must contain blank `__init__.py` files.
-6. Project imports use absolute imports from the repository root, for example `from src.config.config import Config`; tests must not modify `sys.path`.
-7. Explicit Python unit tests must be discoverable and runnable from the VS Code test view; use unittest discovery arguments `-v -s ./tests -p *_test.py -t .`.
-8. Rust uses built-in tests and `cargo test`.
-9. Write the failing test first and report the expected failure.
-10. Implement the smallest change that passes.
-11. Refactor only within the current task boundary.
-12. Do not weaken assertions to make a test pass.
-13. After code passes explicitly requested tests, run `$cx-review` code-deliverable review for document agreement, duplication smells, full object-oriented design, minimal implementation, and business semantics.
-14. If review fails, do not mark the task complete; fix implementation or docs, then rerun tests and review.
-15. Record verification commands, results, `$cx-review` decision, `$cx-evidence` evidence decision, and residual gaps in the current task or change document.
+- Every assertion compares one actual value with one known constant fact.
+- The expected right-hand side may only be a fixed literal, enum member, configuration type constant, or manually confirmed named constant from the test fixture.
+- Never test “expression equals expression.” The expected side must not contain a function call, database query, comprehension, arithmetic formula, sort, aggregation, transformation, or business algorithm equivalent to production code.
+- Never use list-style comparison. Do not directly compare two complete lists, arrays, tensors, slices, query results, or other ordered collections, and do not loop over an entire collection to compare every element.
+- For an ordered collection, assert length, shape, or type as needed, then separately assert the first element, the last element, and any one middle element against known constant facts.
+- Check every element only when the current user request or original task explicitly requires full-collection verification. Expected values must still be manually confirmed constants rather than values recomputed during the test.
+- Limit-up and limit-down calculations are the established full-coverage exception. Expected prices, abnormal codes, and states must still be known constants and must not be generated by rerunning the limit-price algorithm in the test.
+- Never weaken assertions, widen tolerances, or delete important assertions merely to make a test pass.
 
-## Python Expectations
+## Test Data And Mocks
 
-- Use `uv` managed Python.
-- Use `unittest` unless the project already uses another framework.
-- Use full object-oriented design for state, lifecycle, invariants, and domain collaboration.
-- TDD cannot justify preserving bloated entrypoints, useless tests, or future-extension wrappers. Tests should pin only behavior required by the current use case, not convenience wrappers, negative-index compatibility, clone methods, rebuild methods, padding methods, fallback validation, or future-extension entrypoints.
-- Unit-test assertions must state that one actual value equals one known constant fact. Expected values must come from manual confirmation, real small samples, fixed fixtures, or frozen database facts. Do not recompute another calculation, query, transformation, aggregation, ordering, formula, or equivalent business algorithm on the expected side and compare both results.
-- For lists, arrays, tensors, query results, and other ordered collections, check the first item, the last item, and one middle item against known constant facts by default, plus length, shape, or type when relevant. Do not compare a full collection against another fully computed collection just to look complete.
-- Only when the current request or task document explicitly requires full collection verification may a test check every item. Limit-up and limit-down price calculation tests are an explicit exception and may cover a full market-data sample; even then, expected limit prices, abnormal codes, and expected states must be known constant facts or manually confirmed facts, not values recomputed with the same limit-price algorithm in the test.
-- If an implementation turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines, the task remains incomplete until it is deleted back to the smallest functional entrypoint.
-- Constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields.
-- Common packages under `src/<subsystem>/` include package-local `readme.md` files that explain functional entrypoints and usage.
-- Do not use dynamic reflection by default.
-- Do not add command-line parameters to target-project scripts.
+- Unless the current user request explicitly requires them, do not use mocks, test doubles, fake databases, or fake data-access layers.
+- Data-related tests must use real records from the test database. If the test database is missing, report the missing prerequisite instead of substituting simulated data.
+- Centralize database opening, reads, and shared-domain-object construction in the single test initialization entry defined by the language-specific skill. Test files only reuse shared data and never reread the database independently.
+- Do not automatically mock external services, time, randomness, hardware, or side-effect boundaries. Add the smallest mock only when the user explicitly requests it.
 
-## Rust Expectations
+## Implementation Discipline
 
-- Model domain state with struct, enum, trait, and explicit `Result`.
-- Avoid `unwrap`, `expect`, and `panic!` in production paths unless the invariant is local and documented.
-- Run `cargo fmt` and `cargo test`; run `cargo clippy --all-targets --all-features` when practical.
+- Implement only the latest behavior required by the current test. Delete old entrypoints, aliases, adapters, compatibility branches, parameters, configuration, paths, and related tests.
+- Tests cannot justify bloated entrypoints, convenience wrappers, debug entrypoints, future-extension surfaces, or test-only production APIs.
+- Model state, lifecycle, invariants, and domain collaboration with explicit classes, structs, enums, traits, or equivalent types.
+- Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
+- Unless the user explicitly requests validation or error handling, do not add validation that raises errors and do not catch, translate, wrap, swallow, or default underlying failures.
+- Refactor by deleting code, reducing branches, and shrinking the public surface rather than moving simple logic into more wrappers.
 
-## Output
+## Record And Output
 
-Return:
+Every test-first cycle records:
 
-- Current task and class/type measure.
-- Test file and code file.
-- Expected red failure.
-- Implementation summary.
-- Verification commands and results.
-- `$cx-review` code-deliverable decision and `$cx-evidence` evidence decision. FAIL means the task remains incomplete.
-- Execution mode, remaining risk, or next task gate.
+- The mapping among the current use case, design, original task, temporary change, production file, and test file.
+- The current class or type-group measure.
+- The narrow failing-test command, failure reason, and output summary.
+- The minimal production implementation and the passing command and result.
+- When refactoring occurs, the verification result proving the test still passes.
+- The `$cx-review` artifact-quality and completion-evidence decisions; either failure keeps the task unfinished.
+- Whether the temporary change file was deleted and any residual risk.

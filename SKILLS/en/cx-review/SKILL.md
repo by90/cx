@@ -1,81 +1,88 @@
 ---
 name: cx-review
-description: Use for mandatory local review after code, documentation, tutorials, research, design, process changes, or any other deliverable is produced. Reviews by artifact type for document agreement, business semantics, duplication smells, full object-oriented design, minimal implementation, source quality, tutorial executability, design feasibility, and completion status. If review fails, the task, change, or deliverable is not complete.
+description: Use for the unified review of any completed code, document, tutorial, research, design, process, or release artifact. First review artifact quality by type, then verify review coverage, validation evidence, current-state documents, temporary-change deletion conditions, and residual risk. A failure in either stage blocks completion and deletion of the active change file.
 version: 0.1.0
 ---
 
-# cx Deliverable Review
-
-## Language Rules
-
-- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
-- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+# cx Unified Delivery Review
 
 ## Purpose
 
-Run local review after any deliverable is produced and before marking a task or change complete. Deliverables include code, use-case documents, task documents, change documents, design documents, tutorials, research reports, release notes, and workflow rules. Any P0/P1/P2 finding means review fails; the task, change, or deliverable must remain incomplete until fixed and reviewed again.
+Run two consecutive stages in one skill: determine whether artifacts are correct, then determine whether the evidence permits completion. A task completes and its active change file can be deleted only after both stages pass.
 
-## General Rules
+## General rules
 
-1. Identify the artifact types produced in this turn; when several types changed, review each type.
-2. Review against the user request, `docs/cx` project notes, use case, design, task, change, and relevant sources; do not only inspect surface formatting.
-3. If review fails, return concrete findings, evidence, and fixes. Do not mark the task, change, or deliverable complete.
-4. After review passes, record the PASS decision, review scope, verification evidence, and residual risk in the current task or change document. If no target cx document exists, state it in the final summary.
-5. Review must check whether conversation summaries, documents, tutorials, research, designs, process records, review decisions, and verification evidence follow the language rules. In Chinese-package work, unexplained English in Chinese prose is a P2 or higher finding.
+1. List every artifact type and file in scope.
+2. Review each artifact type independently.
+3. Run the completion-evidence gate after artifact-quality review.
+4. Any priority-one, priority-two, or priority-three finding fails review. Fix it and repeat both stages.
+5. Durable documents describe only the current valid state. Old solutions, comparisons, and process narratives belong only in an unfinished change file.
+6. A failed review keeps the task unfinished and the active change file present.
+7. Delete the change file only after both stages pass, then commit the deletion.
 
-## Review Types
+## Stage one: artifact quality
 
 ### Code
 
-- Implementation matches the use case, design, task, and change documents exactly, with no missing behavior, scope creep, or changed business meaning.
-- Bloated code is a P1 finding. Any source code, tests, scripts, tools, examples, or workflow-generated code that turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines fails review and must first delete useless entrypoints, branches, tests, and abstractions.
-- No repeated checks, transformations, config reads, field passing, similar helpers, or several locals naming the same concept.
-- Full object-oriented design is used when state, lifecycle, invariants, or domain collaboration are present.
-- Implementation is minimal: no extra validation, fallbacks, exception wrapping, variable passing, parameters, redundant names, bloated files, convenience wrappers, protocol inheritance, clone methods, rebuild methods, future-extension entrypoints, debug entrypoints, or abstractions without real reuse.
-- Constructors and functions use default parameters for configuration defaults, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
-- Deletion checklist is complete: delete functional entrypoints without real call sites; delete wrappers callers can replace with arrays, tensors, standard slicing, constructors, or configuration defaults; delete test-only entrypoints; delete compatibility branches that hide errors; delete helpers that do not isolate real complexity.
+- Implementation exactly matches the current use case, design, original task, and unfinished change.
+- Explicit objects or equivalent types represent state, lifecycle, invariants, and domain collaboration.
+- The agent read relevant `docs/cx/docs/` topics and searched registered common packages, public entries, and real callers.
+- Unless the user explicitly requests a specific validation or error behavior in the current request, code does not add validation that raises an error and does not catch, translate, wrap, swallow, skip, or fall back from errors. The original type, message, and stack stop execution.
+- Code, interfaces, parameters, configuration, paths, callers, documentation, examples, and declared tests express only the latest intent. No old entry, alias, adapter, bridge, compatibility branch, compatibility behavior, or old trace remains.
+- No duplicated logic, bloated code, needless parameters, needless variables, convenience wrapper, debug entry, or speculative extension remains.
 
-### Documentation
+### Current-state documents
 
-- The document has a clear audience, goal, scope, status, and single home.
-- Content matches project notes, use cases, design, tasks, changes, code behavior, and verification evidence.
-- No scattered documents, duplicate explanations, stale claims, conflicting rules, vague TODOs, or unsupported conclusions.
-- Structure is short and actionable instead of repeating background or narrative filler.
-- Documents state concrete facts, concrete actions, and concrete decisions, with no filler, repeated goals, missing "what to do", or undefined invented terms.
-- Chinese-package documents use complete Chinese prose; any retained English term, abbreviation, or proper name is explained in Chinese in the same sentence or an adjacent sentence.
-- Project documents, use cases, designs, and tasks each own their own content; the same goals are not repeated across all of them.
-- Use cases express business scenarios, main success scenarios, conditional substeps, and sub-use cases, not test plans or implementation tasks.
-- Task files use `tasks/NN.task_name.md`, change files use `changes/change_name.md` without timestamps, and change documents record only later changes after implementation.
-- Common packages under `src/<subsystem>/` have package-local `readme.md` files that list functional entrypoints and usage, not instance config sections, internal fields, or implementation steps as functional documentation.
-
-### Tutorial
-
-- The tutorial can be followed in order; prerequisites, commands, inputs, expected outputs, and failure handling are explicit.
-- Commands, paths, UI text, and APIs match the current project state.
-- No hidden steps, skipped steps, stale commands, marketing-style introductions, or one-off experience presented as stable process.
-- Examples are minimal and runnable, and do not lead users to damage the worktree, expose credentials, or bypass project rules.
-
-### Research
-
-- The research question, date window, inclusion criteria, exclusion criteria, and target reader are defined first.
-- Every non-obvious claim has a reliable source; volatile facts such as latest status, recommendations, prices, rules, model capabilities, or paper status are checked online.
-- Primary sources, papers, blog interpretations, vendor claims, and weak community signals are separated.
-- The output provides synthesis, limits, unknowns, and actionable recommendations instead of only listing sources.
+- Project, use-case, design, task, topic, and research documents each have a distinct responsibility.
+- Every durable document states only the current goal, design, task, interface, or conclusion.
+- No durable document contains an old solution, comparison, migration narrative, completed change, draft, backup, or parallel version.
+- An existing story did not change task count or task identity because of a requirement change, implementation change, or code error.
+- Every topic has one current document and every link or source entry is valid.
 
 ### Design
 
-- The design starts from target behavior, business constraints, data boundaries, lifecycle, and invariants.
-- Public entrypoints, common call paths, special-case entrypoints, state sources, reuse boundaries, non-goals, and verification are explicit.
-- Necessary tradeoffs are compared, including why more complex, dynamic, or legacy-compatible paths are not chosen.
-- The design can be implemented by the next one-task/one-code-file step or by an explicit ordered task sequence.
+- Design starts from target behavior, constraints, data boundaries, lifecycle, and invariants.
+- Entries, object responsibilities, collaboration, state sources, reuse boundaries, non-goals, and verification are explicit.
+- Common packages and stable technical processes have independent topic documents under `docs/cx/docs/`.
+- The design maps to the original task set without creating tasks for implementation changes.
 
-### Process And Change
+### Tutorial
 
-- The change document accurately records previous state, current requirement, ordered task list, affected files, verification evidence, and completion status.
-- A task or change is marked complete only after the corresponding artifact review passes.
-- Failed, missing-evidence, unverified, unreviewed, or user-unconfirmed work is not written as complete.
+- Preconditions, steps, commands, inputs, expected results, and failure handling are executable in order.
+- Commands, paths, labels, and interfaces match current project state.
+- No outdated step, historical alternative, or hidden prerequisite remains.
 
-## Output Format
+### Research
+
+- The question, date window, inclusion criteria, exclusion criteria, and audience are explicit.
+- Reliable sources support non-obvious claims, with source types distinguished.
+- The note under `docs/cx/notes/` answers the question, explains it plainly, and states applicability, limits, and work impact.
+- No search scratchpad, material pile, candidate history, or replaced conclusion remains.
+
+### Temporary change and process
+
+- Changes, implementation direction shifts, and code errors in an existing story entered `changes/` and were committed before work.
+- The change file fully states current facts, target state, and major differences.
+- Durable documents were rewritten directly to current state without copying the change history.
+- The original task was updated while task count and identity remained stable.
+
+## Stage two: completion-evidence gate
+
+Verify:
+
+1. Every artifact type received its corresponding quality review.
+2. The request, current use case, design, original task, code, and topic documents express the same behavior.
+3. Commands, checks, screenshots, sources, or observation actually cover the artifacts.
+4. Unit tests are evidence only when explicitly declared by the user, current task, or active change.
+5. No unrun, failed, or missing verification is reported as successful.
+6. Durable documents contain only current state and no old/new difference outside unfinished changes.
+7. No required topic document or registered common capability was ignored.
+8. All callers use the current entry without compatibility code.
+9. No failed review, unresolved finding, or blocker is marked complete.
+10. The active change file can be deleted without losing current knowledge because durable documents are updated.
+11. Residual risks are explicit and do not block the current goal.
+
+## Output
 
 ```text
 Findings:
@@ -84,14 +91,20 @@ Findings:
    Fix:
 
 Review scope:
-- Artifact type:
-- Documents checked:
+- Artifact types:
+- Current documents checked:
 - Commands or sources checked:
+
+Verified:
+- command or evidence -> result
+
+Missing evidence:
+- None, or list the gap
 
 Review decision:
 - PASS or FAIL
-- FAIL means the task, change, or deliverable remains incomplete
+- FAIL keeps the task unfinished and the active change file present
 
 Residual risk:
-- ...
+- None, or list non-blocking risks
 ```

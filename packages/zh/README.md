@@ -8,6 +8,8 @@
 
 cx 是工作流包，不是组件库。它规定人类和人工智能如何先读取 `docs/cx/docs/` 专题文档和已登记通用能力，再用当前用例、设计、固定任务和临时变更文件推进工作。正式文档只保留最新状态，变更历史由 Git 保存。
 
+开发代码只实现当前最新意图。除非用户在当前请求中明确要求具体校验或异常处理，否则不自行校验后抛出异常，不捕获、转换、包装、吞掉或兜底异常；底层异常保持原始类型、信息和调用栈并自然中止程序。所有旧接口、别名、适配层、桥接层、兼容分支和相关痕迹必须删除，调用方同步使用当前入口。
+
 代码、文档、教程、研究、设计或流程交付物完成后必须由 `$cx-review` 连续执行交付物质量审查和完成证据门禁；任一阶段不通过时任务仍未完成，当前变更文件不得删除。
 
 所有 cx 文档只属于 `docs/cx`：
@@ -47,19 +49,19 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 功能或缺陷：
 
 ```text
-请使用 $cx-workflow 选择最小必要的 cx 技能。开始工作时先用 $cx-doc 读取 docs/cx/docs 中的专题文档，并搜索项目已经登记的通用包和真实调用点；再用 $cx-story 定位当前用例、设计和原任务。已有 story 的变化、实现改向或代码错误先用 $cx-changelog 建立临时变更文件并提交到 Git，然后修改原任务和实现。正式文档只写当前状态。默认不创建或修改单元测试；只有我明确要求测试先行开发、单元测试或失败测试时，才使用 $cx-tdd。除非我在当前请求中明确要求具体校验或异常处理，否则禁止自行校验后抛出异常，也禁止捕获、转换、包装、吞掉或兜底异常；底层异常必须原样抛出并中止程序。交付物完成后用 $cx-review 连续执行质量审查和完成证据门禁；通过后删除当前变更文件并提交删除动作。
+请使用 $cx-workflow 选择最小必要的 cx 技能。开始工作时先用 $cx-doc 读取 docs/cx/docs 中的专题文档，并搜索项目已经登记的通用包和真实调用点；再用 $cx-story 定位当前用例、设计和原任务。已有 story 的变化、实现改向或代码错误先用 $cx-changelog 建立临时变更文件并提交到 Git，然后修改原任务和实现。正式文档只写当前状态。默认不创建或修改单元测试；只有我明确要求测试先行开发、单元测试或失败测试时，才使用 $cx-tdd。除非我在当前请求中明确要求具体校验或异常处理，否则禁止自行校验后抛出异常，也禁止捕获、转换、包装、吞掉或兜底异常；底层异常必须原样抛出并中止程序。开发代码只实现当前最新意图，调用方同步使用当前入口；所有旧接口、别名、适配层、桥接层、兼容分支和相关痕迹必须删除。交付物完成后用 $cx-review 连续执行质量审查和完成证据门禁；通过后删除当前变更文件并提交删除动作。
 ```
 
 Python / PyTorch：
 
 ```text
-请使用 $cx-story。Python 使用 uv 管理的解释器和项目 uv 工作流。对状态、生命周期、不变量和领域对象协作使用完整面向对象设计；默认不写单元测试。只有我明确要求 Python / PyTorch 单元测试、TDD 或 tensor 测试时，才叠加 $cx-tdd 和 $cx-pytorch-tdd，并使用 unittest、确定性小数据，禁止默认使用 getattr/setattr 等动态反射。
+请使用 $cx-story。Python 使用 uv 管理的解释器和项目 uv 工作流。对状态、生命周期、不变量和领域对象协作使用完整面向对象设计；默认不写单元测试。只有我明确要求 Python、PyTorch 或 Lightning 单元测试、TDD 或 tensor 测试时，才先使用 $cx-tdd，再叠加 $cx-pytorch-tdd。测试使用 unittest；数据相关测试由 tests/__init__.py 一次读取测试数据库并共享真实对象；除非我明确要求，禁止 mock 测试。
 ```
 
 Rust：
 
 ```text
-请使用 $cx-story 和 $cx-rust-tdd。用 struct/enum/trait 表达领域状态，默认只实现当前任务绑定的一个 Rust 代码文件。默认不写单元测试；只有我明确要求 Rust 单元测试或 TDD 时，才先写失败的 #[test] 或集成测试，再运行 cargo test。无论是否测试，都运行 cargo fmt，可行时运行 clippy。
+请使用 $cx-story。用 struct、enum 和 trait 表达领域状态，默认只实现当前任务绑定的一个 Rust 代码文件。只有我明确要求 Rust 单元测试或 TDD 时，才先使用 $cx-tdd，再叠加 $cx-rust-tdd。数据相关测试通过统一夹具一次读取测试数据库并共享真实对象；除非我明确要求，禁止 mock 测试。Rust 修改后运行 cargo fmt，可行时运行 clippy；只有明确要求测试时才运行 cargo test。
 ```
 
 发布：
@@ -80,11 +82,11 @@ Rust：
 | `$cx-version` | 项目内 `tools/semver.py`、SemVer、`VERSION`、`docs/VERSIONS.md` 和发布 tag |
 | `$cx-research` | 模型选择、模型原理、近期论文和带来源综合分析 |
 | `$cx-design` | 面向对象设计、职责拆分、领域对象、类命名、继承组合和数据访问边界 |
-| `$cx-pytorch-tdd` | 明确声明时的 Python、PyTorch、Lightning 测试 |
+| `$cx-pytorch-tdd` | 在 `$cx-tdd` 主流程上补充 Python、PyTorch 和 Lightning 测试规则 |
 | `$cx-pytorch-quick-hpo` | PyTorch 快速调参、字段贡献研究、特征组合和候选初筛 |
 | `$cx-pytorch-full-hpo` | PyTorch 全量调参、完整训练、评估、回测和候选模型选择 |
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模和 PyTorch Forecasting 选型 |
-| `$cx-rust-tdd` | Rust 类型设计、所有权设计、可选显式测试和 cargo fmt/clippy/test |
+| `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实数据夹具和 `cargo` 检查 |
 | `$cx-common-module` | 通用功能、可复用类和功能入口设计 |
 | `$cx-review` | 交付物质量审查、完成证据门禁和剩余风险 |
 

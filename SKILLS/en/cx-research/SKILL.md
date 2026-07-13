@@ -1,76 +1,71 @@
 ---
 name: cx-research
-description: Use for model selection research, AI paper surveys, model mechanism research, latest-six-month AI literature scans, source triage, blog interpretation, and citation-backed synthesis.
+description: Use for model selection, AI paper reviews, model principles, recent literature, source screening, and technical-option research. Every effort must answer one explicit question, save the synthesized current conclusion under docs/cx/notes, and explain the conclusion, evidence, limits, and work impact in fluent plain language.
 version: 0.1.0
 ---
 
-# cx Research Workflow
-
-## Language Rules
-
-- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
-- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+# cx Question-Driven Research
 
 ## Purpose
 
-Use this skill when the task is research rather than implementation: choosing a model, understanding a model family, comparing architectures, surveying recent AI papers, or collecting expert interpretations from papers and technical blogs.
+Research answers a concrete question that affects current work. The repository keeps only the synthesized current conclusion, never search scratchpads, excerpt piles, candidate lists, or replaced conclusions.
 
-## Source Strategy
+## Source strategy
 
-Use multiple source classes and label them clearly:
+1. Primary sources: official documentation, model cards, technical reports, papers, conference pages, benchmark repositories, and source code.
+2. Discovery sources: arXiv, OpenReview, Semantic Scholar, OpenAlex, Papers with Code, and citation graphs.
+3. Interpretation: laboratory blogs, engineering blogs, expert articles, technical talks, and replication reports.
+4. Community signals: issues, forums, and social posts are weak signals and cannot support a conclusion alone.
 
-1. Primary sources: official documentation, model cards, technical reports, arXiv papers, OpenReview submissions, conference proceedings, benchmark repositories, and source code.
-2. Indexes and discovery tools: Semantic Scholar, arXiv search, OpenAlex, Papers with Code, Hugging Face Papers, conference pages, and citation graphs.
-3. Interpretation sources: lab blogs, engineering blogs, independent expert writeups, talks, and reproducibility reports.
-4. Community signals: GitHub issues, benchmark discussions, and forums only as weak signals, never as proof by themselves.
+## Required workflow
 
-## Required Workflow
+1. Define the research question, decision deadline, audience, and conclusion needed by current work.
+2. State inclusion and exclusion criteria before searching.
+3. Search primary, discovery, and reliable interpretation sources.
+4. Use an explicit date window for “latest” or “recent.” “Last six months” means the six calendar months before today.
+5. Deduplicate with stable identifiers.
+6. Distinguish peer-reviewed papers, preprints, interpretation, benchmarks, and vendor claims.
+7. Extract source, date, claim, method, evidence quality, limits, and relevance.
+8. Synthesize by consensus, conflict, maturity, applicability, and implementation consequence.
+9. Cite every non-obvious claim and state unknown, disputed, or volatile points.
+10. Use `$cx-doc` to create or update the numbered question file under `docs/cx/notes/`.
+11. Use `$cx-review` for research quality, note quality, and completion evidence.
 
-1. Define the research question, decision deadline, target user, and output format.
-2. Define inclusion and exclusion criteria before collecting sources.
-3. Search across academic sources, official sources, and interpretation sources.
-4. For "latest" or "recent" AI research, use an explicit date window. "Last six months" means from today's date back six calendar months.
-5. Deduplicate papers by title, DOI, arXiv ID, OpenReview ID, or Semantic Scholar Corpus ID.
-6. Separate peer-reviewed papers, preprints, blog interpretations, benchmarks, and vendor claims.
-7. Extract evidence into a table: source, date, venue/status, claim, method, evidence quality, limitations, and relevance.
-8. Synthesize, do not merely list. Group by research direction, agreement, conflict, maturity, and implementation consequence.
-9. Cite every non-obvious claim with a link.
-10. State what is unknown, stale, disputed, or likely to change.
-11. After the research deliverable is produced, run `$cx-review` research review. If review fails, do not mark the research task or change complete.
+## Research note
 
-## Model Selection Research
+```markdown
+# Research: specific question
 
-For selecting a model, compare:
+## Research question
 
-- Task fit and required modalities.
-- Quality evidence on relevant benchmarks or internal evals.
-- Context length, tool use, structured output, latency, throughput, reliability, and cost.
-- Deployment constraints: API availability, local inference, privacy, licensing, region, and hardware.
-- Failure modes: hallucination, weak reasoning, multilingual gaps, coding gaps, safety constraints, and eval contamination.
-- Migration risk and fallback plan.
+## Conclusion
 
-## Model Mechanism Research
+Answer the question first.
 
-For model principle research, prioritize original papers and technical reports. Explain architecture, training objective, data assumptions, inference behavior, scaling constraints, and known limitations. Do not treat marketing claims as mechanism evidence.
+## Plain-language explanation
 
-## Output Format
+Explain why in language the project reader can understand.
 
-```text
-Question:
-Search window:
-Sources searched:
-Inclusion/exclusion criteria:
+## Evidence and sources
 
-Findings:
-1. Claim
-   Evidence:
-   Limits:
-   Practical consequence:
+## Applicability
 
-Source table:
-| Source | Date | Type | Claim | Evidence quality | Link |
+## Limits and unknowns
 
-Recommendation:
-Open questions:
-Review decision:
+## Impact on current work
 ```
+
+- Save it as `docs/cx/notes/NN.concise_question.md`.
+- Keep one current conclusion per question and update it in place.
+- Put old/new differences only in an unfinished change file.
+- Use fluent, concrete language rather than invented terms or jargon piles.
+
+## Required output
+
+- Research question and time window.
+- Inclusion and exclusion criteria.
+- Direct conclusion and plain-language explanation.
+- Key evidence, source links, and evidence quality.
+- Applicability, limits, unknowns, and impact on current work.
+- Current research note under `docs/cx/notes/`.
+- Unified `$cx-review` decision.

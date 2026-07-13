@@ -18,13 +18,18 @@ TASK_DOCUMENT_RE = re.compile(r"\d{2}\..+\.md\Z")  # A task document looks like 
 TIMESTAMPED_CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}")  # Change filenames must not carry timestamps.
 LEGACY_CX_FILE_NAMES = {"B" + "DD.md", "ENGINEERING" + "_SPEC.md", "CHANGE" + "LOG.md", "GUIDE.md"}  # Old cx files are not allowed.
 LEGACY_CX_TEXT_RE = re.compile(r"\bB" + r"DD\b|\bGher" + r"kin\b|ENGINEERING" + r"_SPEC|CHANGE" + r"LOG")  # Old workflow words are not allowed in cx docs.
+RESERVED_CX_DIRECTORIES = {"docs", "notes"}  # Topic documents and research notes are not scenario folders.
 CHANGE_REQUIRED_HEADINGS = (
     "## Status",
-    "## Task",
-    "## Task Name",
-    "## What Was Done Before",
-    "## What Should Happen Now",
-)  # Each change must include the fields that let AI continue work safely.
+    "## Related objects",
+    "## Current facts",
+    "## Target state",
+    "## Major changes",
+    "## Ordered work list",
+    "## File scope",
+    "## Verification",
+    "## Completion action",
+)  # Every temporary change must fully describe the current instruction and deletion condition.
 
 
 @dataclass(frozen=True)
@@ -68,7 +73,7 @@ class ScenarioScanner:
             return []  # Return an empty list and let the caller report the missing root.
         folders: list[ScenarioFolder] = []  # Collect scenario folders in a stable list.
         for child in sorted(self.cx_dir.iterdir()):  # Iterate direct docs/cx children by name.
-            if child.is_dir():  # Only directories can be main success scenarios.
+            if child.is_dir() and child.name not in RESERVED_CX_DIRECTORIES:  # Exclude topic and research-note directories.
                 folders.append(self._build_scenario(child))  # Convert the directory to a structured object.
         return folders  # Return all discovered scenario folders.
 

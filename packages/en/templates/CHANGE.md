@@ -1,33 +1,45 @@
-# Change
-
-## Implementation Time
-
-TODO
+# Change: TODO
 
 ## Status
 
-open
+In progress
 
-## Related Object
+## Related objects
 
-TODO
+- Use case: TODO
+- Design: TODO
+- Original task: TODO
 
-## What Was Done Before
+## Current facts
 
-TODO
+TODO: State the behavior, documents, and implementation that exist before work.
 
-## What Should Happen Now
+## Target state
 
-TODO
+TODO: State the latest behavior, documents, and implementation required after completion.
 
-## File Naming
+## Major changes
 
-Change files live under `changes/`, use a descriptive change name, and do not include timestamps. Changes record only later changes after implementation.
+1. TODO: List every material difference between current facts and target state.
+
+## Ordered work list
+
+| Order | Original task or document | Current action | Status |
+| --- | --- | --- | --- |
+| 01 | TODO | TODO | In progress |
+
+## File scope
+
+- Durable documents: TODO
+- Production file: TODO
+- Unit-test file: Not declared
 
 ## Verification
 
 TODO
 
-## Review Decision
+## Completion action
 
-TODO: Record `$cx-review` PASS/FAIL for this change's deliverables and `$cx-evidence` evidence review. FAIL keeps this change open.
+- Commit this file before editing durable documents or implementation.
+- Delete this file after both `$cx-review` stages pass.
+- Commit the deletion and create no completed-change archive.

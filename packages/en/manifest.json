@@ -2,7 +2,7 @@
   "package": "cx",
   "language": "en",
   "version": "0.1.2",
-  "purpose": "Codex use-case-driven workflow with docs/cx tasks, single-code-file implementation, explicit tests, object-oriented design, and changes",
+  "purpose": "Codex development workflow with current-state documents, fixed tasks, temporary changes, topic documents, latest-only interfaces, and unified delivery review",
   "skills": [
     {
       "name": "cx-workflow",
@@ -19,6 +19,10 @@
     {
       "name": "cx-changelog",
       "path": ".agents/skills/cx-changelog/SKILL.md"
+    },
+    {
+      "name": "cx-doc",
+      "path": ".agents/skills/cx-doc/SKILL.md"
     },
     {
       "name": "cx-design",
@@ -59,10 +63,6 @@
     {
       "name": "cx-review",
       "path": ".agents/skills/cx-review/SKILL.md"
-    },
-    {
-      "name": "cx-evidence",
-      "path": ".agents/skills/cx-evidence/SKILL.md"
     }
   ],
   "agents": [

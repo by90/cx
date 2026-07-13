@@ -67,8 +67,8 @@ version: 0.1.0
 - 通用功能、可复用类和稳定接口：先 `$cx-doc`，再 `$cx-common-module`。
 - 架构、职责、领域对象和数据访问边界：`$cx-design`。
 - 研究、模型选择和论文综合：`$cx-research`，并使用 `$cx-doc` 保存研究笔记。
-- 用户或当前文档明确声明单元测试或测试先行：`$cx-tdd` 及必要专项技能。
-- Rust 实现：`$cx-rust-tdd`；单元测试仍需明确声明。
+- 用户或当前文档明确声明单元测试或测试先行：先使用 `$cx-tdd` 执行唯一主流程；Python、PyTorch 或 Lightning 测试再叠加 `$cx-pytorch-tdd`，Rust 测试再叠加 `$cx-rust-tdd`。
+- Rust 普通实现遵循当前任务的默认实现流程；没有明确测试要求时不使用 `$cx-rust-tdd`。
 - 发布版本：`$cx-version`。
 - 任一交付物完成后的质量审查和完成证据门禁：`$cx-review`。
 

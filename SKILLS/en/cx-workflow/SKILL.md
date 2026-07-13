@@ -1,75 +1,95 @@
 ---
 name: cx-workflow
-description: Use for workflow handling, task routing, end-to-end development orchestration, selecting the right cx skills, docs/cx use-case flow, change-first work selection, default one-task/one-code-file execution, explicit tests, full object-oriented design, minimal reusable code, and mandatory review after every code, documentation, tutorial, research, design, or process deliverable.
+description: Use as the cx workflow router and end-to-end orchestrator. Start by reading docs/cx/docs topics and registered common packages, then locate the current story, fixed tasks, and temporary changes and choose the smallest skill set. Durable documents keep only current state, and cx-review handles both quality and completion evidence.
 version: 0.1.0
 ---
 
-# cx Workflow Router
-
-## Language Rules
-
-- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
-- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+# cx Workflow Orchestration
 
 ## Purpose
 
-Use this skill first when a user request needs workflow routing or several cx skills. It decides the smallest useful skill set and the execution order.
+Understand established project knowledge and reusable capabilities before deciding the current work. The workflow keeps no development-process documents: durable documents show only the latest state and Git stores history.
 
-## Required First Steps
+## Overriding principles
 
-1. Create a visible todo list for any multi-step work.
-2. Read the target project's `AGENTS.md` or repository instructions when present.
-3. Read `docs/cx/00.project.md` or the relevant project-level `docs/cx` documents when present.
-4. If a target scenario exists, read its use-case document, design document, `tasks/`, and `changes/`.
-5. Unless adding a new task, conditional substep, or use case, inspect unfinished changes first and use them to decide the current work.
-6. Recommend the smallest necessary cx skill combination before execution.
+1. Keep no intermediate artifact, completed-change archive, old solution, draft, backup, or parallel plan.
+2. Project, use-case, design, task, topic, and research documents describe only current valid state.
+3. Old/new differences belong only in the active unfinished file under `changes/`.
+4. Commit a change file before work. Delete it after review passes and commit the deletion.
+5. Task count, numbers, filenames, and identities remain fixed after story creation. Implementation changes and code errors update the original task.
+6. Git commits, tags, and releases preserve history. cx documents do not.
 
-## Non-Negotiable Flow
+## Startup order
 
-1. Development tasks are use-case driven and live under `docs/cx`.
-2. Every main success scenario has one folder.
-3. Every scenario folder has a use-case document, design document, `tasks/`, and `changes/`.
-4. cx documents state concrete facts, concrete actions, and concrete decisions. Avoid filler, repeated goals, missing "what to do", and undefined invented terms.
-5. A task is one Markdown file under `tasks/`, starts at `01.`, and does not use a generic `00.task.md` filename.
-6. A change is one Markdown file under `changes/`, has no timestamp in the filename, and records only later changes after implementation.
-7. A task's basic measure is a class or type group.
-8. A task touches one task document and one production code file; if a second code file is needed, split the next task first.
-9. Unit tests are not default deliverables. Create, edit, or run unit tests only when the current user request, existing task document, or change document explicitly asks for unit tests, TDD, failing tests, or red-green-refactor.
-10. Python, PyTorch, and Rust work follow full object-oriented design or equivalent type modeling for state, lifecycle, invariants, and domain collaboration.
-11. Architecture choices, class splits, responsibility boundaries, domain objects, database-access boundaries, field enums, inheritance/composition decisions, and implementation-path choices use `$cx-design` before coding.
-12. Python constructors and functions express configuration defaults as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; function bodies store parameters on same-named fields, such as `self.batch_size = batch_size`.
-13. Common packages under `src/<subsystem>/` must include package-local `readme.md` files that explain functional entrypoints and usage.
-14. Code defaults to minimal, reusable, low-duplication implementation; avoid bloated files, overly long variable names, sentence-like identifiers, and abstractions without real reuse. If an implementation turns behavior expressible with a few fields, direct array slicing, standard-library semantics, or one clear constructor into hundreds or thousands of lines, enter deletion-first refactoring before it can be complete.
-15. Default execution is one-task/one-code-file: complete the current task document, edit only the bound production code file, report the result, and continue to another code file only when the user explicitly asks for multi-task continuation.
-16. After any code, documentation, tutorial, research, design, process-change, or release-note deliverable is produced, run `$cx-review` for the matching artifact type before considering the task, change, or deliverable complete.
-17. If review fails, the task, change, or deliverable remains incomplete until the implementation, document, tutorial, research, design, or process record is fixed and reviewed again.
-18. Code review checks exact agreement with the use-case, design, task, and change documents; duplication smells; full object-oriented design; minimal code with no extra validation, extra variable passing, or redundant variable/parameter names; and business-semantic fit.
-19. Documentation, tutorial, research, and design review check single source of truth, tutorial executability, source quality and synthesis, design feasibility, and business meaning. Any failed required deliverable review blocks completion.
-20. When modifying cx workflow, skills, templates, examples, install rules, or global `AGENTS.md` templates, modify only the cx source repository; after every modification, commit and push `main`, then run the matching install script so local global cx skills and `AGENTS.md` are updated from the remote source.
+1. Create a visible conversation checklist for multi-step work.
+2. Read `docs/cx/docs/00.index.md` and relevant topic documents.
+3. Search documented common packages, public entries, source locations, and real callers.
+4. Read project context, the current use case, design, and original task.
+5. Check the story `changes/` directory.
+6. Follow an unfinished change when present; otherwise follow the current original task.
+7. For a requirement change, design change, implementation change, or code error in an existing story, create or update the change file and commit it before implementation.
+8. Choose the smallest necessary skill set and proceed.
 
-## Skill Selection
+## Common-capability gate
 
-- Use `$cx-story` for use cases, main success scenarios, conditional substeps, tasks, and changes.
-- Use `$cx-tdd` only when the user or current docs explicitly ask for TDD, unit tests, failing tests, or red-green-refactor.
-- Use `$cx-design` for object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, database-access boundaries, field enums, or implementation-path tradeoffs.
-- Use `$cx-common-module` before adding reusable code, reusable classes, shared utilities, stable APIs, or common state.
-- Use `$cx-pytorch-tdd` only for explicitly requested Python, PyTorch, Lightning, tensor, training, or ML tests.
-- Use `$cx-rust-tdd` for Rust implementation and explicit Rust tests when requested.
-- Use `$cx-pytorch-quick-hpo` and `$cx-pytorch-full-hpo` for staged tuning.
-- Use `$cx-timeseries-modeling` for heterogeneous multivariate time-series design.
-- Use `$cx-research` for model selection, papers, and cited synthesis.
-- Use `$cx-version` for release versioning.
-- Use `$cx-review` after code, documentation, tutorial, research, design, process-change, or release-note deliverables are produced.
-- Use `$cx-evidence` before handoff, merge, release, or when verification evidence, review decisions, or compliance are uncertain.
+Before adding a class, function, component, data structure, protocol implementation, or tool:
 
-## Output
+1. Read related topic documents under `docs/cx/docs/`.
+2. Search registered common packages and stable interfaces.
+3. Search source and real callers to confirm documentation is current.
+4. Record the reason to adopt or reject each relevant candidate.
+5. Design a new entry only when no existing capability satisfies the goal.
+6. Add or update the topic document and index with any new common capability.
 
-Return:
+Ignoring a registered common package and adding similar implementation is duplication and must fail `$cx-review`.
 
-- Whether the request is programming, research, release, documentation, review, or operational work.
-- Target `docs/cx` scenario and task if known.
-- Current unfinished change if one controls the work.
-- Selected skills and order.
-- Execution mode, including whether continuation beyond the current code file was explicitly requested.
-- Narrowest validation commands expected.
-- Review decision for each produced artifact type. FAIL means the task, change, or deliverable is not complete.
+## Current state and changes
+
+- A new story may establish a new fixed task set.
+- An existing story never adds, deletes, or renames task files.
+- A changed approach first enters `$cx-changelog`, then rewrites the original task.
+- Code errors use the same flow and never create fix tasks or error-history documents.
+- Durable documents cannot narrate prior/current alternatives or migrations. That material belongs only in the active change file.
+- Keep the change file until `$cx-review` passes, then delete and commit it.
+
+## Topic documents and research
+
+- Use `$cx-doc` for common packages, protocols, data processes, feature systems, metric definitions, and technical direction.
+- Use `$cx-research` for research and save its question-specific synthesized conclusion under `docs/cx/notes/`.
+- Answer the research question first, then explain evidence, limits, and work impact plainly.
+- Do not commit search scratchpads, excerpt piles, or candidate-process notes.
+
+## Skill routing
+
+- Use cases, fixed task sets, and current story state: `$cx-story`.
+- Changes or code errors in an existing story: `$cx-changelog`, then return to the original `$cx-story` task.
+- Topic documents, common-package docs, protocols, data processes, feature systems, or technical direction: `$cx-doc`.
+- Reusable functions, classes, and stable interfaces: `$cx-doc`, then `$cx-common-module`.
+- Architecture, responsibilities, domain objects, and data-access boundaries: `$cx-design`.
+- Research, model selection, and paper synthesis: `$cx-research`, with `$cx-doc` for the note.
+- Explicitly requested unit tests or test-driven development: use `$cx-tdd` as the single main workflow; add `$cx-pytorch-tdd` for Python, PyTorch, or Lightning tests, and add `$cx-rust-tdd` for Rust tests.
+- Ordinary Rust implementation follows the current task's default implementation flow. Do not use `$cx-rust-tdd` without an explicit test requirement.
+- Version release: `$cx-version`.
+- Artifact quality and completion evidence: `$cx-review`.
+
+## Implementation discipline
+
+1. By default, complete the current task document and edit its one production file.
+2. Continue through multiple original tasks only when the user explicitly requests it.
+3. Do not create, modify, or run unit tests unless the user, current task, or active change explicitly declares them.
+4. Use complete object modeling for state, lifecycle, invariants, and domain collaboration.
+5. Keep implementation minimal and remove redundant checks, fallbacks, variables, unused entries, and speculative extensions.
+6. Unless the user explicitly requests a specific validation or error behavior in the current request, do not add validation that raises an error and do not catch, translate, wrap, swallow, or fall back from errors. Preserve the original type, message, and stack and stop execution.
+7. Implement only the latest intent. Delete old interfaces, aliases, adapters, bridges, compatibility branches, old parameters, old configuration, old paths, old behavior, and all traces; migrate every caller to the current entry.
+8. For cx source changes, finish Chinese source and package first, then synchronize English source and package.
+9. Commit and push `main`, then run the remote installer to update global skills and `AGENTS.md`.
+
+## Completion order
+
+1. Rewrite durable documents and implementation to current state.
+2. Run the narrowest effective verification, then necessary package-level checks.
+3. Use `$cx-review` for artifact-quality review.
+4. Use the same `$cx-review` for the completion-evidence gate.
+5. Keep the change file and fix findings when review fails.
+6. Delete the change file and commit the deletion when review passes.
+7. Finish, cancel, or explicitly block every checklist item and report verification and residual risk.

@@ -1,10 +1,10 @@
 # 00.design.md
 
-## Reusable Code
+## Topic Documents and Reusable Code
 
-| Capability | Existing Entrypoint | Usage |
-| --- | --- | --- |
-| TODO | TODO | TODO |
+| Topic document | Capability | Existing entry | Usage |
+| --- | --- | --- | --- |
+| `docs/cx/docs/NN.topic.md` | TODO | TODO | TODO |
 
 ## New Common Code Needed
 
@@ -17,7 +17,7 @@
 - Functional entrypoint: TODO
 - Normal call style: TODO
 - Special-case entrypoint: TODO
-- Package readme: TODO; common packages must list functional entrypoints and usage.
+- Topic document: TODO; every common package has an independent numbered document under `docs/cx/docs/`.
 
 ## Default Parameters
 
@@ -32,8 +32,10 @@
 
 ## Implementation Boundary
 
-- One task handles one task document and one production code file; split another task before editing a second code file.
+- Establish the task set once for a new story. Never add, delete, or rename task files in an existing story.
+- Each task handles one task document and one production file. Rewrite the original task when implementation changes.
 - Unit tests are not default deliverables; add one matching unit-test file only when unit tests or TDD are explicitly requested.
 - The task measure is a class or type group.
 - Default implementation uses full object-oriented design, minimal code, reuse first, and avoids bloated files, overly long identifiers, and duplicated logic.
-- Design, documentation, code, or other deliverables must pass `$cx-review`; before handoff they must pass `$cx-evidence` evidence review.
+- Design, documentation, code, and other deliverables must pass artifact-quality and completion-evidence review in `$cx-review`.
+- This document states only current design and contains no previous solution, comparison, or migration history.

@@ -18,13 +18,18 @@ TASK_DOCUMENT_RE = re.compile(r"\d{2}\..+\.md\Z")  # 任务文件必须形如 01
 TIMESTAMPED_CHANGE_FILE_RE = re.compile(r"\d{8}T\d{6}")  # 变更文件名禁止携带时间戳。
 LEGACY_CX_FILE_NAMES = {"B" + "DD.md", "ENGINEERING" + "_SPEC.md", "CHANGE" + "LOG.md", "GUIDE.md"}  # 旧 cx 文件不再允许出现。
 LEGACY_CX_TEXT_RE = re.compile(r"\bB" + r"DD\b|\bGher" + r"kin\b|ENGINEERING" + r"_SPEC|CHANGE" + r"LOG")  # 旧流程关键词不应进入新 cx 文档。
+RESERVED_CX_DIRECTORIES = {"docs", "notes"}  # 专题文档和研究笔记目录不是主成功场景。
 CHANGE_REQUIRED_HEADINGS = (
     "## 状态",
-    "## 任务",
-    "## 任务名称",
-    "## 之前做了什么",
-    "## 现在应该如何",
-)  # 每个变更文件必须说明 AI 判断工作的关键依据。
+    "## 关联对象",
+    "## 当前事实",
+    "## 目标状态",
+    "## 主要变化",
+    "## 顺序工作清单",
+    "## 文件范围",
+    "## 验证方式",
+    "## 完成动作",
+)  # 每个临时变更文件必须完整表达当前工作指令和删除条件。
 
 
 @dataclass(frozen=True)
@@ -78,7 +83,7 @@ class ScenarioScanner:
             return []  # 返回空列表，让上层统一报告缺失目录。
         folders: list[ScenarioFolder] = []  # 收集发现的主成功场景文件夹。
         for child in sorted(self.cx_dir.iterdir()):  # 按名称稳定遍历 docs/cx 的直接子项。
-            if child.is_dir():  # 只有目录才可能是主成功场景。
+            if child.is_dir() and child.name not in RESERVED_CX_DIRECTORIES:  # 排除专题文档和研究笔记目录。
                 folders.append(self._build_scenario(child))  # 将目录转换成带固定路径字段的对象。
         return folders  # 返回所有直接场景目录。
 

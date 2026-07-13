@@ -86,8 +86,9 @@ Verification:
 6. Domain objects must not access structured fields through string field names; use explicit enums when stable column ordinals are needed.
 7. Performance paths must not add bulk prechecks, fallback conversions, compatibility entrypoints, or silent filtering to look complete.
 8. Defaults belong in function signatures; function bodies must not stack large `None` branches or duplicate parameter names to express defaults.
-9. Old entrypoints, aliases, adapters, and compatibility branches are deleted during development unless the current user explicitly requires them.
+9. Development design keeps only the latest interface. Delete old entries, aliases, adapters, bridges, compatibility parameters, compatibility configuration, compatibility paths, old behavior, and all traces; migrate every caller.
 10. If a behavior can be expressed with a few fields, direct object collaboration, and one clear constructor, do not turn it into hundreds of template lines.
+11. Unless the user explicitly requests a specific validation or error behavior in the current request, do not design validators, custom errors, catch paths, translation, wrapping, swallowing, or fallback. Let the original error stop execution.
 
 ## Red Flags
 
@@ -119,10 +120,10 @@ Ask these questions after design or code is produced:
 
 ## Collaboration With Other Skills
 
-1. When use cases, tasks, or changes exist, use `$cx-story` to locate and update cx documents before this skill performs responsibility design.
-2. For shared capabilities, reusable infrastructure, or shared interfaces, use `$cx-common-module` after this skill clarifies object boundaries.
+1. When use cases, tasks, or changes exist, use `$cx-doc` to read related topic documents, then use `$cx-story` to locate the current use case, design, and original task before responsibility design.
+2. For shared capabilities, reusable infrastructure, or shared interfaces, use `$cx-common-module` after this skill clarifies object boundaries and searches registered common packages.
 3. When the user explicitly asks for unit tests or TDD, use `$cx-tdd` or the relevant specialist testing skill after this skill forms the design conclusion.
-4. After any code, design, documentation, or process deliverable is produced, use `$cx-review`; before handoff, use `$cx-evidence` according to project rules.
+4. After any code, design, documentation, or process deliverable is produced, use `$cx-review` for artifact quality and the completion-evidence gate.
 
 ## Output
 

@@ -2,5 +2,5 @@ name = "cx-story"
 description = "Turn requests into docs/cx use-case, task, and change documents without editing implementation code."
 sandbox_mode = "read-only"
 developer_instructions = """
-Focus on use-case and task discovery. Read docs/cx project documents first, then the target scenario use-case document, design document, tasks, and changes. Unless the user is adding a use case, branch, or task, inspect unfinished changes first and use them to decide current work. Output main success scenarios, branch scenarios, task lists, current task documents, and change-document recommendations. Do not implement code. Document updates do not require the main flow to stop by default; only per-task confirmation mode asks the main flow to wait for user review after the task is complete.
+Focus on current-state use cases and fixed task sets. Read docs/cx/docs topics and registered common capabilities before project context, the target use case, design, original tasks, and unfinished changes. Establish the task set once for a new story. Never add, delete, or rename task files in an existing story. A requirement change, implementation-direction shift, or code error enters a temporary change file and then rewrites the original task. Durable documents state only current facts and never preserve old/new differences or completed changes. Do not implement code.
 """

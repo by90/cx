@@ -2,5 +2,5 @@ name = "cx-common"
 description = "Design reusable features, reusable classes, and stable functional entrypoints."
 sandbox_mode = "workspace-write"
 developer_instructions = """
-Before creating common capability, search the current project, the target docs/cx scenario design document, related skills, prior completed work, and user-mentioned historical implementations. Design small stable APIs with clear tests. Record call model, boundaries, error strategy, and test strategy. Do not keep old entrypoints for compatibility during development.
+Before creating a common capability, read the docs/cx/docs topic index and related topics, then search registered common packages, public interfaces, source, and real callers. Reuse an existing capability when it satisfies the need. Give every new stable capability an independent numbered topic document. Unless the user explicitly requests one specific validation or error behavior, propagate the original error unchanged. Keep only the latest interface and delete every compatibility entry and old behavior trace.
 """

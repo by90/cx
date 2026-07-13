@@ -1,117 +1,67 @@
 ---
 name: cx-common-module
-description: Use for code duplication, shared utilities, reusable features, reusable classes, reusable components, component extraction, API design, indexed-series-like data structures, and deciding whether repeated implementation logic should become common modules.
+description: Use to discover and design registered common packages, shared utilities, reusable features, reusable classes, stable interfaces, and common data structures. Before implementation, read docs/cx/docs topic documents, then search source and real callers so existing common capabilities are not ignored and duplicated.
 version: 0.1.0
 ---
 
-# cx Reusable Feature, Reusable Class, And Common Module Extraction
-
-## Language Rules
-
-- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
-- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
+# cx Common-Capability Reuse
 
 ## Purpose
 
-Turn repeated logic, stable data structures, reusable classes, generic capabilities, test harnesses, and UI state models into small, stable, verifiable reusable capabilities. AI-assisted coding often creates similar code in multiple places; this skill stops that drift by requiring search, calling-model design, API design, migration planning, and verification when duplication becomes meaningful.
+Find project capabilities before adding implementation. Every stable common capability stays small and has an independent topic document under `docs/cx/docs/`.
 
-## Minimal Implementation Discipline
+## Required discovery order
 
-Iron rule: absolutely no unmaintainable pile-up code. This applies to source code, tests, scripts, tools, examples, and workflow-generated code; common modules cannot use "reuse", "stability", or "future extension" as reasons to bloat.
+1. Read `docs/cx/docs/00.index.md` and relevant topic documents.
+2. Obtain the common package, public interface, source location, usage, and scope from the topic document.
+3. Search source, the current use case, design, original task, and real callers to confirm that documentation and implementation agree.
+4. Search adjacent domains for an existing equivalent structure or directly reusable entry.
+5. Record candidates, adoption or rejection reasons, and caller impact.
+6. Design a new entry only when no existing capability satisfies the current goal.
 
-- Default to the least code that satisfies the current need; do not frameworkize, generalize, or abstract early. Prove real call sites before extracting a functional entrypoint.
-- Stable infrastructure starts as one field group, one constructor, and the fewest public methods. If callers can use arrays, tensors, standard slicing, standard-library errors, configuration default parameters, or explicit construction directly, do not wrap it.
-- If a public class or public function adds protocol inheritance, convenience wrappers, clone methods, rebuild methods, padding methods, negative-index compatibility, fallback validation, debug entrypoints, or future-extension entrypoints for completeness, delete them unless the current calling model requires them.
-- Keep file, class, method, and variable names short and clear; avoid sentence-like identifiers, and extract responsibilities or reuse domain terms when names grow too long.
-- Do not create functions, classes, constants, or validators for one-line forwarding, one-off logic, or flows without real reuse value.
-- Unless business rules explicitly require it, do not hide exceptions, silently fall back, or turn errors that would harm the product into defaults, empty results, skipped records, fake successful retries, or warnings; during development, let these errors stop execution.
-- Use a simple test: if the same bug shipped to the product would cause a problem, it must surface as a failure. Only add explicit handling when the business requires degradation, recovery, or user-visible guidance, and cover that path with tests.
-- Do not add validation that only "looks safer" but is not required, such as filename allowlists, path validity checks, extra AST scans, or duplicate config rule checks.
-- Do not put per-item data-validity checks inside large loops, training loops, hot paths, or batch processing to fall back or slow the system down. Handle data validity at entrypoints, data preparation, test fixtures, or separate diagnostic tasks, and never use those checks to replace real failures.
-- By default, do not catch or wrap exceptions yourself; when the underlying library already gives clear exceptions, let the original exception propagate.
-- Do not create custom exception types unless callers truly need to distinguish that exception and already have a clear handling path.
-- Prefer expressing defaults through function or constructor parameters. Configuration defaults should be written directly as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field, for example `self.batch_size = batch_size`.
-- Keep only the functional entrypoint needed for current behavior; do not add debug entrypoints, memory validation entrypoints, scan entrypoints, or interfaces for future needs.
-- Let YAML, JSON, database, filesystem, and similar parsing errors be handled by the corresponding library or standard library by default; add semantic checks only when business rules explicitly require them.
-- Every helper function must satisfy all of these: clear name, reduces duplication or isolates real complexity, and either has more than one call site or significantly improves readability. Otherwise inline it.
-- A generic capability, reusable feature, or reusable class should first abstract the functional entrypoint, call style, lifecycle, state source, and test isolation; do not first abstract one-off file reads, one-off validation, single-field conversion, or future-maybe internal steps.
-- Common-module review must ask whether the code can be deleted first. Behavior callers can express directly with arrays, tensors, standard slicing, constructors, configuration default parameters, or library-native errors does not belong in a common module.
-- Refactoring should delete code, reduce branches, and shrink the public surface, not move logic into more small functions.
+Missing documentation does not prove that a capability is absent. Search source anyway. When a stable capability lacks a topic document, use `$cx-doc` to document its current entry first.
 
-## Calling Model Gate
+## Calling model
 
-Before adding or changing a generic capability, reusable feature, reusable class, shared tool, or stable API, write down:
+Before adding or changing a common capability, state:
 
 ```text
-Public entrypoint:
-Normal call style:
-Special-case entrypoint:
+Problem solved:
+Topic document:
+Public entry:
+Normal usage:
+Special-case entry:
 Instance or state lifecycle:
 State source:
-How verification covers all source call sites:
-readme functional entrypoint section:
+Real callers:
+Error behavior:
+Verification:
 Non-goals:
 ```
 
-The abstraction boundary must answer four questions:
+Reject an abstraction unless it hides real complexity, reduces caller knowledge, has multiple real callers or isolates stable error-prone behavior, and cannot be expressed directly through the underlying structure or library.
 
-1. Does this abstraction hide caller complexity, or create internal complexity?
-2. Does the caller need to know one less thing?
-3. When adding a peer capability, config section, field, or data source, can we change data declarations rather than control-flow code?
-4. Does a helper have at least two real call sites, or truly isolate real complexity?
-5. Does this common package include a package-local `readme.md` that explains functional entrypoints and usage?
+## Current documentation
 
-If the answers do not support abstraction, inline the logic or keep the direct implementation.
+- Every common package and stable public interface has one numbered topic document under `docs/cx/docs/`.
+- The topic document states the current problem, entry, inputs, outputs, constraints, shortest usage, and verification.
+- Rewrite the same topic document when direction changes. Never preserve migration history.
+- A package-local note, when unavoidable, only links to the topic document and shows the shortest entry. It does not duplicate details.
 
-## Reuse Discovery
+## Implementation discipline
 
-Before adding a new abstraction, search:
-
-1. The current project's `src/`, `tests/`, `docs/cx`, and the target scenario's design document.
-2. Enabled related workflow skills such as `$cx-pytorch-tdd`, `$cx-rust-tdd`, `$cx-tdd`, and this skill.
-3. Existing projects or prior implementations explicitly mentioned by the user, such as `IndexedSeries` in `rise202604`.
-4. Adjacent structures with the same shape, such as indexed series, packed tensor batches, ragged tensors, time-window datasets, or GPUI state reducers.
-
-Record candidates, accept/reject reasons, and migration impact. Do not add a reusable feature, reusable class, or reusable component without search evidence.
-
-## Extract when
-
-Extract a generic capability, reusable class, or common module when at least one is true:
-
-- The same logic appears in two or more places.
-- A behavior is important enough to have its own conditional substep, separate use case, or task.
-- The logic crosses project areas, such as training and UI.
-- The logic is error-prone: indexed series, tensor padding, masks, progress synchronization, cancellation, metrics, checkpoint paths, or UI state reducers.
-- A data structure already expresses a stable domain concept, such as grouped long series, window indices, packed batches, state reducers, or test data fixtures.
-
-Do not extract when the abstraction is speculative and has only one unclear use.
+- Use the least code that satisfies the current goal. Do not pre-build frameworks or compatibility layers.
+- Keep only the latest public entry and callers. Delete old interfaces, aliases, adapters, bridges, compatibility parameters, compatibility configuration, compatibility paths, old behavior, and related documentation.
+- Unless the user explicitly requests a specific validation or error behavior in the current request, do not add validation that raises an error and do not catch, translate, wrap, swallow, skip, or fall back from errors. Let the original error stop execution.
+- Use explicit objects or equivalent types for state, lifecycle, and invariants.
+- Put defaults in function signatures or configuration objects.
+- Remove entries with no real caller, no complexity reduction, or test-only purpose.
 
 ## Required output
 
+- Topic documents read.
 - Search evidence and candidate comparison.
-- Public API proposal with functional entrypoint, normal call style, special-case entrypoint, lifecycle, state source, inputs, outputs, error policy, and a minimal example.
-- Package-local `readme.md` that lists functional entrypoints and usage; do not list instance config sections, internal fields, or implementation steps as functional entrypoint documentation.
-- Verification approach, preferably covering real small data and edge cases; use tests first only when unit tests or TDD are explicitly requested.
-- Backward-compatible migration plan describing which call sites move and which stay unchanged.
-- Reusable capability notes in the target `docs/cx` design document.
-- Task or change document updates for the verification that proves the reusable capability; record test mapping only when unit tests are explicitly requested.
-- `$cx-review` decision after the deliverable is produced, especially whether duplication smells were removed without over-abstracting or adding extra parameter passing, plus `$cx-evidence` evidence review before handoff.
-
-## Code Constraints
-
-- Any reusable-capability code or explicitly requested tests added or edited by this skill must follow comprehensive comments: file-level explanations must state file purpose and main classes, functions, or test targets; classes/types need responsibility explanations; functions and test methods must explain parameter meanings and return values or explicitly say there is no return value; every line of business code and test business logic needs an adjacent intent comment.
-- Generic capabilities, reusable classes, reusable components, and common modules must be minimal, stable, and low-coupling. Do not abstract for its own sake, and do not copy repeated logic into multiple similar implementations.
-- Python reusable capabilities should express default behavior with type annotations and default parameters. Configuration defaults should be written directly as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; the function body stores the parameter on a same-named field, for example `self.batch_size = batch_size`. Do not stack long `None` or parameter-case branches inside `__init__`.
-- Public APIs must use explicit object-oriented design or static interfaces. Do not use `getattr`, `setattr`, `delattr`, monkey-patching, dynamic injection, or stringly typed dispatch by default.
-
-## Registry Fields
-
-```text
-Capability | Purpose | Public API | Owners/Callers | Tests | Migration notes
-```
-
-## Initial module priorities
-
-1. `indexed_series` or `indexed_tensor_series`: long-series wrappers indexed by category, entity, or time window.
-2. `lightning_test_harness`.
-3. Project-specific component libraries that already have a README and tests.
+- Decision to reuse or add an entry, with reasons.
+- Current topic document and source entry.
+- Verification.
+- Unified `$cx-review` decision.

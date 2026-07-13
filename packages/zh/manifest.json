@@ -2,7 +2,7 @@
   "package": "cx",
   "language": "zh",
   "version": "0.1.2",
-  "purpose": "Codex use-case-driven workflow with docs/cx tasks, single-code-file implementation, explicit tests, OOP, and changes",
+  "purpose": "以当前状态文档、固定任务、临时变更、专题文档、最新接口和统一交付审查约束 Codex 研发流程",
   "skills": [
     {
       "name": "cx-workflow",
