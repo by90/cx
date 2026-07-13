@@ -11,6 +11,12 @@ version: 0.1.0
 - Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
 - In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
 
+## Resource-Safety Gate
+
+The first step of every full-HPO experiment is to estimate expected system-memory and VRAM use, then decide whether the run may start. Record at least currently available system memory, currently available VRAM, expected peak use, the safety margin reserved for the operating system and Codex App, and the decision to start or reduce the experiment. The estimate may use model structure, tensor shapes, batch size, and a minimal trial run, but must not start full-data training merely to discover whether resources will be exhausted.
+
+Full HPO is expected to consume substantial resources and run for a long time, so it must start in an external terminal outside Codex App. Codex App's built-in terminal must not host the training process or its high-volume output. Continuously write training progress, standard output, standard error, system memory, process memory, VRAM use, per-epoch metrics, and errors to file-based logs. The agent must analyze experiment status by reading those log files, without relying on scrolling terminal output, terminal control sequences, or other special terminal handling. This gate prevents resource exhaustion and system crashes, especially Codex App crashes caused by the training process or terminal-output load.
+
 ## Purpose
 
 Validate quick-HPO candidates on complete data, select the best through third-best plans, and save the best model as a release candidate after training, test evaluation, backtesting, and user confirmation.

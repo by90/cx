@@ -6,6 +6,12 @@ version: 0.1.0
 
 # cx Python And PyTorch Test Supplement
 
+## Resource-Safety Gate
+
+For any test work that includes experimental training, first estimate expected system-memory and VRAM use, then decide whether the run may start. Record at least currently available system memory, currently available VRAM, expected peak use, the safety margin reserved for the operating system and Codex App, and the decision to start or reduce the experiment. The estimate may use model structure, tensor shapes, batch size, and a minimal trial run, but must not start full training merely to discover whether resources will be exhausted.
+
+Any task within this skill that is expected to consume substantial resources or run for a long time must start in an external terminal outside Codex App, so Codex App's built-in terminal does not host the task process or its high-volume output. Continuously write task progress, standard output, standard error, system memory, process memory, VRAM use, and errors to file-based logs. The agent must analyze status by reading those log files, without relying on scrolling terminal output, terminal control sequences, or other special terminal handling. This gate prevents resource exhaustion and system crashes, especially Codex App crashes caused by the task process or terminal-output load.
+
 ## Boundary
 
 This skill does not define the test-first workflow. Execute `$cx-tdd` completely, then add these Python, PyTorch, and Lightning rules to the same test cycle.
