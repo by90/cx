@@ -24,6 +24,8 @@ Run two consecutive stages in one skill: determine whether artifacts are correct
 
 ### Code
 
+- The modified scope contains only the current task jointly defined by the user's current request, current use-case path, original task document, and active unfinished change. Any out-of-scope modification without the user's explicit authorization for that specific list item is a scope violation and fails review, regardless of motive or outcome.
+- Out-of-scope issues were not opportunistically modified, deleted, formatted, refactored, tested, documented, or configured. They appear only on an authorization-needed list containing file, location, symptom, risk, and recommendation; agent inference, preference, review opinion, and best-practice judgment were not treated as authorization.
 - Implementation exactly matches the current use case, design, original task, and unfinished change.
 - Explicit objects or equivalent types represent state, lifecycle, invariants, and domain collaboration.
 - The agent read current-domain common-package tutorials from project `AGENTS.md` and searched registered public entries and real callers.

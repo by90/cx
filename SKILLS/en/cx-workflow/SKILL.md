@@ -76,6 +76,8 @@ Ignoring a registered common package and adding similar implementation is duplic
 
 ## Implementation discipline
 
+**Absolute task-scope gate**: implement only the current task jointly defined by the user's current request, current use-case path, original task document, and active unfinished change. When any out-of-scope issue is found, never modify, delete, format, refactor, add tests, add documentation, or adjust configuration opportunistically. Regardless of how obvious, simple, severe, or aligned with best practices the agent believes the issue is, put it only on an authorization-needed list that states the file, location, symptom, risk, and recommendation. Add that item to the task only after the user explicitly authorizes the specific list item. Agent inference and review opinion are not authorization.
+
 1. By default, complete the current task document and edit its one production file.
 2. Continue through multiple original tasks only when the user explicitly requests it.
 3. Do not create, modify, or run unit tests unless the user, current task, or active change explicitly declares them.
