@@ -65,7 +65,7 @@ Ignoring a registered common package and adding similar implementation is duplic
 
 - Use cases, fixed task sets, and current story state: `$cx-story`.
 - Changes or code errors in an existing story: `$cx-changelog`, then return to the original `$cx-story` task.
-- Topic documents, common-package docs, protocols, data processes, feature systems, or technical direction: `$cx-doc`.
+- Common-package tutorials, project `AGENTS.md` navigation, topic documents, protocols, data processes, feature systems, or technical direction: `$cx-doc`.
 - Reusable functions, classes, and stable interfaces: `$cx-doc`, then `$cx-common-module`.
 - Architecture, responsibilities, domain objects, and data-access boundaries: `$cx-design`.
 - Research, model selection, and paper synthesis: `$cx-research`, with `$cx-doc` for the note.

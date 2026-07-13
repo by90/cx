@@ -1,6 +1,6 @@
 # cx Codex Use-Case-Driven Workflow Pack
 
-cx is a Codex skill package for disciplined human-AI development. It requires the agent to read `docs/cx/docs/` topic documents and registered common capabilities before using the current use case, design, fixed task set, and temporary changes under `docs/cx`. Unit tests and TDD enter scope only when explicitly requested.
+cx is a Codex skill package for disciplined human-AI development. It requires every project to maintain a root `AGENTS.md` that supplements global rules and every common package to have a caller tutorial. The agent reads current-domain tutorials and registered public entries before using the current use case, design, fixed task set, and temporary changes under `docs/cx`. Unit tests and TDD enter scope only when explicitly requested.
 
 cx is not a component library or business implementation. It defines collaboration flow, document structure, task splitting, full object-oriented design, minimal reuse-first implementation, release versioning, and delivery evidence.
 
@@ -45,7 +45,7 @@ If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 ## Core Workflow
 
 1. `$cx-workflow` classifies the request, creates a visible todo list, and selects the smallest required skills.
-2. `$cx-doc` reads topic documents and registered common capabilities before `$cx-story` locates the current use case, design, and fixed tasks.
+2. `$cx-doc` reads or creates project `AGENTS.md`, then follows its domain navigation to every common-package tutorial and registered public entry before `$cx-story` locates the current use case, design, and fixed tasks.
 3. Each main success scenario has one folder, such as `docs/cx/01.create_user/`.
 4. Each scenario folder contains `00.use_case.md`, `00.design.md`, `tasks/`, and `changes/`.
 5. Each task is one Markdown file, such as `tasks/01.write_user_entity.md`.
@@ -64,6 +64,7 @@ If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 ## docs/cx Layout
 
 ```text
+AGENTS.md
 docs/cx/
 docs/cx/00.project.md
 docs/cx/docs/
@@ -80,7 +81,7 @@ docs/cx/01.create_user/changes/
 docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 ```
 
-`docs/cx/docs/` stores independent numbered topic documents for common packages and stable technical processes. `docs/cx/notes/` stores current conclusions for specific research questions. Durable documents never preserve old/new comparisons or completed changes.
+Project `AGENTS.md` is tailored to project goals, languages, toolchain, and common packages and lists required tutorials for each domain. `docs/cx/docs/` stores an independent caller tutorial for every common package and topic documents for stable technical processes. `docs/cx/notes/` stores current conclusions for specific research questions. Durable documents never preserve old/new comparisons or completed changes.
 
 ## Available Skills
 
@@ -90,7 +91,7 @@ docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 | `$cx-story` | Use cases, main-success scenarios, conditional substeps, fixed tasks, and current state |
 | `$cx-tdd` | Explicit test-first work, narrow failing tests, minimal implementation, and refactor |
 | `$cx-changelog` | Registration, commit, execution, and completion deletion of temporary change files |
-| `$cx-doc` | Topic documents, common-package documentation, stable technical processes, and research notes |
+| `$cx-doc` | Common-package caller tutorials, stable topic documents, research notes, and project `AGENTS.md` tutorial navigation |
 | `$cx-version` | Project-local `tools/semver.py`, `VERSION`, `docs/VERSIONS.md`, release tags, and release validation |
 | `$cx-research` | Model selection, paper research, source filtering, and cited synthesis |
 | `$cx-design` | Object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, and data-access boundaries |

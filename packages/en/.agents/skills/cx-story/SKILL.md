@@ -37,7 +37,7 @@ docs/cx/01.create_user/changes/
 ```
 
 - The project-root `AGENTS.md` supplements global rules and navigates current-project common-package tutorials.
-- `docs/cx/docs/` stores topics for common packages and stable technical processes.
+- `docs/cx/docs/` stores caller tutorials for common packages and topic documents for stable technical processes.
 - `docs/cx/notes/` stores current conclusions for explicit research questions.
 - Each numbered top-level story folder represents one user goal.
 - Each story has one current use case, one current design, a fixed `tasks/` set, and a `changes/` directory containing unfinished work only.

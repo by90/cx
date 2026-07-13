@@ -2,7 +2,7 @@
   "package": "cx",
   "language": "en",
   "version": "0.1.2",
-  "purpose": "Codex development workflow with current-state documents, fixed tasks, temporary changes, topic documents, latest-only interfaces, and unified delivery review",
+  "purpose": "Codex development workflow with project rules, common-package tutorials, current-state documents, fixed tasks, temporary changes, latest-only interfaces, and unified delivery review",
   "skills": [
     {
       "name": "cx-workflow",

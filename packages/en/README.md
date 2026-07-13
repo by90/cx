@@ -6,19 +6,24 @@ Do not install both English and Chinese packages into the same target project. S
 
 ## Core Contract
 
-cx is a workflow pack, not a component library. It requires agents to read `docs/cx/docs/` topic documents and registered common capabilities before using current use cases, designs, fixed tasks, and temporary changes. Durable documents keep only the latest state and Git preserves history.
+cx is a workflow pack, not a component library. Every project maintains a root `AGENTS.md` that supplements global rules, and every common package has a caller tutorial. Agents follow project rules to read current-domain tutorials and registered public entries before using current use cases, designs, fixed tasks, and temporary changes. Durable documents keep only the latest state and Git preserves history.
 
 Development code implements only the latest intent. Unless the user explicitly requests a specific validation or error behavior, preserve the original error type, message, and stack and stop execution. Delete every old interface, alias, adapter, bridge, compatibility branch, and related trace, and move all callers to the current entry.
 
 After code, documentation, tutorials, research, design, or process deliverables, `$cx-review` runs artifact-quality review and the completion-evidence gate. A failure in either stage keeps the task unfinished and the active change file present.
 
 ```text
+AGENTS.md
 docs/cx/00.project.md
+docs/cx/docs/00.index.md
+docs/cx/docs/01.configuration_tutorial.md
 docs/cx/01.create_user/00.use_case.md
 docs/cx/01.create_user/00.design.md
 docs/cx/01.create_user/tasks/01.write_user_entity.md
 docs/cx/01.create_user/changes/adjust_user_entity_constraints.md
 ```
+
+Tailor project `AGENTS.md` to project goals, primary languages, toolchain, and actual common packages. Register each package's domain, tutorial link, public entry, and read-first condition. Read every matching tutorial before entering a domain; use `$cx-doc` to add missing tutorials first.
 
 Establish the task set once for a new story. After creation, task count, numbers, filenames, and identities remain fixed. Requirement changes, implementation changes, and code errors rewrite the original task rather than creating fix or modification tasks.
 Change files under `changes/` guide unfinished work only. Commit them before implementation, delete them after review, and commit the deletion.
@@ -45,7 +50,7 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 Feature or bug:
 
 ```text
-Use $cx-workflow and select the smallest required cx skills. First use $cx-doc to read docs/cx/docs topic documents and search registered common packages and real callers, then use $cx-story to locate the current use case, design, and original task. For a change, implementation-direction shift, or code error in an existing story, use $cx-changelog to create and commit a temporary change file, then rewrite the original task and implementation. Durable documents state only current facts. Do not create or edit unit tests unless I explicitly request them. Unless I explicitly request a specific validation or error behavior in the current request, do not add validation that raises an error and do not catch, translate, wrap, swallow, or fall back from errors; preserve the original error and stop execution. Implement only the latest interface and delete every compatibility trace. After deliverables, run both $cx-review stages; delete and commit the active change file only after both pass.
+Use $cx-workflow and select the smallest required cx skills. First use $cx-doc to read project AGENTS.md and every common-package tutorial for the current domain, then search documented public entries and real callers. Add missing project rules or tutorials before continuing. Next use $cx-story to locate the current use case, design, and original task. For a change, implementation-direction shift, or code error in an existing story, use $cx-changelog to create and commit a temporary change file, then rewrite the original task and implementation. Durable documents state only current facts. Do not create or edit unit tests unless I explicitly request them. Unless I explicitly request a specific validation or error behavior in the current request, do not add validation that raises an error and do not catch, translate, wrap, swallow, or fall back from errors; preserve the original error and stop execution. Implement only the latest interface and delete every compatibility trace. After deliverables, run both $cx-review stages; delete and commit the active change file only after both pass.
 ```
 
 Python / PyTorch:
@@ -74,7 +79,7 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 | `$cx-story` | Use cases, main-success scenarios, conditional substeps, fixed tasks, and current state |
 | `$cx-tdd` | Explicit test-first work, narrow failing tests, minimal implementation, and refactor |
 | `$cx-changelog` | Registration, commit, execution, and completion deletion of temporary change files |
-| `$cx-doc` | Topic documents, common-package documentation, and research notes |
+| `$cx-doc` | Common-package caller tutorials, stable topic documents, research notes, and project `AGENTS.md` tutorial navigation |
 | `$cx-version` | Project-local `tools/semver.py`, SemVer, `VERSION`, `docs/VERSIONS.md`, and release tags |
 | `$cx-research` | Model selection, model mechanisms, recent papers, and cited synthesis |
 | `$cx-design` | Object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, and data-access boundaries |
