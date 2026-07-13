@@ -21,6 +21,10 @@
       "path": ".agents/skills/cx-changelog/SKILL.md"
     },
     {
+      "name": "cx-doc",
+      "path": ".agents/skills/cx-doc/SKILL.md"
+    },
+    {
       "name": "cx-design",
       "path": ".agents/skills/cx-design/SKILL.md"
     },
@@ -59,10 +63,6 @@
     {
       "name": "cx-review",
       "path": ".agents/skills/cx-review/SKILL.md"
-    },
-    {
-      "name": "cx-evidence",
-      "path": ".agents/skills/cx-evidence/SKILL.md"
     }
   ],
   "agents": [
