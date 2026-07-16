@@ -96,8 +96,8 @@ Project `AGENTS.md` is tailored to project goals, languages, toolchain, and comm
 | `$cx-research` | Model selection, paper research, source filtering, and cited synthesis |
 | `$cx-design` | Object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, and data-access boundaries |
 | `$cx-pytorch-tdd` | Adds `unittest`, mirrored test layout, shared real test data, and tensor checks to `$cx-tdd` |
-| `$cx-pytorch-quick-hpo` | Quick PyTorch tuning, field contribution research, feature sets, and candidates |
-| `$cx-pytorch-full-hpo` | Full PyTorch tuning, full-data training, evaluation, backtesting, and candidate selection |
+| `$cx-pytorch-quick-hpo` | Lightweight PyTorch HPO on one tenth of complete-entity samples, including data, model, and training selection plus ablation and backtesting for 5 candidates |
+| `$cx-pytorch-full-hpo` | Full-data PyTorch HPO that changes only batch size, learning rate, optimizer, and scheduler parameters, then trains, tests, and backtests all 5 candidates |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling and PyTorch Forecasting selection |
 | `$cx-rust-tdd` | Adds Rust built-in tests, shared real test data, and `cargo` checks to `$cx-tdd` |
 | `$cx-common-module` | Reusable features, reusable classes, functional entrypoints, and repeated logic convergence |

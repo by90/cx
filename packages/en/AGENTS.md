@@ -127,8 +127,8 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 - `$cx-research`: model selection, paper research, source filtering, and cited synthesis.
 - `$cx-design`: object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, database-access boundaries, field enums, and implementation-path tradeoffs.
 - `$cx-pytorch-tdd`: adds Python, PyTorch, and Lightning tools, layout, real data, and tensor checks to the `$cx-tdd` main workflow.
-- `$cx-pytorch-quick-hpo`: quick PyTorch tuning and candidate screening.
-- `$cx-pytorch-full-hpo`: full PyTorch tuning and release candidate selection.
+- `$cx-pytorch-quick-hpo`: lightweight PyTorch HPO on one tenth of complete-entity samples, including data, model, and training selection plus ablation and backtesting for 5 candidates.
+- `$cx-pytorch-full-hpo`: full-data PyTorch HPO that keeps data and model parameters fixed, changes only batch size, learning rate, optimizer, and scheduler parameters, then trains, tests, and backtests all 5 candidates.
 - `$cx-timeseries-modeling`: heterogeneous multivariate time-series modeling.
 - `$cx-rust-tdd`: adds Rust built-in tests, shared real-data fixtures, and `cargo` checks to the `$cx-tdd` main workflow.
 - `$cx-common-module`: reusable features, reusable classes, and functional entrypoint design.

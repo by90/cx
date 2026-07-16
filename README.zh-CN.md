@@ -96,8 +96,8 @@ docs/cx/01.创建用户/changes/调整用户实体约束.md
 | `$cx-research` | 模型选择、论文研究、来源筛选和带引用综合分析 |
 | `$cx-design` | 面向对象设计、职责拆分、领域对象、类命名、继承组合和数据访问边界 |
 | `$cx-pytorch-tdd` | 在 `$cx-tdd` 主流程上补充 `unittest`、镜像测试布局、共享真实测试数据和张量检查 |
-| `$cx-pytorch-quick-hpo` | PyTorch 快速调参、字段贡献研究、特征组合和候选方案初筛 |
-| `$cx-pytorch-full-hpo` | PyTorch 全量调参、完整训练、测试集评估、回测和候选模型选择 |
+| `$cx-pytorch-quick-hpo` | PyTorch 轻量调参：使用十分之一完整实体样本选择数据、模型和训练参数，并为 5 个候选执行消融实验和回测 |
+| `$cx-pytorch-full-hpo` | PyTorch 全量调参：使用全部样本，仅调整批次大小、学习率、优化器和调度器参数，并逐一训练、测试和回测 5 个候选 |
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模、协变量、泄漏检查和 PyTorch Forecasting 选型 |
 | `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实测试数据和 `cargo` 检查 |
 | `$cx-common-module` | 可复用功能、可复用类、功能入口和重复逻辑收敛 |

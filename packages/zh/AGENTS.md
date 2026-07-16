@@ -205,8 +205,8 @@ coding-agent 提示词应说明：
 - `$cx-research`：模型选择、AI 论文研究、来源筛选和带引用综合分析。
 - `$cx-design`：面向对象设计、职责拆分、领域对象、类命名、继承组合、数据库访问边界、字段枚举和实现路径取舍。
 - `$cx-pytorch-tdd`：在 `$cx-tdd` 主流程上补充 Python、PyTorch 和 Lightning 的测试工具、布局、真实数据与张量检查。
-- `$cx-pytorch-quick-hpo`：PyTorch 快速调参、字段贡献研究、特征组合、窗口长度、标签、训练超参和模型容量初筛。
-- `$cx-pytorch-full-hpo`：PyTorch 全量调参、完整数据训练、测试集评估、回测、top 3 候选比较和候选模型选择。
+- `$cx-pytorch-quick-hpo`：PyTorch 轻量调参使用十分之一完整实体样本，选择数据参数、模型结构参数和训练参数，并对 5 个候选分别执行消融实验和回测。
+- `$cx-pytorch-full-hpo`：PyTorch 全量调参使用全部样本，保持轻量阶段的数据与模型参数不变，只调整批次大小、学习率、优化器参数和调度器参数，并逐一训练、测试和回测 5 个候选。
 - `$cx-timeseries-modeling`：异构多变量时间序列建模、字段语义分层、协变量、泄漏检查和 PyTorch Forecasting 选型。
 - `$cx-rust-tdd`：在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实数据夹具和 `cargo` 检查。
 - `$cx-common-module`：通用功能、可复用功能、可复用类、可复用能力抽取和功能入口设计。
