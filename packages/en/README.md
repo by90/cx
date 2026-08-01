@@ -84,7 +84,7 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 | `$cx-research` | Model selection, model mechanisms, recent papers, and cited synthesis |
 | `$cx-design` | Object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, and data-access boundaries |
 | `$cx-pytorch-tdd` | Adds Python, PyTorch, and Lightning rules to the `$cx-tdd` main workflow |
-| `$cx-pytorch-quick-hpo` | Lightweight PyTorch HPO on one tenth of complete-entity samples, including data, model, and training selection plus ablation and backtesting for 5 candidates |
+| `$cx-pytorch-quick-hpo` | Quick PyTorch HPO on one tenth of complete-entity samples: freeze user-fixed dimensions, search the remaining model structure, learning-rate range, optimizer, scheduler, and sliding-window dimensions, jointly select 5 candidates for lower validation loss, more effective `val_loss` improvements, training close to 120 epochs, and a later best epoch, then run per-candidate ablation and backtesting |
 | `$cx-pytorch-full-hpo` | Full-data PyTorch HPO that changes only batch size, learning rate, optimizer, and scheduler parameters, then trains, tests, and backtests all 5 candidates |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling |
 | `$cx-rust-tdd` | Adds Rust built-in tests, shared real-data fixtures, and `cargo` checks to `$cx-tdd` |

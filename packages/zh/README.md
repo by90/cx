@@ -88,7 +88,7 @@ Rust：
 | `$cx-research` | 模型选择、模型原理、近期论文和带来源综合分析 |
 | `$cx-design` | 面向对象设计、职责拆分、领域对象、类命名、继承组合和数据访问边界 |
 | `$cx-pytorch-tdd` | 在 `$cx-tdd` 主流程上补充 Python、PyTorch 和 Lightning 测试规则 |
-| `$cx-pytorch-quick-hpo` | PyTorch 轻量调参：使用十分之一完整实体样本选择数据、模型和训练参数，并为 5 个候选执行消融实验和回测 |
+| `$cx-pytorch-quick-hpo` | PyTorch 快速调参：使用十分之一完整实体样本，冻结用户已确定的维度，搜索其余模型结构、学习率范围、优化器、调度器和滑动窗口等维度，并按较小验证损失、较多验证损失有效改进次数、尽量跑满 120 轮和靠后的最佳轮次联合筛选 5 个候选，再逐一执行消融实验和回测 |
 | `$cx-pytorch-full-hpo` | PyTorch 全量调参：使用全部样本，仅调整批次大小、学习率、优化器和调度器参数，并逐一训练、测试和回测 5 个候选 |
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模和 PyTorch Forecasting 选型 |
 | `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实数据夹具和 `cargo` 检查 |
