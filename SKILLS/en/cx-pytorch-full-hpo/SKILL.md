@@ -1,6 +1,6 @@
 ---
 name: cx-pytorch-full-hpo
-description: Use for full-data HPO in PyTorch, Lightning, and time-series projects; accept exactly 5 lightweight-HPO candidates, adjust only batch size, learning rate, optimizer parameters, and scheduler parameters on all samples, then train, test, and backtest every candidate.
+description: Use for full-data HPO in PyTorch, Lightning, and time-series projects; run exactly one candidate on all samples, then immediately diagnose convergence, speed, recall, business risk, and data correctness before evidence determines the next single change. Candidate count is unbounded, and prequeued continuous execution is forbidden.
 version: 0.1.0
 ---
 
@@ -8,65 +8,113 @@ version: 0.1.0
 
 ## Language Rules
 
-- Use the package language for conversations, explanations, plans, summaries, review decisions, verification evidence, and cx documents. Do not mix languages inside prose fragments or term lists.
-- In Chinese-package work, if an English identifier, command, path, API name, library, protocol, standard, proper name, or ambiguity-sensitive term must remain in English, explain its meaning, role, and local context in Chinese in the same sentence or an adjacent sentence. In English-package work, explain unavoidable non-English terms in English.
-
-## Resource-Safety Gate
-
-The first step of every full-HPO experiment is to estimate expected system-memory and VRAM use, then decide whether the run may start. Record at least currently available system memory, currently available VRAM, expected peak use, the safety margin reserved for the operating system and Codex App, and the decision to start or adjust allowed training parameters such as batch size. The estimate may use model structure, tensor shapes, batch size, and a minimal trial run, but must not start full-data training merely to discover whether resources will be exhausted. All samples are the full-HPO data boundary; resource pressure must not reduce the sample ratio or change parameters frozen by lightweight HPO. If allowed training-parameter changes still cannot run safely, wait for sufficient resources.
-
-Full HPO is expected to consume substantial resources and run for a long time, so it must start in an external terminal outside Codex App. Codex App's built-in terminal must not host the training process or its high-volume output. Continuously write training progress, standard output, standard error, system memory, process memory, VRAM use, per-epoch metrics, and errors to file-based logs. The agent must analyze experiment status by reading those log files, without relying on scrolling terminal output, terminal control sequences, or other special terminal handling. This gate prevents resource exhaustion and system crashes, especially Codex App crashes caused by the training process or terminal-output load.
+- Use the package language for conversations, plans, conclusions, evidence, and cx documents.
+- Keep code identifiers, commands, paths, API names, libraries, protocols, standards, and proper names unchanged when needed, and explain their local meaning in adjacent prose.
 
 ## Purpose
 
-Validate the `5` candidates fixed by lightweight HPO on all samples. Full HPO keeps data parameters, labels, windows, and model structure fixed, adjusts only batch size, learning rate, optimizer parameters, and scheduler parameters, then selects a release candidate after every candidate completes training, test evaluation, and backtesting.
+Evaluate one current candidate at a time on all samples. Pause immediately after its training, testing, and backtesting, diagnose the result completely, and use only that evidence to propose the next experiment. Full HPO is an open evidence loop, not a fixed candidate count, fixed candidate identity set, or continuously executing queue.
+
+Quick-HPO results may provide initial evidence, but they are not a fixed-count admission gate. The user may directly specify the baseline, fixed dimensions, adjustable dimensions, epoch cap, early-stopping patience, and business objective. Current user requirements override skill defaults.
 
 ## Iron Rules
 
-1. Full HPO must take exactly the `5` candidates, complete recipes, ablation results, and backtest results delivered by `$cx-pytorch-quick-hpo`. When window length was tunable during quick HPO, the input must also include the post-candidate `30`-, `40`-, `50`-, and `60`-day long-window comparisons; when the user fixed the window, full HPO must not require extension results that do not exist. It must not skip lightweight HPO or add, remove, or replace candidate identities during the full-data stage.
-2. The training script must run by itself with default configuration. The full-tuning script may only clone and modify typed config in memory through a config hook, then pass that config object into the training entrypoint.
-3. The backtest script must run by itself with default configuration. The full-tuning script may only call the backtest entrypoint with an in-memory config object and must not edit the current backtest config file.
-4. When saving results, the tuning script may only persist trial configs, full-data recipes, test metrics, backtest configs, and model artifact paths into the output directory. Never rewrite the current project config, default config, or user-maintained config files.
-5. Every full-HPO candidate trial uses all samples and has an explicit training length of `120` epochs. It monitors `val_loss` and uses default early-stopping patience `20`. When a learning-rate warm-up and cool-down cycle is used, explicitly specify and persist the scheduler name, warm-up epochs, cool-down epochs, cycle count, maximum learning rate, minimum learning rate, and transition function. Patience may change only when one complete cycle exceeds `20` epochs; prefer shortening the cycle or keeping patience at or below `30`, and record the unavoidable reason and actual value when patience must exceed `30`. Every random process in trials, model initialization, data shuffling, and backtesting reads the seed config whose value is `3407` from the config subsystem.
-6. Full HPO freezes the data parameters, field set, bin boundaries, feature mode, label definition, window length, model structure, and model capacity selected by lightweight HPO. Each candidate may search only batch size, learning rate, optimizer parameters, and scheduler parameters.
-7. A normal full-HPO candidate must complete all `120` epochs and produce at least one new best `val_loss`, under the same improvement decision, during epochs `101` through `120`. Only when all `5` candidates fail this gate may fallback ranking apply: rank completed epochs from most to fewest, then compare the last-`20`-epoch `val_loss` improvement count, best-to-final-epoch distance, best/final `val_loss`, `test_loss`, and backtest results in that order. A single high backtest must not outrank a candidate that completed more epochs.
-8. All `5` candidates must complete training on all samples and test-set evaluation. Full HPO must not train only higher-ranked candidates or pause after the first candidate for extra confirmation.
-9. Run backtesting immediately after each candidate completes training and testing. A good or poor result affects final comparison but never justifies skipping the remaining candidates.
-10. If a candidate trains, tests, or backtests poorly, record its result and cause, then continue with the remaining candidates. Decide whether to return to lightweight HPO only after all `5` candidates finish.
-11. When saving the best model as a release candidate, follow the existing `$cx-version` workflow, user-confirmation gate, version records, and release evidence requirements.
-12. Multi-model projects must first select each model's per-model best release candidate, then compare those per-model winners to choose the global best. The global best is the default release for inference.
-13. Inference must preserve the right to choose a different model release. The root `main` terminal menu and each model's `main` terminal menu must expose both the default global best release and selectable historical/candidate releases.
-14. Full HPO must keep the same five-minute tracking cadence as lightweight HPO: take a baseline sample immediately after startup, then report every 5 minutes with the current candidate, current trial, current epoch, latest `val_loss`, current best `val_loss`, `val_loss` improvement count, elapsed candidate time, average epoch time, estimated remaining epochs, GPU utilization, VRAM usage, peak VRAM, system memory, and current process memory. If no epoch or artifact changes within a 5-minute window, report the stalled position, process id, and resource-log path.
-15. Every full-HPO epoch, trial, and candidate must be written to a shared resource-monitoring artifact. Records must include start/end time, epoch duration, cumulative candidate duration, average epoch duration, GPU utilization, allocated/reserved/peak/free VRAM, total/available system memory, process memory, sample throughput, OOM status, best/final `val_loss`, `test_loss`, early-stop epoch, `val_loss` improvement count, the absolute and proportional best-to-final-epoch distance, and resource-log path.
-16. The five-candidate comparison and release recommendation must include Top10 business metrics: Top10 hit rate, mean gain for hit candidates, mean gain for missed candidates, Top10 downside share, and mean loss among downside candidates. The table must also include candidate identity, allowed training-parameter changes, `val_loss`, `test_loss`, trained epochs, `val_loss` improvement count, absolute and proportional best-to-final-epoch distance, trial duration, average epoch duration, and those business metrics.
+1. Allow only one full-data candidate to be planned, trained, tested, or backtested at a time. Never prebuild several candidates for continuous background execution, and never start the next candidate automatically.
+2. Do not cap candidate count. Every new candidate must follow the completed diagnosis of the preceding candidate. Do not continue merely to increase experiment count when no new evidence exists.
+3. Before each run, record a falsifiable hypothesis, one primary change, any necessarily coupled changes, fixed configuration, comparison baseline, expected metric improvement, and stop condition. Narrow independent changes that would prevent attribution.
+4. Use every sample in the task-defined full-data boundary. Never silently reduce entities, securities, dates, or sample ratio under resource pressure. Adjust only task-authorized resource parameters or wait for resources.
+5. When the user does not specify the epoch cap, early-stopping patience, and random seed, default to `120` epochs, patience `20`, and seed `3407` from the config subsystem. Persist any user or project override in the candidate recipe.
+6. User goals and the current hypothesis determine adjustable dimensions. Do not limit full HPO by default to batch size, learning rate, optimizer, and scheduler. When fields, labels, windows, loss, sampling, model structure, or capacity changes, place the candidate in a new comparable group and do not directly rank losses with different meanings.
+7. Keep training and backtest scripts independently runnable. Build the current candidate through typed in-memory config objects without rewriting user-maintained default config files.
+8. Persist the complete configuration, data boundary, fields, labels, window, split, loss, sampling, model, optimizer, scheduler, batch settings, seed, epoch cap, actual patience, and artifact paths for every candidate.
+9. For warm-up, hold, cool-down, or cyclic learning rates, persist scheduler name, stage lengths, cycle count, maximum and minimum learning rates, transition function, and actual patience. Diagnosis must read the actual per-epoch learning rate rather than only the planned recipe.
+10. Start resource-intensive or long-running training in an external terminal outside Codex App. Continuously write standard output, standard error, progress, per-epoch metrics, resources, and failures to files that the agent reads for analysis.
+11. Before launch, record available system memory, available VRAM, expected peak use, the safety margin reserved for the operating system and Codex App, and the start-or-adjust decision. A complete run must not be the first resource probe.
+12. Take a baseline sample immediately after launch, then at least every five minutes read candidate state, epoch, training and validation losses, best validation loss, improvement count, actual learning rate, elapsed time, throughput, GPU utilization, VRAM, system memory, and process memory. If no epoch or artifact changes, report the stalled position, process id, and log paths.
+13. Immediately after training, use the same config and best checkpoint for task-required testing and backtesting. When failure prevents a stage, record why it is missing and never substitute empty metrics or results from another run.
+14. Stop the pipeline in diagnosis state after the complete training-testing-backtesting chain ends, or after any stage fails. Complete and persist every required diagnosis before constructing another candidate.
+15. Ordinary accuracy is invalid as the primary measure for extreme imbalance. Classification must at least report positive support, confusion matrix, positive recall, precision, F1, balanced accuracy, area under the precision-recall curve, and lift over the positive-rate baseline. Ranking tasks must also report daily top-K recall, precision, and coverage.
+16. Fixed-threshold classification and continuous-score ranking are different problems. Diagnose threshold, probability calibration, positive and negative score distributions, and ranking quality separately. Do not let an almost-all-negative threshold hide useful ranking information, or let ranking lift hide failed classification.
+17. When backtesting or strict test results select the next candidate, explicitly record that the strict test has entered tuning and no longer provides an untouched unbiased estimate. When rolling validation or a separate selection segment exists, select threshold, K, and candidates only there.
+18. Do not publish, tag, or change the default inference model without explicit user authorization. A best candidate is an evidence-backed recommendation; release still follows `$cx-version` and its user confirmation gate.
+
+## Mandatory Post-Run Diagnosis
+
+### 1. Why the Run Did Not Reach Its Epoch Cap
+
+1. Distinguish normal completion, early stopping, out-of-memory failure, non-finite loss, data failure, process failure, manual stop, and external resource change.
+2. Inspect monitored metric, minimum improvement, actual patience, last improvement epoch, best epoch, current learning-rate stage, epoch cap, completed epochs, and callback record.
+3. Verify that last checkpoint, best checkpoint, resume state, and history are complete and share one provenance. Do not call an abnormal stop early stopping or call every early stop a failed model.
+
+### 2. Why Loss Fell Slowly or Plateaued
+
+1. Inspect per-epoch training loss, validation loss, their gap, smoothed trend, variance, improvement spacing, best epoch, and tail behavior together.
+2. Inspect actual learning-rate history, optimizer state, weight decay, gradient norms, gradient clipping, physical batch, effective batch, gradient accumulation, and optimizer steps per epoch.
+3. Distinguish excessive or insufficient learning rate, mismatched schedule stage, underfitting, overfitting, inadequate capacity, excessive regularization, label noise, conflicting objectives, and distribution drift.
+4. Persist every component and weight of composite loss; check whether total-loss progress hides a stalled positive-class or ranking objective.
+
+### 3. Why Training Was Slow
+
+1. Separate data preparation, training batches, validation batches, checkpoint saving, testing, and backtesting time, including first-epoch versus steady-state behavior.
+2. Record samples, physical batches, optimizer steps, mean batch time, samples per second, data wait, and model compute time.
+3. Analyze CPU and GPU utilization, allocated/reserved/peak VRAM, system and process memory, disk input/output, data-loader workers, and device transfers together.
+4. Explain throughput changes through window length, field count, input width, model capacity, batch settings, and precision. No single utilization number proves the bottleneck.
+
+### 4. Why Recall or Ranking Coverage Was Low
+
+1. Verify label definition, positive threshold, positive support in train/validation/test, the daily positive-count distribution, zero-positive days, time split, and sample membership.
+2. Report confusion matrix, positive recall, precision, specificity, F1, balanced accuracy, area under the precision-recall curve, area under the receiver operating characteristic curve, positive baseline, and lift.
+3. For daily top-K, report hits, total true positives, recall, precision, and the share of dates with at least one hit, both as daily distributions and full-period aggregates.
+4. Compare score distributions, quantiles, and boundary cases for positives, false negatives, true negatives, and false positives to distinguish representation, loss, class weighting, sampling, capacity, threshold, calibration, and ranking overlap.
+5. Check whether abundant flat or easy-negative samples dominate gradients. Class weighting, focal loss, stratified sampling, hard-example mining, or ranking loss are hypotheses only; change them one at a time and measure recall against false-positive cost.
+
+### 5. Whether Business Risk Was Acceptable
+
+1. For daily top-K, report return mean, median, quantiles, worst value, large-drop count and share, mean loss among downside samples, and mean loss in the worst tail.
+2. Compare return distributions for hits, misses, false positives, and false negatives, and check whether higher recall was bought with more large drops.
+3. Record transaction cost, suspension, price-limit, tradability, and repeated-security boundaries; mark unavailable facts as unverified.
+
+### 6. Whether Data, Implementation, and Comparison Were Trustworthy
+
+1. Verify field semantics, units, enable order, missing and abnormal distributions, normalization fit boundary, label source, window closure, time leakage, and cross-sectional ranking scope.
+2. Verify seed, data version, training membership, resume identity, loss implementation, metric implementation, checkpoint selection, and prediction-label alignment.
+3. Compare numeric metrics only inside groups with the same label, loss, split, evaluation frequency, and epoch cap. Report other candidates separately.
+4. Inspect train-validation gap, temporal drift, daily metric variance, and domination by a few dates so that accidental one-day gains do not appear stable.
+
+## Deciding the Next Candidate
+
+After diagnosis, write:
+
+1. One most likely and falsifiable primary cause.
+2. Supporting evidence, contrary evidence, and missing evidence.
+3. The next single primary change and necessary coupled changes.
+4. Data, fields, labels, windows, model, and training parameters that remain fixed.
+5. The primary expected metric, risk guardrail, and stop condition.
+6. A decision to continue, gather more evidence, return to a smaller experiment, or stop full HPO.
+
+When the primary cause remains ambiguous, run the smallest diagnostic or ablation before another complete candidate. A user-authorized continuing search may repeat this loop any number of times, but each repetition must be triggered separately by the preceding evidence.
 
 ## Required Workflow
 
-1. Read the `5` candidates, complete recipes, per-candidate ablation results, per-candidate backtests, field recommendations, final window lengths, label definitions, model structures, and convergence evidence from lightweight HPO. When window length was tunable during quick HPO, also read the post-candidate `30`-, `40`-, `50`-, and `60`-day long-window comparisons. Then lock every parameter that full HPO may not change.
-2. Use `$cx-common-module` to check whether full-data recipes, model saving, test evaluation, and backtest calls already have functional entrypoints. If not, define the calling model first.
-3. Use `$cx-pytorch-tdd` to verify full-data config construction, in-memory config overrides, training entrypoint, test-stage entrypoint, backtest entrypoint, and output persistence.
-4. Before starting candidates, confirm that resource monitoring, five-minute sampling, and five-candidate report fields can be written as structured artifacts. If missing, add the shared monitor and summary entrypoints first.
-5. For each candidate, search only batch size, learning rate, optimizer parameters, and scheduler parameters. Every comparison fixes all samples, explicit `120` epochs, default early-stopping patience `20`, and seed config value `3407`. A warm-up and cool-down cycle recipe must include scheduler name, warm-up epochs, cool-down epochs, cycle count, maximum learning rate, minimum learning rate, transition function, and actual early-stopping patience.
-6. Train all `5` candidates on all samples and run test-set evaluation inside each training workflow. Every 5 minutes, report the current epoch, `val_loss`, improvement count, candidate duration, and resource usage. After training, record `val_loss`, `test_loss`, resource metrics, and sustainability evidence.
-7. After each candidate finishes training, derive the backtest config from the same in-memory config, immediately run backtesting, and save the backtest config, Top10 hit rate, hit-candidate mean gain, missed-candidate mean gain, downside share, downside mean loss, and results into the output directory.
-8. After all `5` candidates complete training, testing, and backtesting, admit normally only candidates that complete all `120` epochs and produce a new best `val_loss` during epochs `101` through `120`; if every candidate fails, use rule 7's fallback ranking. After the eligible set is determined, rank by `val_loss`, `test_loss`, Top10 hit rate, missed-candidate mean gain, downside share, downside mean loss, and business risk.
-9. For multi-model projects, select each model's per-model best candidate first, then compare the per-model winners to choose the global best. Set the global best as the default inference release.
-10. Update, or require updating, the root `main` terminal menu and each model's `main` terminal menu so the global best release is selected by default while users can choose other model releases for inference.
-11. After selecting the best model, write model artifact, recipe, test results, backtest results, five-minute tracking summaries, resource monitoring, data version, random seed, global-best basis, default inference release, and release recommendation into the target `docs/cx` task, change, or experiment summary.
+1. Read the user objective, current config, existing training and backtest evidence, and dimensions the user fixed or authorized for change.
+2. Use `$cx-common-module` to find existing config construction, training, testing, backtesting, metrics, and resource-monitoring entrypoints.
+3. Use `$cx-tdd` and `$cx-pytorch-tdd` only when the user, task, or change explicitly requires unit tests or test-driven development. Otherwise create, modify, and run no unit tests.
+4. Register the hypothesis, comparison boundary, complete recipe, resource budget, log paths, and stop condition for one current candidate.
+5. Start only that candidate in an external terminal and read file logs at the five-minute cadence.
+6. Immediately run same-provenance testing and backtesting after training, then stop in diagnosis state.
+7. Complete the six mandatory diagnosis sections and next-candidate decision, preserving raw metrics, conclusions, and evidence paths.
+8. Return to step 4 for one new candidate only when the decision is to continue and evidence supports a specific change. Never prequeue candidates.
+9. End the loop when the user objective is reached, the user says stop, evidence makes further cost unreasonable, or an external condition blocks progress. Report completion state honestly.
 
 ## Verification Evidence
 
-- Source of the `5` lightweight-HPO candidates, complete recipes, per-candidate ablation results, and per-candidate backtests. When window length was tunable during quick HPO, also include the source of the post-candidate four-run long-window comparison.
-- Training and backtest scripts run independently with default config.
-- The full-tuning script only changes config in memory; the output directory contains full-data recipe, test config, backtest config, and candidate results; current config files are unchanged.
-- Complete data boundary, train/validation/test split, data version, and random seed.
-- Execution evidence for all samples, explicit `120` epochs, default early-stopping patience `20`, actual patience, and seed config value `3407`. A warm-up and cool-down cycle also records scheduler name, warm-up epochs, cool-down epochs, cycle count, maximum learning rate, minimum learning rate, and transition function. For every candidate include early-stop epoch, best/final `val_loss`, `test_loss`, `val_loss` improvement count and ratio, best epoch, best-to-final-epoch distance, and whether epochs `101` through `120` produced a new best value.
-- Evidence that data parameters, labels, windows, and model structures did not change during full HPO, and that only batch size, learning rate, optimizer parameters, and scheduler parameters differed.
-- Five-minute tracking summaries with sample time, current candidate, current epoch, latest `val_loss`, best `val_loss`, elapsed candidate time, average epoch seconds, estimated remaining epochs, GPU utilization, VRAM usage, peak VRAM, system memory, and process memory.
-- Per-candidate trial duration, average epoch duration, peak VRAM, remaining VRAM, GPU utilization, system memory, process memory, sample throughput, and OOM or failure reason.
-- Per-candidate Top10 hit rate, hit-candidate mean gain, missed-candidate mean gain, Top10 downside share, and downside mean loss.
-- Training, test, and per-candidate backtest results for all `5` candidates. If any candidate fails, include the cause and evidence that the remaining candidates continued.
-- Five-candidate comparison table showing allowed training-parameter changes, normal-gate or fallback identity, sustainability evidence, `val_loss`, `test_loss`, trained epochs, last-`20`-epoch `val_loss` improvement count, absolute and proportional best-to-final-epoch distance, trial duration, average epoch duration, and Top10 business metrics. If fallback ranking was used, also preserve evidence that every candidate failed the normal gate and the completed-epoch ranking.
-- Each model's per-model best release candidate, global-best selection basis, and default inference release.
-- Verification that the root `main` terminal menu and each model's `main` terminal menu can choose the default global best or another release.
-- Best model release-candidate path, recipe, metrics, backtest result, and `$cx-version` follow-up action.
+- Candidate hypothesis, one primary change, fixed configuration, complete recipe, full-sample boundary, data version, and seed.
+- Prelaunch resource estimate, external process identity, standard-output and standard-error paths, per-epoch history, and five-minute resource summaries.
+- Completed versus planned epochs, stop reason, final and best epochs, training and validation losses, actual learning rate, improvement count, gradients, and batch/step facts.
+- Data preparation, training, validation, testing, backtesting, and saving times, plus throughput, GPU, VRAM, system memory, process memory, and input/output evidence.
+- Class support, daily positive distribution, confusion matrix, positive recall, precision, F1, balanced accuracy, area under the precision-recall curve, baseline lift, and daily top-K recall, precision, and coverage.
+- Top-K return distribution, large-drop count and share, worst return, mean downside loss, and worst-tail mean loss.
+- Field, label, window, normalization, split, leakage, resume, checkpoint, and metric-alignment checks.
+- Whether strict test entered selection, whether comparisons share one group, and the valid scope of conclusions.
+- Mandatory diagnosis and next-candidate decision; when continuing, preserve how current evidence triggered the next candidate.
+- Evidence that no candidate started before diagnosis finished and that no fixed-count continuous background queue exists.
