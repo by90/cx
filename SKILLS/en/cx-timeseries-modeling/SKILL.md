@@ -26,7 +26,7 @@ Handle multivariate time series where each field has a different meaning. Do not
 7. Attention weights over time or variables are not direct feature importance. Combine variable-selection outputs with ablation, permutation, and business review.
 8. Splits must be temporal or rolling-origin backtests. Random row splits are forbidden when they can leak future information.
 9. Metrics must match the business objective: point forecasts can use MAE/RMSE/SMAPE/MASE; quantile or probabilistic forecasts must record quantile loss, coverage, or calibration.
-10. Add `$cx-pytorch-hpo` for tuning: reuse the project's shared tuner, run one candidate at a time on a fixed data boundary, and permit one evidence-backed next change only after validation-business-first trail analysis. Stock tasks use every eligible registration-regime entity; they neither sample one tenth of entities nor switch between lightweight and full-data stages.
+10. Add `$cx-pytorch-hpo` for tuning: reuse the project's shared tuner, explicitly use a mature HPO sampler/pruner to jointly suggest parameters and allocate training resources on a fixed data boundary, and continuously analyze completed, pruned, and failed trials with the validation business metric first. Stock tasks use every eligible registration-regime entity; they neither sample one tenth of entities nor switch between lightweight and full-data stages.
 11. Do not create unit tests by default; when unit tests are explicitly requested, verify only windows, field roles, leakage checks, metrics, and model input/output shapes. Do not run long training in unit tests.
 
 ## Framework Selection
@@ -44,7 +44,7 @@ Handle multivariate time series where each field has a different meaning. Do not
 - Rolling-origin or temporal split description.
 - Proof that covariates are available at prediction time.
 - Reason for choosing PyTorch Forecasting, NeuralForecast, Darts, or another framework.
-- The fixed data boundary, scope ledger, frozen baseline, one-candidate training and validation trail, progress analysis, unique next change, and final frozen recipe's strict test and backtest shared with `$cx-pytorch-hpo`.
+- The fixed data boundary, complete conditional search space, frozen baseline, persistent study, training/validation trails, trial states, progress analysis, and final validation incumbent's strict test and backtest shared with `$cx-pytorch-hpo`.
 
 ## Research Reminders
 

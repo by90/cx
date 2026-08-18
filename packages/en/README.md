@@ -84,7 +84,7 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 | `$cx-research` | Model selection, model mechanisms, recent papers, and cited synthesis |
 | `$cx-design` | Object-oriented design, responsibility splitting, domain objects, class naming, inheritance/composition, and data-access boundaries |
 | `$cx-pytorch-tdd` | Adds Python, PyTorch, and Lightning rules to the `$cx-tdd` main workflow |
-| `$cx-pytorch-hpo` | Unified PyTorch HPO that reuses the project's shared tuner, fixes stock tuning to all eligible registration-regime entities, runs one candidate at a time, analyzes the full trail with validation business performance first, and permits one next change |
+| `$cx-pytorch-hpo` | Automatic PyTorch HPO that reuses the project's shared tuner, uses every eligible registration-regime entity, lets a mature sampler/pruner search the full conditional space and allocate trial resources, and continuously analyzes all trial states |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling |
 | `$cx-rust-tdd` | Adds Rust built-in tests, shared real-data fixtures, and `cargo` checks to `$cx-tdd` |
 | `$cx-common-module` | Reusable features, reusable classes, and functional entrypoint design |

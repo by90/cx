@@ -9,7 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Added `$cx-pytorch-hpo`: stock tuning uses every eligible registration-regime entity, reuses a shared project tuner, runs one candidate at a time, prioritizes validation business performance, isolates strict test, and ships a tested progress-analysis tool.
-- Fixed `$cx-pytorch-hpo` formal training to immutable `max_epochs=1000` and `early_stopping_patience=20`; the analyzer rejects global or per-trial deviations before continuation.
+- Reworked `$cx-pytorch-hpo` around persistent automatic HPO: mature sampler/pruner tooling jointly searches the full conditional space, controls trial epochs and pruning from validation business trajectories, tracks every trial state, and keeps strict test isolated.
+- Previously fixed `$cx-pytorch-hpo` formal training to immutable `max_epochs=1000` and `early_stopping_patience=20`; this historical contract is superseded by the automatic-HPO resource policy above.
 - Added a startup command-compatibility rule so Codex writes Windows PowerShell 5.1-safe commands by default and does not probe unsupported `&&` or `||` connectors through failure.
 - Added a startup encoding rule to the English and Chinese AGENTS templates so Windows PowerShell sessions set UTF-8 before handling Chinese files and avoid repeated mojibake warnings.
 - Added stricter cx documentation rules for concrete wording, defined terms, task-file naming, post-implementation change documents, package-local readme files, default-parameter configuration usage, absolute imports, and VS Code unittest discovery.

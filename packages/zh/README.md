@@ -88,7 +88,7 @@ Rust：
 | `$cx-research` | 模型选择、模型原理、近期论文和带来源综合分析 |
 | `$cx-design` | 面向对象设计、职责拆分、领域对象、类命名、继承组合和数据访问边界 |
 | `$cx-pytorch-tdd` | 在 `$cx-tdd` 主流程上补充 Python、PyTorch 和 Lightning 测试规则 |
-| `$cx-pytorch-hpo` | PyTorch 统一调参：复用项目公共调参模块，股票任务固定使用注册制全部合格实体，每次只运行一个候选，以验证业务指标为首要目标分析完整轨迹，再决定唯一下一改动 |
+| `$cx-pytorch-hpo` | PyTorch 自动 HPO：复用项目公共调参模块，股票任务固定使用注册制全部合格实体，由成熟 sampler/pruner 联合搜索完整条件空间、决定 trial 资源并持续分析全部状态 |
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模和 PyTorch Forecasting 选型 |
 | `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实数据夹具和 `cargo` 检查 |
 | `$cx-common-module` | 通用功能、可复用类和功能入口设计 |
