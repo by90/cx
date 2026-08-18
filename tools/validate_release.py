@@ -27,6 +27,10 @@ def names(data: dict[str, object], key: str) -> list[str]:
     return sorted(str(item["name"]) for item in data.get(key, []))
 
 
+def relative_files(root: Path) -> list[Path]:
+    return sorted(path.relative_to(root) for path in root.rglob("*") if path.is_file())
+
+
 def run(command: list[str], cwd: Path) -> int:
     print("$ " + " ".join(command))
     completed = subprocess.run(command, cwd=cwd, text=True)
@@ -118,15 +122,24 @@ def main() -> int:
             errors.append(f"SKILLS/{lang} skill names do not match packages/{lang}/manifest.json")
 
         for skill_name in manifest_skill_names:
-            package_skill = package / ".agents" / "skills" / skill_name / "SKILL.md"
-            public_skill = public_skill_root / skill_name / "SKILL.md"
-            if not public_skill.exists():
-                errors.append(f"missing public skill file: {public_skill.relative_to(root)}")
-                continue
-            if package_skill.read_text(encoding="utf-8") != public_skill.read_text(encoding="utf-8"):
+            package_skill_root = package / ".agents" / "skills" / skill_name
+            public_skill_directory = public_skill_root / skill_name
+            package_files = relative_files(package_skill_root)
+            public_files = relative_files(public_skill_directory)
+            if package_files != public_files:
                 errors.append(
-                    f"public skill differs from package source: {public_skill.relative_to(root)}"
+                    f"public skill tree differs from package source: "
+                    f"{public_skill_directory.relative_to(root)}"
                 )
+                continue
+            for relative_path in public_files:
+                package_file = package_skill_root / relative_path
+                public_file = public_skill_directory / relative_path
+                if package_file.read_bytes() != public_file.read_bytes():
+                    errors.append(
+                        f"public skill file differs from package source: "
+                        f"{public_file.relative_to(root)}"
+                    )
 
     for package in (en, zh):
         example = package / "examples" / "python_ml_project"

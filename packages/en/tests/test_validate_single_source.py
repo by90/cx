@@ -27,10 +27,14 @@ class TestValidateSingleSource(unittest.TestCase):
             (changes / "write_user_entity.md").write_text(  # Write a change document.
                 "# Change\n\n"
                 "## Status\nopen\n\n"
-                "## Task\n01\n\n"
-                "## Task Name\nwrite_user_entity\n\n"
-                "## What Was Done Before\nNothing has been implemented.\n\n"
-                "## What Should Happen Now\nWrite the test first, then implement the class.\n",
+                "## Related objects\nTask 01.\n\n"
+                "## Current facts\nNothing has been implemented.\n\n"
+                "## Target state\nThe user entity works.\n\n"
+                "## Major changes\n1. Add the entity.\n\n"
+                "## Ordered work list\n1. Test, then implement.\n\n"
+                "## File scope\nSource and test.\n\n"
+                "## Verification\nRun unit tests.\n\n"
+                "## Completion action\nDelete this file after review.\n",
                 encoding="utf-8",
             )
 
@@ -137,7 +141,7 @@ class TestValidateSingleSource(unittest.TestCase):
             report = validate_single_source(root)  # Run validation.
 
         self.assertFalse(report.ok)  # Missing headings must fail.
-        self.assertIn("missing heading ## What Should Happen Now in docs/cx/01.create_user/changes/write_user_entity.md", report.errors)  # The error must identify the missing heading.
+        self.assertIn("missing heading ## Completion action in docs/cx/01.create_user/changes/write_user_entity.md", report.errors)  # The error must identify the missing heading.
 
 
 if __name__ == "__main__":

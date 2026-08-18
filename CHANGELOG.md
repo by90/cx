@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Added `$cx-pytorch-hpo`: stock tuning uses every eligible registration-regime entity, reuses a shared project tuner, runs one candidate at a time, prioritizes validation business performance, isolates strict test, and ships a tested progress-analysis tool.
 - Added a startup command-compatibility rule so Codex writes Windows PowerShell 5.1-safe commands by default and does not probe unsupported `&&` or `||` connectors through failure.
 - Added a startup encoding rule to the English and Chinese AGENTS templates so Windows PowerShell sessions set UTF-8 before handling Chinese files and avoid repeated mojibake warnings.
 - Added stricter cx documentation rules for concrete wording, defined terms, task-file naming, post-implementation change documents, package-local readme files, default-parameter configuration usage, absolute imports, and VS Code unittest discovery.
@@ -16,7 +17,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Strengthened the package rule that Chinese workflow changes are completed first and then synchronized into the English package.
 - Added a Python development iron rule requiring target-project scripts to avoid command-line arguments and route adjustable behavior through config-subsystem items with defaults.
 - Added PowerShell cx installers that update skills from remote `main` and overwrite the global Codex `AGENTS.md` with the matching language package template.
-- Added `$cx-pytorch-quick-hpo` and `$cx-pytorch-full-hpo` for staged PyTorch tuning: quick sample tuning, field-contribution study, full-data training, testing, backtesting, and release-candidate selection.
 - Added `$cx-timeseries-modeling` for heterogeneous multivariate time-series design with PyTorch Forecasting as the primary reference framework.
 - Added a development-stage no-legacy-compatibility iron rule to AGENTS, `$cx-pytorch-tdd`, and `$cx-rust-tdd`.
 - Added a `$cx-workflow` skills command officer rule requiring task analysis and a recommended minimal cx skill combination before execution.

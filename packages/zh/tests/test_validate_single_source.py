@@ -30,10 +30,14 @@ class TestValidateSingleSource(unittest.TestCase):
             (changes / "编写用户实体.md").write_text(  # 写入变更文档。
                 "# 变更\n\n"
                 "## 状态\n未完成\n\n"
-                "## 任务\n01\n\n"
-                "## 任务名称\n编写用户实体\n\n"
-                "## 之前做了什么\n尚未实现。\n\n"
-                "## 现在应该如何\n先写测试，再实现类。\n",
+                "## 关联对象\n任务 01\n\n"
+                "## 当前事实\n尚未实现。\n\n"
+                "## 目标状态\n用户实体可用。\n\n"
+                "## 主要变化\n1. 增加实体。\n\n"
+                "## 顺序工作清单\n1. 先测试后实现。\n\n"
+                "## 文件范围\n源码和测试。\n\n"
+                "## 验证方式\n运行单元测试。\n\n"
+                "## 完成动作\n审查后删除本文件。\n",
                 encoding="utf-8",
             )
 
@@ -157,7 +161,7 @@ class TestValidateSingleSource(unittest.TestCase):
             report = validate_single_source(root)  # 执行 docs/cx 校验。
 
         self.assertFalse(report.ok)  # 缺少章节必须失败。
-        self.assertIn("missing heading ## 现在应该如何 in docs/cx/01.创建用户/changes/编写用户实体.md", report.errors)  # 错误必须指出缺失章节。
+        self.assertIn("missing heading ## 完成动作 in docs/cx/01.创建用户/changes/编写用户实体.md", report.errors)  # 错误必须指出缺失章节。
 
 
 if __name__ == "__main__":
