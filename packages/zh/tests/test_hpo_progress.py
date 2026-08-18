@@ -32,6 +32,10 @@ def payload(*trials: dict, strict_test_used: bool = False) -> dict:
             "higher_is_better": True,
             "minimum_business_delta": 0.01,
         },
+        "training_contract": {
+            "max_epochs": 1000,
+            "early_stopping_patience": 20,
+        },
         "strict_test_used_for_selection": strict_test_used,
         "baseline_trial": "baseline",
         "trials": list(trials),
@@ -57,7 +61,9 @@ def trial(
         "best_validation_loss": loss,
         "final_validation_loss": loss + 0.01,
         "completed_epochs": 100,
-        "planned_epochs": 100,
+        "planned_epochs": 1000,
+        "max_epochs": 1000,
+        "early_stopping_patience": 20,
         "best_epoch": 90,
         "resource_gate_passed": True,
         "changed_dimension": "summary_width",
@@ -93,6 +99,13 @@ class TestHpoProgress(unittest.TestCase):
         value["data_scope"]["all_eligible_entities"] = False
 
         with self.assertRaisesRegex(ValueError, "all eligible entities"):
+            MODULE.analyze(value)
+
+    def test_rejects_changes_to_fixed_training_contract(self) -> None:
+        value = payload(trial("baseline", 0.20, 1.20))
+        value["training_contract"]["early_stopping_patience"] = 21
+
+        with self.assertRaisesRegex(ValueError, "1000.*20"):
             MODULE.analyze(value)
 
     def test_continues_only_one_evidence_backed_change(self) -> None:

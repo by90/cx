@@ -1,7 +1,7 @@
 ---
 name: cx-pytorch-hpo
 description: 用于 PyTorch、Lightning 和股票时间序列项目的统一调参；复用项目公共调参模块，在注册制全部合格实体上每次只运行一个候选，以验证业务指标为首要目标分析完整轨迹，并仅允许一个证据支持的下一改动。
-version: 0.2.0
+version: 0.2.1
 ---
 
 # cx PyTorch 统一调参
@@ -22,6 +22,7 @@ version: 0.2.0
 8. 验证业务目标是候选选择的第一目标。验证损失用于反向传播、检查点和收敛诊断；业务指标持续下降时，不得仅因损失改善而晋级。类别权重等方案已被当前项目证据否定时，不得无新假设重复消耗预算。
 9. 用户硬件、内存和时限是门禁。启动前以真实张量形状和最小试运行估算显存、系统内存、每轮时间和总时间；只能调整尚未冻结的容量、批次或精度，不能改变数据覆盖和用户固定维度。
 10. 按项目规则冻结业务最优、最小验证损失和真实最终状态全部检查点。严格测试只使用项目规定的检查点。
+11. 每个正式调参候选的最大训练轮次固定为 1000，早停耐心固定为 20。两者是用户不可变训练契约，任何时候都不是候选维度；公共调参模块和轨迹分析工具必须在启动前拒绝改写、缺失或不一致的值。旧口径试验只可标记为历史预实验，不能进入正式可比轨迹。
 
 ## 公共模块协议
 
@@ -33,6 +34,7 @@ version: 0.2.0
 - 每轮记录训练/验证损失、首要业务指标、学习率、耗时、吞吐、图形处理器利用率、显存、系统内存和进程内存。
 - 候选结束后冻结配置、规定检查点、历史、资源、验证预测、业务指标和分析。
 - 校验前后候选只有一个 changed_dimension。业务指标只在相同标签、切分和业务评价的 business_comparison_group 内比较；验证损失只在相同损失定义的 loss_comparison_group 内比较。
+- 启动前校验全局和候选训练契约均为 max_epochs=1000、early_stopping_patience=20，拒绝把这两个值作为 changed_dimension 或内存覆盖。
 - 在分析结论为 continue 前拒绝启动下一候选。
 
 不要原样恢复以 QuickTune 命名、顺序执行全部试验或把业务指标置于损失之后的旧接口。可以复用其薄适配器、内存配置、验证隔离、资源审计和冻结产物设计。
@@ -63,9 +65,9 @@ version: 0.2.0
 
     python scripts/analyze_hpo_progress.py path/to/ledger.json path/to/analysis
 
-台账包含 data_scope、objective、baseline_trial、trials、strict_test_used_for_selection 和最多一个 proposed_next。每个完成候选记录名称、business_comparison_group、loss_comparison_group、业务主指标、最佳/最终验证损失、完成/计划轮次、最佳轮次、资源门禁和唯一 changed_dimension。
+台账包含 data_scope、training_contract、objective、baseline_trial、trials、strict_test_used_for_selection 和最多一个 proposed_next。training_contract 固定记录 max_epochs=1000 与 early_stopping_patience=20；每个候选还必须重复记录 planned_epochs=1000、max_epochs=1000、early_stopping_patience=20。每个完成候选记录名称、business_comparison_group、loss_comparison_group、业务主指标、最佳/最终验证损失、完成/计划轮次、最佳轮次、资源门禁和唯一 changed_dimension。
 
-工具输出 analysis.json 与 analysis.md，强制注册制全部实体，拒绝严格测试参与选择，并识别连续业务退化、损失与业务冲突、不可比候选、多项改动、无有效改善和资源失败。它只分析证据，不启动训练。
+工具输出 analysis.json 与 analysis.md，强制注册制全部实体和 1000/20 训练契约，拒绝严格测试参与选择，并识别连续业务退化、损失与业务冲突、不可比候选、多项改动、无有效改善和资源失败。它只分析证据，不启动训练。
 
 ## 完成证据
 

@@ -1,7 +1,7 @@
 ---
 name: cx-pytorch-hpo
 description: Use for unified HPO in PyTorch, Lightning, and stock time-series projects; reuse the project's shared tuning module, run one candidate at a time on every eligible registration-regime entity, analyze the full trail with the validation business metric first, and permit only one evidence-backed next change.
-version: 0.2.0
+version: 0.2.1
 ---
 
 # cx Unified PyTorch HPO
@@ -22,6 +22,7 @@ Build one model-independent, evidence-driven tuning loop. Do not split tuning in
 8. The validation business objective is primary for candidate selection. Validation loss supports gradients, checkpoints, and convergence diagnosis. Never advance solely on better loss while business performance keeps falling. Do not repeat a rejected class-weighting or similar scheme without a new hypothesis.
 9. User hardware, memory, and elapsed-time limits are gates. Estimate VRAM, system memory, epoch time, and total time from real tensor shapes and a minimal run. Adjust only unfrozen capacity, batch, or precision; never change data coverage or user-fixed dimensions.
 10. Freeze business-best, minimum-validation-loss, and true-final checkpoints whenever required. Strict test uses only the project-authorized checkpoint.
+11. Every formal HPO candidate has immutable max_epochs=1000 and early_stopping_patience=20. Neither value is ever a candidate dimension. The shared tuner and progress analyzer must reject missing, overridden, or inconsistent values before launch. Older contracts may be retained only as historical preliminary runs and cannot enter the formal comparable trail.
 
 ## Shared Module Contract
 
@@ -33,6 +34,7 @@ The shared tuner is the only implementation of this lifecycle:
 - Record train/validation loss, primary business metric, learning rate, time, throughput, GPU utilization, VRAM, system memory, and process memory every epoch.
 - Freeze effective config, required checkpoints, history, resources, validation predictions, business metrics, and analysis.
 - Require one changed_dimension. Compare business metrics only inside a business_comparison_group with the same label, split, and business evaluation; compare validation loss only inside a loss_comparison_group with the same loss definition.
+- Before launch, require both the global and per-trial training contract to be max_epochs=1000 and early_stopping_patience=20; reject either value as changed_dimension or an in-memory override.
 - Refuse the next candidate until analysis returns continue.
 
 Do not restore an old QuickTune API that sequentially runs all trials or puts business metrics behind loss. Its thin adapters, in-memory configs, validation isolation, resource audit, and frozen-artifact design remain useful evidence.
@@ -63,9 +65,9 @@ Run:
 
     python scripts/analyze_hpo_progress.py path/to/ledger.json path/to/analysis
 
-The ledger contains data_scope, objective, baseline_trial, trials, strict_test_used_for_selection, and at most one proposed_next. Each completed trial records its name, business_comparison_group, loss_comparison_group, primary business metric, best/final validation loss, completed/planned epochs, best epoch, resource gate, and unique changed_dimension.
+The ledger contains data_scope, training_contract, objective, baseline_trial, trials, strict_test_used_for_selection, and at most one proposed_next. training_contract records immutable max_epochs=1000 and early_stopping_patience=20; every trial repeats planned_epochs=1000, max_epochs=1000, and early_stopping_patience=20. Each completed trial records its name, business_comparison_group, loss_comparison_group, primary business metric, best/final validation loss, completed/planned epochs, best epoch, resource gate, and unique changed_dimension.
 
-The tool writes analysis.json and analysis.md. It enforces all-entity registration-regime scope, rejects strict-test selection, and detects consecutive business regression, loss/business conflict, incomparable trials, multiple changes, ineffective learning, and resource failures. It analyzes evidence and never launches training.
+The tool writes analysis.json and analysis.md. It enforces all-entity registration-regime scope and the 1000/20 training contract, rejects strict-test selection, and detects consecutive business regression, loss/business conflict, incomparable trials, multiple changes, ineffective learning, and resource failures. It analyzes evidence and never launches training.
 
 ## Completion Evidence
 

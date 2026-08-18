@@ -51,6 +51,16 @@ def analyze(payload: dict) -> dict:
     if payload.get("strict_test_used_for_selection") is not False:
         raise ValueError("strict test must not participate in candidate selection")
 
+    training_contract = _mapping(payload, "training_contract")
+    if (
+        int(training_contract.get("max_epochs", 0)) != 1000
+        or int(training_contract.get("early_stopping_patience", -1)) != 20
+    ):
+        raise ValueError(
+            "training contract must keep max_epochs=1000 and "
+            "early_stopping_patience=20"
+        )
+
     objective = _mapping(payload, "objective")
     business_metric_name = _text(objective, "business_metric")
     higher_is_better = objective.get("higher_is_better")
@@ -90,6 +100,15 @@ def analyze(payload: dict) -> dict:
     flags: list[str] = []
     completed: list[dict] = []
     for index, trial in enumerate(trials):
+        if (
+            int(trial.get("planned_epochs", 0)) != 1000
+            or int(trial.get("max_epochs", 0)) != 1000
+            or int(trial.get("early_stopping_patience", -1)) != 20
+        ):
+            raise ValueError(
+                "training contract must keep max_epochs=1000 and "
+                "early_stopping_patience=20 for every trial"
+            )
         if trial.get("strict_test_used_for_selection") is True:
             raise ValueError("strict test must not participate in candidate selection")
         if trial.get("status") != "completed":
@@ -210,6 +229,10 @@ def analyze(payload: dict) -> dict:
         "schema_version": 1,
         "data_scope_id": scope["id"],
         "data_scope_start_date": scope["start_date"],
+        "training_contract": {
+            "max_epochs": 1000,
+            "early_stopping_patience": 20,
+        },
         "business_metric": business_metric_name,
         "baseline_trial": baseline_name,
         "latest_trial": latest["name"],
