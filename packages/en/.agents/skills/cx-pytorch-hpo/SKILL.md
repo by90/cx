@@ -2,7 +2,7 @@
 name: cx-pytorch-hpo
 description: Use for automatic HPO in PyTorch, Lightning, and stock time-series projects; reuse the project's shared tuner, optimize the validation business metric on every eligible registration-regime entity, jointly search data, model, optimization, schedule, and loss parameters with a mature sampler/pruner, and admit trials safely through CPU, physical-memory, commit-memory, and per-GPU VRAM capacity gates.
 metadata:
-  version: 0.4.0
+  version: 0.4.1
 ---
 
 # cx Automatic PyTorch HPO
@@ -25,6 +25,12 @@ Delegate candidate direction, parameter interaction, and training-resource alloc
 10. Default to serial high-resource work and never run more than two such jobs concurrently. Run at most one independent trial worker per GPU. Dual-GPU concurrency must pass host and per-GPU capacity admission and consumes both concurrency slots.
 11. Record train/validation loss, cumulative business best, learning rate, time, steps, CPU, physical memory, commit memory, and per-GPU VRAM every epoch. Freeze the effective config, epoch trail, business-best, validation-loss-best, and prune/completion-final state per trial. OOM, exhausted commit memory, and exceptions are explicit trial states with reasons.
 12. A one-percentage-point or similar meaningful-delta rule applies only between two completed, contract-comparable trials. Within one run, report only business best with epoch and validation-loss best with epoch.
+
+## Ordinary Single-Candidate Stopping Rule
+
+An ordinary single-candidate baseline, reproduction, or falsifiable experiment trains for at most `120` epochs by default and applies early stopping to the project's explicit validation selection objective. Stop immediately and classify the candidate as training poorly when that objective has not improved for `9` complete epochs; do not require the run to complete `100` epochs first. After stopping, still freeze the business-best, validation-loss-best, and final states under the target project's rules, and run strict test only with the project-authorized checkpoint.
+
+Do not layer this `120/9` rule onto a formal automated HPO trial. Formal automated HPO continues to disable framework-native manual early stopping and lets the pruner determine actual epochs from per-epoch validation business metrics. The two stopping mechanisms must not be active in the same trial.
 
 ## Shared Module Contract
 
