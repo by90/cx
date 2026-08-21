@@ -10,7 +10,7 @@ Development code implements only the latest intent. Unless the user explicitly r
 
 After any deliverable, `$cx-review` runs artifact-quality review and the completion-evidence gate. A failure in either stage keeps the task unfinished and the active change file present.
 
-Current package version: `0.1.2`. cx is still experimental and has not declared a stable `1.0.0` workflow.
+Current package version: `0.2.0`. cx is still experimental and has not declared a stable `1.0.0` workflow.
 
 Chinese README: [README.zh-CN.md](README.zh-CN.md). In this repository, Chinese workflow changes are completed first and then synchronized into English.
 
