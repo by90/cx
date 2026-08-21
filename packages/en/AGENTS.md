@@ -33,7 +33,7 @@ These rules override other rules, cx skills, templates, examples, and temporary 
 2. **Comprehensive comments**: all new or edited source and unit-test files need file-level purpose notes, class/type notes, function notes, and line-by-line business-code intent comments.
 3. **Default one-task one-code-file execution**: establish the task set and each production-file binding once when a new story is created. Before programming or workflow development, complete the current original task and edit only its one production file. After story creation, a file or implementation change first enters a temporary change and rewrites the original task; never add, delete, or rename task files. Continue into another original task only when the user explicitly requests multi-task continuation.
 4. **Language package document language**: English package documents should be English; Chinese package documents must be Simplified Chinese.
-5. **Explicit unit tests**: by default, do not create, edit, or run unit tests. Create or edit one matching test file only when the current user request, existing task document, or change document explicitly asks for unit tests, TDD, failing tests, or red-green-refactor. When unit tests are explicitly requested, tests mirror `src`; `src/<subsystem>/xx.py` maps only to `tests/<subsystem>/xx_test.py`.
+5. **Explicit unit tests separated from production code**: by default, do not create, edit, or run unit tests. Create or edit one matching test file only when the current user request, existing task document, or change document explicitly asks for unit tests, TDD, failing tests, or red-green-refactor. Production source must not contain test code. When unit tests are explicitly requested, repository-root `tests/` mirrors `src/` as closely as possible; `src/<subsystem>/xx.<ext>` maps only to `tests/<subsystem>/xx_test.<ext>`.
 6. **Default parameters first**: prefer clear type annotations and default parameters over large constructor branching. Configuration defaults should be written directly as default parameters, for example `path=Config.default_config_file()` or `batch_size=config.train.batch_size`; inside the function body, store the parameter on a same-named field, for example `self.batch_size = batch_size`.
 7. **Full object-oriented design, minimal code, and reuse first**: use full object-oriented design for state, lifecycle, invariants, and domain collaboration. Avoid bloated code, overly long files, overly long variable names, and sentence-like identifiers. Search and design functional entrypoints with `$cx-common-module` before adding reusable logic. Do not default to dynamic reflection, monkey patching, dynamic injection, or string dispatch.
 8. **Python scripts do not accept command-line parameters**: target-project scripts take adjustable behavior from config-subsystem items with defaults.
@@ -129,7 +129,8 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 - `$cx-pytorch-tdd`: adds Python, PyTorch, and Lightning tools, layout, real data, and tensor checks to the `$cx-tdd` main workflow.
 - `$cx-pytorch-hpo`: automatic PyTorch HPO that reuses the project's shared tuner; stock tasks use all eligible registration-regime entities while a mature sampler/pruner searches the full conditional space, allocates trial resources, and continuously analyzes every state. Strict test does not enter search.
 - `$cx-timeseries-modeling`: heterogeneous multivariate time-series modeling.
-- `$cx-rust-tdd`: adds Rust built-in tests, shared real-data fixtures, and `cargo` checks to the `$cx-tdd` main workflow.
+- `$cx-rust-tdd`: adds external mirrored Rust test layout, shared real-data fixtures, and `cargo` checks to the `$cx-tdd` main workflow.
+- `$cx-ui`: pages, components, ViewModels, presentation state, and giant UI-file refactoring with one-way View, ViewModel, Service, Data layering and single-file responsibility.
 - `$cx-common-module`: reusable features, reusable classes, and functional entrypoint design.
 - `$cx-review`: artifact-quality review, the completion-evidence gate, current-state consistency, and residual risk.
 - A failure in either `$cx-review` stage means the task is incomplete and the active change file remains.
@@ -157,11 +158,13 @@ A coding-agent prompt should include goal, context, constraints, required workfl
 ## Rust / GPUI Rules
 
 - When Rust unit tests are explicitly requested, use built-in test mechanisms and `cargo test`.
+- Rust production source must never contain `#[cfg(test)]`, inline `mod tests`, fixtures, or test-only entrypoints. Tests live only in repository-root `tests/`, which mirrors `src/` as closely as possible; `src/<subsystem>/foo.rs` maps to at most `tests/<subsystem>/foo_test.rs`.
 - Run `cargo fmt` after Rust changes. Run `cargo test` only when unit tests or TDD are explicitly required, and run `cargo clippy --all-targets --all-features` when practical.
 - Data-related Rust tests use real test-database records through one shared fixture module and a one-time initialization mechanism; individual test modules never reread the database. Do not use mocks or fake repositories unless the current user request explicitly requires them.
 - Model domain state with struct, enum, trait, and explicit `Result`.
 - Avoid `unwrap`, `expect`, and `panic!` in production paths unless locally proven and documented.
-- Separate pure state, reducers, and rendering.
+- UI work must use `$cx-ui`. View owns page and component rendering and event binding, ViewModel owns presentation state and user intent, Service owns use-case orchestration, and Data owns external reads and writes; dependencies flow only through View -> ViewModel -> Service -> Data.
+- Every page, reusable component, and ViewModel lives in a separate file; module entrypoints only export and compose dependencies. Do not accumulate pages, components, business services, data access, or tests in a unified UI file.
 - After Rust/GPUI desktop UI changes, launch or package the real app and observe it on device.
 - Put temporary screenshots and UI verification artifacts under `temp/` or the project temporary directory.
 

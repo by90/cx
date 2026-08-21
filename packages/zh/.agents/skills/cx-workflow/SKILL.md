@@ -68,6 +68,7 @@ version: 0.1.0
 - 通用包教程、项目 `AGENTS.md` 导航、专题文档、协议、数据过程、特征体系或技术转向：`$cx-doc`。
 - 通用功能、可复用类和稳定接口：先 `$cx-doc`，再 `$cx-common-module`。
 - 架构、职责、领域对象和数据访问边界：`$cx-design`。
+- 页面、组件、ViewModel、界面状态、导航或 UI 巨型文件重构：`$cx-ui`；涉及领域职责和数据访问边界时同时使用 `$cx-design`。
 - 研究、模型选择和论文综合：`$cx-research`，并使用 `$cx-doc` 保存研究笔记。
 - 用户或当前文档明确声明单元测试或测试先行：先使用 `$cx-tdd` 执行唯一主流程；Python、PyTorch 或 Lightning 测试再叠加 `$cx-pytorch-tdd`，Rust 测试再叠加 `$cx-rust-tdd`。
 - Rust 普通实现遵循当前任务的默认实现流程；没有明确测试要求时不使用 `$cx-rust-tdd`。

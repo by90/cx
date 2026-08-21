@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Added `$cx-ui` with strict View, ViewModel, Service, Data dependency direction, one file per page, reusable component, and ViewModel, and explicit gates against giant mixed-responsibility UI files.
+- Changed `$cx-rust-tdd` to forbid all test code in production `src/` and require one-to-one `_test.rs` files under a repository-root `tests/` tree that mirrors `src/` as closely as Cargo allows.
 - Added `$cx-pytorch-hpo`: stock tuning uses every eligible registration-regime entity, reuses a shared project tuner, runs one candidate at a time, prioritizes validation business performance, isolates strict test, and ships a tested progress-analysis tool.
 - Reworked `$cx-pytorch-hpo` around persistent automatic HPO: mature sampler/pruner tooling jointly searches the full conditional space, controls trial epochs and pruning from validation business trajectories, tracks every trial state, and keeps strict test isolated.
 - Previously fixed `$cx-pytorch-hpo` formal training to immutable `max_epochs=1000` and `early_stopping_patience=20`; this historical contract is superseded by the automatic-HPO resource policy above.

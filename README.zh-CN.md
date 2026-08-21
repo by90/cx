@@ -59,7 +59,8 @@ shskills install --url git@github.com:by90/cx.git --agent custom --dest "$env:US
 13. 开发代码只实现当前最新意图，调用方同步使用当前入口；除非用户明确要求具体校验或异常处理，否则让底层异常保持原始类型、信息和调用栈并自然中止程序，不保留任何兼容或兜底痕迹。
 14. 任一交付物完成后必须由 `$cx-review` 连续执行交付物质量审查和完成证据门禁；通过后删除当前变更文件。
 15. 只有用户明确选择逐任务确认时，才在每个任务完成并记录验证证据和 review 结论后停止等待核对。
-16. `$cx-tdd` 统一处理测试先行主流程；明确声明 Python、PyTorch 或 Lightning 测试时叠加 `$cx-pytorch-tdd`，明确声明 Rust 测试时叠加 `$cx-rust-tdd`；两个语言技能不处理普通实现流程。
+16. `$cx-tdd` 统一处理测试先行主流程；明确声明 Python、PyTorch 或 Lightning 测试时叠加 `$cx-pytorch-tdd`，明确声明 Rust 测试时叠加 `$cx-rust-tdd`；Rust 生产源码禁止混入测试，外置测试在根目录 `tests/` 镜像 `src/` 并一一对应。
+17. 页面、组件、ViewModel、界面状态或 UI 巨型文件任务使用 `$cx-ui`，严格执行 View → ViewModel → Service → Data 单向依赖，并把每个页面、组件和 ViewModel 放入独立文件。
 
 ## docs/cx 结构
 
@@ -98,7 +99,8 @@ docs/cx/01.创建用户/changes/调整用户实体约束.md
 | `$cx-pytorch-tdd` | 在 `$cx-tdd` 主流程上补充 `unittest`、镜像测试布局、共享真实测试数据和张量检查 |
 | `$cx-pytorch-hpo` | PyTorch 统一调参：复用项目公共调参模块，股票任务固定使用注册制全部合格实体，每次只运行一个候选，以验证业务指标为首要目标分析完整轨迹，再决定唯一下一改动 |
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模、协变量、泄漏检查和 PyTorch Forecasting 选型 |
-| `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实测试数据和 `cargo` 检查 |
+| `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 外置镜像测试布局、共享真实测试数据和 `cargo` 检查 |
+| `$cx-ui` | 页面、组件、ViewModel 与 UI 巨型文件重构，强制单向分层和单文件职责 |
 | `$cx-common-module` | 可复用功能、可复用类、功能入口和重复逻辑收敛 |
 | `$cx-review` | 交付物质量审查、完成证据门禁、文档一致性和剩余风险 |
 

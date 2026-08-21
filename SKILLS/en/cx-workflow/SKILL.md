@@ -68,6 +68,7 @@ Ignoring a registered common package and adding similar implementation is duplic
 - Common-package tutorials, project `AGENTS.md` navigation, topic documents, protocols, data processes, feature systems, or technical direction: `$cx-doc`.
 - Reusable functions, classes, and stable interfaces: `$cx-doc`, then `$cx-common-module`.
 - Architecture, responsibilities, domain objects, and data-access boundaries: `$cx-design`.
+- Pages, components, ViewModels, presentation state, navigation, or giant UI-file refactoring: `$cx-ui`; also use `$cx-design` when domain responsibilities or data-access boundaries are involved.
 - Research, model selection, and paper synthesis: `$cx-research`, with `$cx-doc` for the note.
 - Explicitly requested unit tests or test-driven development: use `$cx-tdd` as the single main workflow; add `$cx-pytorch-tdd` for Python, PyTorch, or Lightning tests, and add `$cx-rust-tdd` for Rust tests.
 - Ordinary Rust implementation follows the current task's default implementation flow. Do not use `$cx-rust-tdd` without an explicit test requirement.

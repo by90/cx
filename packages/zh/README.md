@@ -66,7 +66,7 @@ Python / PyTorch：
 Rust：
 
 ```text
-请使用 $cx-story。用 struct、enum 和 trait 表达领域状态，默认只实现当前任务绑定的一个 Rust 代码文件。只有我明确要求 Rust 单元测试或 TDD 时，才先使用 $cx-tdd，再叠加 $cx-rust-tdd。数据相关测试通过统一夹具一次读取测试数据库并共享真实对象；除非我明确要求，禁止 mock 测试。Rust 修改后运行 cargo fmt，可行时运行 clippy；只有明确要求测试时才运行 cargo test。
+请使用 $cx-story。用 struct、enum 和 trait 表达领域状态，默认只实现当前任务绑定的一个 Rust 代码文件。只有我明确要求 Rust 单元测试或 TDD 时，才先使用 $cx-tdd，再叠加 $cx-rust-tdd。生产源码禁止包含测试代码；测试只能位于与 src 同级且尽可能镜像源码结构的 tests，每个被测源码文件最多对应一个同名 _test.rs。数据相关测试通过统一夹具一次读取测试数据库并共享真实对象；除非我明确要求，禁止 mock 测试。Rust 修改后运行 cargo fmt，可行时运行 clippy；只有明确要求测试时才运行 cargo test。
 ```
 
 发布：
@@ -90,7 +90,8 @@ Rust：
 | `$cx-pytorch-tdd` | 在 `$cx-tdd` 主流程上补充 Python、PyTorch 和 Lightning 测试规则 |
 | `$cx-pytorch-hpo` | PyTorch 自动 HPO：复用项目公共调参模块，股票任务固定使用注册制全部合格实体，由成熟 sampler/pruner 联合搜索完整条件空间、决定 trial 资源并持续分析全部状态 |
 | `$cx-timeseries-modeling` | 异构多变量时间序列建模和 PyTorch Forecasting 选型 |
-| `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 内置测试、共享真实数据夹具和 `cargo` 检查 |
+| `$cx-rust-tdd` | 在 `$cx-tdd` 主流程上补充 Rust 外置镜像测试布局、共享真实数据夹具和 `cargo` 检查 |
+| `$cx-ui` | 页面、组件、ViewModel 与 UI 巨型文件重构，强制单向分层和单文件职责 |
 | `$cx-common-module` | 通用功能、可复用类和功能入口设计 |
 | `$cx-review` | 交付物质量审查、完成证据门禁和剩余风险 |
 

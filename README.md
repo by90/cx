@@ -59,7 +59,8 @@ If `CODEX_HOME` is set, use `$env:CODEX_HOME\skills` as the destination.
 13. Development code implements only the latest intent and moves every caller to the current entry. Unless the user explicitly requests specific validation or error handling, preserve the original error type, message, and stack and stop execution without compatibility or fallback traces.
 14. After any deliverable, `$cx-review` runs both artifact-quality review and the completion-evidence gate. Only both PASS permit completion and deletion of the active change file.
 15. Only explicit per-task confirmation mode stops after each task and waits for review.
-16. `$cx-tdd` owns the test-first main workflow. Add `$cx-pytorch-tdd` for explicitly requested Python, PyTorch, or Lightning tests and `$cx-rust-tdd` for explicitly requested Rust tests; neither language skill handles ordinary implementation.
+16. `$cx-tdd` owns the test-first main workflow. Add `$cx-pytorch-tdd` for explicitly requested Python, PyTorch, or Lightning tests and `$cx-rust-tdd` for explicitly requested Rust tests. Rust production source never contains tests; external tests mirror `src/` one-to-one under repository-root `tests/`.
+17. Use `$cx-ui` for pages, components, ViewModels, presentation state, and giant UI files. Enforce one-way View -> ViewModel -> Service -> Data dependencies and a separate file for every page, component, and ViewModel.
 
 ## docs/cx Layout
 
@@ -98,7 +99,8 @@ Project `AGENTS.md` is tailored to project goals, languages, toolchain, and comm
 | `$cx-pytorch-tdd` | Adds `unittest`, mirrored test layout, shared real test data, and tensor checks to `$cx-tdd` |
 | `$cx-pytorch-hpo` | Unified PyTorch HPO that reuses the project's shared tuner, fixes stock tuning to all eligible registration-regime entities, runs one candidate at a time, analyzes the full trail with validation business performance first, and permits one next change |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling and PyTorch Forecasting selection |
-| `$cx-rust-tdd` | Adds Rust built-in tests, shared real test data, and `cargo` checks to `$cx-tdd` |
+| `$cx-rust-tdd` | Adds external mirrored Rust test layout, shared real test data, and `cargo` checks to `$cx-tdd` |
+| `$cx-ui` | Refactors pages, components, ViewModels, and giant UI files with one-way layering and single-file responsibility |
 | `$cx-common-module` | Reusable features, reusable classes, functional entrypoints, and repeated logic convergence |
 | `$cx-review` | Artifact-quality review, the completion-evidence gate, document agreement, and residual risk |
 

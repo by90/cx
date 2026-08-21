@@ -62,7 +62,7 @@ Use $cx-story. Use a uv-managed Python interpreter. Use full object-oriented des
 Rust:
 
 ```text
-Use $cx-story. Model state with structs, enums, and traits, and by default edit only the Rust code file bound to the current task. Only when I explicitly ask for Rust unit tests or TDD, use $cx-tdd first and then add $cx-rust-tdd. Data-related tests use one shared fixture to load real test-database records once. Do not use mock tests unless I explicitly request them. Run cargo fmt after Rust changes and clippy when practical; run cargo test only when tests are explicitly required.
+Use $cx-story. Model state with structs, enums, and traits, and by default edit only the Rust code file bound to the current task. Only when I explicitly ask for Rust unit tests or TDD, use $cx-tdd first and then add $cx-rust-tdd. Production source contains no tests; tests live only under repository-root tests, mirror src as closely as possible, and map each tested source file to at most one matching _test.rs. Data-related tests use one shared fixture to load real test-database records once. Do not use mock tests unless I explicitly request them. Run cargo fmt after Rust changes and clippy when practical; run cargo test only when tests are explicitly required.
 ```
 
 Release:
@@ -86,7 +86,8 @@ Use $cx-version. Work must happen on a short-lived local branch and merge to mai
 | `$cx-pytorch-tdd` | Adds Python, PyTorch, and Lightning rules to the `$cx-tdd` main workflow |
 | `$cx-pytorch-hpo` | Automatic PyTorch HPO that reuses the project's shared tuner, uses every eligible registration-regime entity, lets a mature sampler/pruner search the full conditional space and allocate trial resources, and continuously analyzes all trial states |
 | `$cx-timeseries-modeling` | Heterogeneous multivariate time-series modeling |
-| `$cx-rust-tdd` | Adds Rust built-in tests, shared real-data fixtures, and `cargo` checks to `$cx-tdd` |
+| `$cx-rust-tdd` | Adds external mirrored Rust test layout, shared real-data fixtures, and `cargo` checks to `$cx-tdd` |
+| `$cx-ui` | Refactors pages, components, ViewModels, and giant UI files with one-way layering and single-file responsibility |
 | `$cx-common-module` | Reusable features, reusable classes, and functional entrypoint design |
 | `$cx-review` | Artifact-quality review, the completion-evidence gate, and residual risk |
 

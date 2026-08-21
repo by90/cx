@@ -32,6 +32,8 @@ Run two consecutive stages in one skill: determine whether artifacts are correct
 - Unless the user explicitly requests a specific validation or error behavior in the current request, code does not add validation that raises an error and does not catch, translate, wrap, swallow, skip, or fall back from errors. The original type, message, and stack stop execution.
 - Code, interfaces, parameters, configuration, paths, callers, documentation, examples, and declared tests express only the latest intent. No old entry, alias, adapter, bridge, compatibility branch, compatibility behavior, or old trace remains.
 - No duplicated logic, bloated code, needless parameters, needless variables, convenience wrapper, debug entry, or speculative extension remains.
+- UI deliverables used `$cx-ui`: every page, reusable component, and ViewModel lives in a separate file; dependencies flow only through View, ViewModel, Service, Data; module entrypoints contain no page, component, business, or data implementation.
+- Explicit Rust tests all live under repository-root `tests/`, mirror `src/` as closely as possible, and map each tested source file to at most one matching `_test.rs`; production source contains no `#[cfg(test)]`, inline tests, or fixtures.
 
 ### Current-state documents
 

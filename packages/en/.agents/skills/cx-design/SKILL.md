@@ -1,6 +1,6 @@
 ---
 name: cx-design
-description: Use for object-oriented design, responsibility splitting, domain object modeling, interface boundaries, collaboration relationships, lifecycles, invariants, data-access layering, and pre-implementation design review; use when the user asks for design, architecture, class splitting, naming, domain models, database-access boundaries, or review finds mixed responsibilities.
+description: Use for object-oriented design, responsibility splitting, domain object modeling, interface boundaries, collaboration relationships, lifecycles, invariants, data-access layering, and pre-implementation design review; use when the user asks for design, architecture, class or file splitting, domain models, UI layering, database-access boundaries, or review finds mixed responsibilities.
 version: 0.1.0
 ---
 
@@ -27,7 +27,7 @@ This skill is not a pattern catalog. It prevents database access, domain rules, 
 
 Use this skill when any of the following is true:
 
-1. The user asks for design, architecture, object-oriented design, responsibility splitting, domain objects, class naming, file splitting, or data-access boundaries.
+1. The user asks for design, architecture, object-oriented design, responsibility splitting, domain objects, class naming, file splitting, UI layering, or data-access boundaries.
 2. One class or file handles database connection, queries, domain rules, field definitions, collection lifecycle, infrastructure algorithms, test-only conveniences, or legacy compatibility.
 3. Review finds a class is too long, has too many methods, passes too many variables, performs too many validations, exposes indirect interfaces, is only a data wrapper, or cannot state its responsibility in one sentence.
 4. The work adds or changes shared infrastructure, domain collections, field enums, database gateways, repository objects, domain services, or data containers.
@@ -122,8 +122,9 @@ Ask these questions after design or code is produced:
 
 1. When use cases, tasks, or changes exist, use `$cx-doc` to read related topic documents, then use `$cx-story` to locate the current use case, design, and original task before responsibility design.
 2. For shared capabilities, reusable infrastructure, or shared interfaces, use `$cx-common-module` after this skill clarifies object boundaries and searches registered common packages.
-3. When the user explicitly asks for unit tests or TDD, use `$cx-tdd` or the relevant specialist testing skill after this skill forms the design conclusion.
-4. After any code, design, documentation, or process deliverable is produced, use `$cx-review` for artifact quality and the completion-evidence gate.
+3. For pages, components, ViewModels, presentation state, navigation, or giant UI files, also use `$cx-ui` to enforce View, ViewModel, Service, Data layering and single-file responsibility.
+4. When the user explicitly asks for unit tests or TDD, use `$cx-tdd` or the relevant specialist testing skill after this skill forms the design conclusion.
+5. After any code, design, documentation, or process deliverable is produced, use `$cx-review` for artifact quality and the completion-evidence gate.
 
 ## Output
 

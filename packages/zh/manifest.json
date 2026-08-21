@@ -53,6 +53,10 @@
       "path": ".agents/skills/cx-rust-tdd/SKILL.md"
     },
     {
+      "name": "cx-ui",
+      "path": ".agents/skills/cx-ui/SKILL.md"
+    },
+    {
       "name": "cx-common-module",
       "path": ".agents/skills/cx-common-module/SKILL.md"
     },
