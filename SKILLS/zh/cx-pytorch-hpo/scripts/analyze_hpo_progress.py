@@ -51,8 +51,21 @@ def analyze(payload: dict) -> dict:
     resource = _mapping(payload, "resource_policy")
     if _number(resource.get("max_wallclock_seconds"), "max_wallclock_seconds") <= 0:
         raise ValueError("max_wallclock_seconds must be positive")
-    if resource.get("framework_early_stopping") is not False:
-        raise ValueError("automatic HPO must disable framework early stopping")
+    # 正式调参与普通候选统一以一百二十轮作为单个参数试验的训练上限。
+    max_epochs = int(resource.get("max_resource", 0))
+    if max_epochs != 120:
+        raise ValueError("max_resource must equal 120 epochs")
+    # 框架训练器必须启用自身早停，剪枝器只负责更早淘汰相对劣势试验。
+    if resource.get("framework_early_stopping") is not True:
+        raise ValueError("automatic HPO must enable framework early stopping")
+    # 连续九轮没有任何验证目标提高时停止当前参数试验。
+    if int(resource.get("early_stopping_patience", 0)) != 9:
+        raise ValueError("early stopping patience must equal 9 epochs")
+    # 零提高阈值保证任意严格提高都会立即重置九轮忍耐计数。
+    if _number(
+        resource.get("early_stopping_min_delta"), "early_stopping_min_delta"
+    ) != 0:
+        raise ValueError("early stopping min_delta must equal zero")
 
     objective = _mapping(payload, "objective")
     metric = _text(objective, "business_metric")
@@ -91,6 +104,9 @@ def analyze(payload: dict) -> dict:
         epochs = int(trial.get("completed_epochs", 0))
         if epochs < 0:
             raise ValueError("completed_epochs must be non-negative")
+        # 剪枝、失败或正常完成都不能记录超过统一训练上限的实际轮数。
+        if epochs > max_epochs:
+            raise ValueError("completed_epochs must not exceed 120")
         value = trial.get("value")
         if state == "complete":
             value = _number(value, f"trial {number} value")

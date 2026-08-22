@@ -51,8 +51,21 @@ def analyze(payload: dict) -> dict:
     resource = _mapping(payload, "resource_policy")
     if _number(resource.get("max_wallclock_seconds"), "max_wallclock_seconds") <= 0:
         raise ValueError("max_wallclock_seconds must be positive")
-    if resource.get("framework_early_stopping") is not False:
-        raise ValueError("automatic HPO must disable framework early stopping")
+    # Formal HPO and ordinary candidates share 120 epochs as the per-trial limit.
+    max_epochs = int(resource.get("max_resource", 0))
+    if max_epochs != 120:
+        raise ValueError("max_resource must equal 120 epochs")
+    # The trainer keeps early stopping while the pruner only terminates weaker trials sooner.
+    if resource.get("framework_early_stopping") is not True:
+        raise ValueError("automatic HPO must enable framework early stopping")
+    # Stop a trial after nine epochs without any validation-objective improvement.
+    if int(resource.get("early_stopping_patience", 0)) != 9:
+        raise ValueError("early stopping patience must equal 9 epochs")
+    # A zero threshold ensures that every strict improvement resets patience immediately.
+    if _number(
+        resource.get("early_stopping_min_delta"), "early_stopping_min_delta"
+    ) != 0:
+        raise ValueError("early stopping min_delta must equal zero")
 
     objective = _mapping(payload, "objective")
     metric = _text(objective, "business_metric")
@@ -91,6 +104,9 @@ def analyze(payload: dict) -> dict:
         epochs = int(trial.get("completed_epochs", 0))
         if epochs < 0:
             raise ValueError("completed_epochs must be non-negative")
+        # Pruned, failed, and completed trials all remain within the unified epoch limit.
+        if epochs > max_epochs:
+            raise ValueError("completed_epochs must not exceed 120")
         value = trial.get("value")
         if state == "complete":
             value = _number(value, f"trial {number} value")
