@@ -11,6 +11,15 @@ from typing import Any
 
 
 def _mapping(payload: dict, field: str) -> dict:
+    """Read one required object field.
+
+    Args:
+        payload: Current parent mapping.
+        field: Field that must contain an object.
+
+    Returns:
+        The object stored under the field.
+    """
     value = payload.get(field)
     if not isinstance(value, dict):
         raise ValueError(f"{field} must be an object")
@@ -18,6 +27,15 @@ def _mapping(payload: dict, field: str) -> dict:
 
 
 def _text(payload: dict, field: str) -> str:
+    """Read one required non-empty text field.
+
+    Args:
+        payload: Current parent mapping.
+        field: Field that must contain non-empty text.
+
+    Returns:
+        Text with surrounding whitespace removed.
+    """
     value = payload.get(field)
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{field} must be non-empty text")
@@ -25,6 +43,15 @@ def _text(payload: dict, field: str) -> str:
 
 
 def _number(value: Any, field: str) -> float:
+    """Convert one required finite number to a float.
+
+    Args:
+        value: Numeric value from the ledger.
+        field: Field description used in an error.
+
+    Returns:
+        A finite floating-point number.
+    """
     result = float(value)
     if not math.isfinite(result):
         raise ValueError(f"{field} must be finite")
@@ -32,7 +59,15 @@ def _number(value: Any, field: str) -> float:
 
 
 def analyze(payload: dict) -> dict:
-    """Validate automatic HPO scope, tool contract, trial states, and incumbent."""
+    """Validate HPO scope, tools, stopping policy, trial states, and incumbent.
+
+    Args:
+        payload: Root object of the persistent HPO ledger.
+
+    Returns:
+        A normalized result ready for analysis artifacts.
+    """
+    # The registration regime and all eligible entities are fixed stock-HPO premises.
     if not isinstance(payload, dict):
         raise ValueError("ledger must be an object")
     scope = _mapping(payload, "data_scope")
@@ -45,6 +80,7 @@ def analyze(payload: dict) -> dict:
     if payload.get("strict_test_used_for_selection") is not False:
         raise ValueError("strict test must not participate in HPO")
 
+    # The optimizer records its sampler, pruner, and recoverable storage explicitly.
     optimizer = _mapping(payload, "optimizer")
     for field in ("tool", "sampler", "pruner", "storage"):
         _text(optimizer, field)
@@ -62,17 +98,20 @@ def analyze(payload: dict) -> dict:
     if int(resource.get("early_stopping_patience", 0)) != 9:
         raise ValueError("early stopping patience must equal 9 epochs")
     # A zero threshold ensures that every strict improvement resets patience immediately.
-    if _number(
-        resource.get("early_stopping_min_delta"), "early_stopping_min_delta"
-    ) != 0:
+    if (
+        _number(resource.get("early_stopping_min_delta"), "early_stopping_min_delta")
+        != 0
+    ):
         raise ValueError("early stopping min_delta must equal zero")
 
+    # The single validation business objective defines direction and the incumbent.
     objective = _mapping(payload, "objective")
     metric = _text(objective, "business_metric")
     direction = _text(objective, "direction")
     if direction not in ("maximize", "minimize"):
         raise ValueError("objective.direction must be maximize or minimize")
 
+    # The ledger retains complete, pruned, failed, running, and waiting trials.
     trials = payload.get("trials")
     if not isinstance(trials, list):
         raise ValueError("trials must be an array")
@@ -80,6 +119,7 @@ def analyze(payload: dict) -> dict:
     numbers: set[int] = set()
     rows = []
     completed = []
+    # Normalize every trial against the current field contract.
     for trial in trials:
         if not isinstance(trial, dict):
             raise ValueError("every trial must be an object")
@@ -129,6 +169,7 @@ def analyze(payload: dict) -> dict:
         if state == "complete":
             completed.append(row)
 
+    # Only completed trials can become incumbent; other states remain audit evidence.
     best = None
     if completed:
         select = max if direction == "maximize" else min
@@ -141,6 +182,7 @@ def analyze(payload: dict) -> dict:
         str(name): _number(value, f"parameter importance {name}")
         for name, value in importance.items()
     }
+    # Preserve resources, failures, importance, and strict-test isolation in the result.
     return {
         "schema_version": 2,
         "data_scope_id": scope["id"],
@@ -162,7 +204,14 @@ def analyze(payload: dict) -> dict:
 
 
 def markdown(result: dict) -> str:
-    """Render a compact automatic-HPO audit report."""
+    """Render a compact automatic-HPO audit report.
+
+    Args:
+        result: Normalized result returned by `analyze`.
+
+    Returns:
+        Markdown report text ending with a newline.
+    """
     best = result["best_trial"]
     best_text = (
         "none"
@@ -207,6 +256,11 @@ def markdown(result: dict) -> str:
 
 
 def main() -> int:
+    """Read a ledger and write JSON and Markdown analysis artifacts.
+
+    Returns:
+        Zero after both analysis artifacts are written successfully.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("ledger", type=Path)
     parser.add_argument("output_directory", type=Path)
@@ -226,4 +280,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # Return the analyzer status unchanged to the invoking terminal.
     raise SystemExit(main())

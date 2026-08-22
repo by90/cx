@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and summarize a persistent automatic-HPO ledger without strict test."""
+"""在不读取严格测试的前提下验证并汇总持久化自动调参台账。"""
 
 from __future__ import annotations
 
@@ -11,6 +11,15 @@ from typing import Any
 
 
 def _mapping(payload: dict, field: str) -> dict:
+    """读取一个必需的对象字段。
+
+    Args:
+        payload: 当前父级字段字典。
+        field: 必须存在且值为对象的字段名。
+
+    Returns:
+        字段对应的对象字典。
+    """
     value = payload.get(field)
     if not isinstance(value, dict):
         raise ValueError(f"{field} must be an object")
@@ -18,6 +27,15 @@ def _mapping(payload: dict, field: str) -> dict:
 
 
 def _text(payload: dict, field: str) -> str:
+    """读取一个必需的非空文本字段。
+
+    Args:
+        payload: 当前父级字段字典。
+        field: 必须存在且值为非空文本的字段名。
+
+    Returns:
+        去除首尾空白后的文本。
+    """
     value = payload.get(field)
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{field} must be non-empty text")
@@ -25,6 +43,15 @@ def _text(payload: dict, field: str) -> str:
 
 
 def _number(value: Any, field: str) -> float:
+    """把一个必需的有限数值转换为浮点数。
+
+    Args:
+        value: 台账提供的数值。
+        field: 发生错误时使用的字段说明。
+
+    Returns:
+        有限浮点数。
+    """
     result = float(value)
     if not math.isfinite(result):
         raise ValueError(f"{field} must be finite")
@@ -32,7 +59,15 @@ def _number(value: Any, field: str) -> float:
 
 
 def analyze(payload: dict) -> dict:
-    """Validate automatic HPO scope, tool contract, trial states, and incumbent."""
+    """验证自动调参范围、工具合同、停止规则、试验状态和当前最优。
+
+    Args:
+        payload: 持久化自动调参台账根对象。
+
+    Returns:
+        可直接写入分析文件的规范化结果。
+    """
+    # 根对象、注册制范围和全部合格实体是股票调参的固定前提。
     if not isinstance(payload, dict):
         raise ValueError("ledger must be an object")
     scope = _mapping(payload, "data_scope")
@@ -45,6 +80,7 @@ def analyze(payload: dict) -> dict:
     if payload.get("strict_test_used_for_selection") is not False:
         raise ValueError("strict test must not participate in HPO")
 
+    # 调参工具必须明确记录采样器、剪枝器和可恢复存储。
     optimizer = _mapping(payload, "optimizer")
     for field in ("tool", "sampler", "pruner", "storage"):
         _text(optimizer, field)
@@ -62,17 +98,20 @@ def analyze(payload: dict) -> dict:
     if int(resource.get("early_stopping_patience", 0)) != 9:
         raise ValueError("early stopping patience must equal 9 epochs")
     # 零提高阈值保证任意严格提高都会立即重置九轮忍耐计数。
-    if _number(
-        resource.get("early_stopping_min_delta"), "early_stopping_min_delta"
-    ) != 0:
+    if (
+        _number(resource.get("early_stopping_min_delta"), "early_stopping_min_delta")
+        != 0
+    ):
         raise ValueError("early stopping min_delta must equal zero")
 
+    # 唯一验证业务目标决定参数试验方向和当前最优。
     objective = _mapping(payload, "objective")
     metric = _text(objective, "business_metric")
     direction = _text(objective, "direction")
     if direction not in ("maximize", "minimize"):
         raise ValueError("objective.direction must be maximize or minimize")
 
+    # 参数试验列表保留完整、剪枝、失败、运行中和等待状态。
     trials = payload.get("trials")
     if not isinstance(trials, list):
         raise ValueError("trials must be an array")
@@ -80,6 +119,7 @@ def analyze(payload: dict) -> dict:
     numbers: set[int] = set()
     rows = []
     completed = []
+    # 每个参数试验按统一字段合同转换为规范化分析行。
     for trial in trials:
         if not isinstance(trial, dict):
             raise ValueError("every trial must be an object")
@@ -129,6 +169,7 @@ def analyze(payload: dict) -> dict:
         if state == "complete":
             completed.append(row)
 
+    # 只有完整参数试验参与当前最优选择，剪枝和失败试验仅供审计。
     best = None
     if completed:
         select = max if direction == "maximize" else min
@@ -141,6 +182,7 @@ def analyze(payload: dict) -> dict:
         str(name): _number(value, f"parameter importance {name}")
         for name, value in importance.items()
     }
+    # 返回值同时保留资源策略、失败原因、参数重要性和严格测试隔离事实。
     return {
         "schema_version": 2,
         "data_scope_id": scope["id"],
@@ -162,7 +204,14 @@ def analyze(payload: dict) -> dict:
 
 
 def markdown(result: dict) -> str:
-    """Render a compact automatic-HPO audit report."""
+    """渲染紧凑的自动调参审计报告。
+
+    Args:
+        result: `analyze` 返回的规范化分析结果。
+
+    Returns:
+        以换行结尾的 Markdown 报告正文。
+    """
     best = result["best_trial"]
     best_text = (
         "none"
@@ -207,6 +256,11 @@ def markdown(result: dict) -> str:
 
 
 def main() -> int:
+    """读取台账并写出 JSON 与 Markdown 分析文件。
+
+    Returns:
+        分析文件成功写出时返回零。
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("ledger", type=Path)
     parser.add_argument("output_directory", type=Path)
@@ -226,4 +280,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # 命令入口把分析结果状态原样交给调用终端。
     raise SystemExit(main())

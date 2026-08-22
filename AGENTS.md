@@ -16,7 +16,7 @@
 | 验证脚本 | Python，由 `uv` 管理 | `uv run --no-project python tools/validate_skill_pack.py packages/zh` |
 | 安装脚本 | PowerShell 与 Shell | `tools/install_cx_zh.ps1`、`tools/install_cx_zh.sh` |
 | 格式与静态检查 | Git 与项目验证脚本 | `git diff --check`、`tools/validate_cx_pack.py` |
-| 单元测试 | 仅在用户、任务或变更明确声明时运行 | 当前任务文档指定的最窄测试命令 |
+| 单元测试 | 禁止 | `cx` 源仓库不创建、不维护、不运行单元测试 |
 
 ## 项目结构与边界
 
@@ -54,6 +54,7 @@
 - 临时变更文件在实施前提交，统一审查通过后删除；Git 是唯一历史来源。
 - 不在技能正文、正式文档或模板中保留旧方案、迁移过程和完成历史。
 - 修改源技能时同时修改对应安装包副本；中文审查通过后再进行英文同步。
+- `cx` 源仓库和双语安装包不保留 `tests/` 目录或单元测试文件；发行验证只使用结构、元数据、镜像、单一来源、编码和静态规则检查。
 
 ## 验证与交付
 
