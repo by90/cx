@@ -2,7 +2,7 @@
 name: cx-pytorch-hpo
 description: Use for automatic HPO in PyTorch, Lightning, and stock time-series projects; reuse the project's shared tuner, optimize the validation business metric on every eligible registration-regime entity, jointly search data, model, optimization, schedule, and loss parameters with a mature sampler/pruner, and admit trials safely through CPU, physical-memory, commit-memory, and per-GPU VRAM capacity gates.
 metadata:
-  version: 0.4.2
+  version: 0.4.3
 ---
 
 # cx Automatic PyTorch HPO
@@ -13,17 +13,17 @@ Delegate candidate direction, parameter interaction, and training-resource alloc
 
 ## Invariants
 
-1. Read the project `AGENTS.md`, effective config, shared training/HPO entrypoints, callers, tests, frozen baseline, and real artifacts first. Evolve an existing model-independent tuner instead of copying its lifecycle into model directories.
+1. Read the project `AGENTS.md`, effective config, shared training/HPO entrypoints, callers, tests, frozen baseline, and real artifacts first. When a model-independent tuner already exists, change only the tuning script and reuse the current model and training entrypoints. A trial must not rewrite product defaults, shared model code, or shared training code, and the lifecycle must not be copied into model directories.
 2. Stock HPO uses every eligible entity and daily row from the applicable registration-regime start; the ChiNext default is `2020-08-24`. Resource pressure must not reduce entity coverage.
 3. Labels, levels, ranking scores, TopN/Top10, and splits come from the authoritative project entrypoint. Freeze validation/test target-date boundaries when window length changes. A label or business-contract change requires a separate study and cannot be directly ranked.
 4. The validation business metric is the sampler, pruner, and incumbent objective. Validation loss supports gradients, diagnosis, and required checkpoints only; lower loss alone cannot promote a trial.
 5. Strict test never enters the study, intermediate values, pruning, parameter importance, or next configuration. Audit only the validation-selected incumbent. If test participates in selection, declare contamination and stop.
 6. Explicitly use a mature HPO tool. Prefer Optuna for a local PyTorch/Lightning workload by default. Before selecting Ray Tune, Syne Tune, SMAC, or another tool, use official documentation to compare OS support, process/memory overhead, recoverable storage, conditional spaces, parallel sampling, and multi-fidelity pruning, then record the choice.
-7. Both ordinary candidates and formal automated HPO trials train for at most `120` epochs and apply `9`-epoch patience to the project's explicit validation selection objective. The minimum improvement must be zero, so any strict improvement immediately resets patience. A pruner may terminate a relatively weak trial earlier from per-epoch validation business metrics, but it cannot cancel, replace, or extend the `120/9` rule.
+7. Both ordinary candidates and formal automated HPO trials train for at most `120` epochs and apply `9`-epoch patience to the project's explicit validation selection objective. The minimum improvement must be zero, so any strict improvement immediately resets patience. A pruner may terminate a relatively weak trial earlier from per-epoch validation business metrics, but it cannot cancel, replace, or extend the `120/9` rule. The study should seek a run-through trial that naturally completes 120 epochs while this rule remains active, but epoch count must not become an incumbent gate.
 8. The search space cannot collapse to latent width. Cover task-relevant data/windows, field representation, temporal model, longitudinal/cross-sectional summaries, optimizer, learning rate, weight decay, batch, scheduler and warmup/period/min-lr/restart parameters, dropout, and loss. User-frozen values stay outside the search.
 9. Use define-by-run conditional spaces: sample only parameters relevant to the selected optimizer, scheduler, architecture, or loss. Architecture combinations must satisfy divisibility, shape, and memory constraints. Do not resample class weighting after project evidence has rejected it.
 10. Default to serial high-resource work and never run more than two such jobs concurrently. Run at most one independent trial worker per GPU. Dual-GPU concurrency must pass host and per-GPU capacity admission and consumes both concurrency slots.
-11. Record train/validation loss, cumulative business best, learning rate, time, steps, CPU, physical memory, commit memory, and per-GPU VRAM every epoch. Freeze the effective config, epoch trail, business-best, validation-loss-best, and prune/completion-final state per trial. OOM, exhausted commit memory, and exceptions are explicit trial states with reasons.
+11. Record train/validation loss, cumulative business best, learning rate, time, steps, CPU, physical memory, commit memory, and per-GPU VRAM every epoch. After the sampler proposes concrete parameters and the in-memory overrides are materialized, freeze that trial's effective config, epoch trail, business-best, validation-loss-best, and prune/completion-final state. OOM, exhausted commit memory, and exceptions are explicit trial states with reasons.
 12. A one-percentage-point or similar meaningful-delta rule applies only between two completed, contract-comparable trials. Within one run, report only business best with epoch and validation-loss best with epoch.
 
 ## Unified Trial Stopping Rule
@@ -34,15 +34,24 @@ Early-stopping comparison uses strict-improvement semantics with a minimum impro
 
 Formal automated HPO also reports per-epoch validation business metrics to the pruner. The pruner may terminate a relatively weak trial before its nine-epoch patience expires. A trial that is not pruned still obeys the `120/9` rule. Pruning supplements training early stopping; it cannot extend a stagnant trial beyond epoch 120 or bypass the rule that any improvement resets patience.
 
+## Configuration Lifecycle and Dual Objectives
+
+1. A study freezes data boundaries, labels, the validation business objective, the `120/9` stopping contract, resource policy, search space, and excluded parameters. It does not prematurely freeze every parameter under search to one shared value set.
+2. For each trial, the tuning script copies a typed config, overrides only the dimensions currently suggested by the sampler in memory, and passes the resulting config object explicitly to the existing model-construction and training entrypoints. Do not express a trial by rewriting product config files, module-level default objects, model source, or training source.
+3. Freeze the trial's effective config snapshot immediately after applying its in-memory overrides. That snapshot reproduces only that trial and does not prevent the sampler from materializing a different config for the next trial.
+4. The incumbent is always determined by the unchanged validation business metric. A `complete` trial that stops after twenty or thirty epochs under the nine-epoch rule may still become incumbent; epoch count cannot override the business objective.
+5. Naturally completing 120 epochs is a separate training-lifecycle run-through objective. Keep nine-epoch early stopping, zero minimum improvement, and pruning genuinely active. Never fake run-through by delaying early stopping, increasing patience, imposing a minimum-epoch gate, or disabling pruning.
+
 ## Shared Module Contract
 
 The shared tuner alone:
 
-- Creates or restores a persistent study and freezes tool version, sampler, pruner, seed, objective direction, resource policy, and data digest.
-- Converts suggestions into typed in-memory configs without editing product defaults or exposing experiment parameters through CLI flags.
+- Creates or restores a persistent study and separately freezes the study protocol, conditional search space, tool version, sampler, pruner, seed, objective direction, resource policy, and data digest.
+- Copies a typed config for each trial, applies HPO suggestions only as in-memory overrides to that copy, and explicitly passes the effective config to the existing model and training entrypoints. It does not edit product defaults, shared model code, shared training code, or expose experiment parameters through CLI flags.
+- Freezes the effective config snapshot at the trial-start boundary so each trial is reproducible without locking the next sample.
 - Reports cumulative per-epoch validation business best to the pruner while every HPO trial keeps `120/9` training early stopping with zero minimum improvement.
 - Owns each trial's artifact directory, GPU identity, state, checkpoints, resource facts, and recovery.
-- Continuously writes `analysis.json` and `analysis.md` with completed/pruned/failed/running trials, incumbent, parameters, actual epochs, resources, failures, and parameter importance.
+- Continuously writes `analysis.json` and `analysis.md` with completed/pruned/failed/running trials, the validation-business incumbent, parameters, actual epochs, resources, failures, and parameter importance. Actual epochs in the full trail also expose whether any trial naturally completed 120 epochs.
 - Prevents the agent from overriding the next configuration, epoch count, or stop decision while sampler/pruner execution is active.
 
 Thin model adapters declare only networks, losses, and search space. Physically remove old QuickTune, manual one-candidate approval, immutable `1000/20`, and dual protocols. Historical manual runs remain results facts only.
@@ -58,13 +67,13 @@ Thin model adapters declare only networks, losses, and search space. Physically 
 
 ## Workflow
 
-1. Freeze data scope, validation/test date boundaries, label, business objective, hardware/wall-clock limits, excluded parameters, and a `resource_policy` containing incremental peaks and reserves.
+1. Separately freeze data scope, validation/test date boundaries, label, business objective, the `120/9` contract, conditional search space, hardware/wall-clock limits, excluded parameters, and a `resource_policy` containing incremental peaks and reserves. Do not misrepresent searched dimensions as one fixed config shared by every trial.
 2. Research current tools online. A local dual-GPU PyTorch workload normally uses Optuna multivariate TPE for conditional/joint sampling and Hyperband or Successive Halving for multi-fidelity stopping; document why a heavier orchestration layer is unnecessary.
 3. Use TDD to connect a per-epoch trainer observer, pruning exceptions, three checkpoints, persistent shared storage, recovery, and analysis. Validate multiprocess locking with an infrastructure-only smoke test, not a reduced-stock formal trial.
 4. Define the full space. Use suitable linear/log distributions for continuous values and categoricals for windows/architectures. Do not binary-search a business dimension without evidence of monotonicity.
-5. Fix seed and study name, start one worker, and permit one worker per GPU only after capacity admission passes again. Let the sampler suggest configurations, let the pruner terminate relatively weak trials earlier, and let `120/9` determine actual epochs for the remaining trials; do not manually redirect a running study.
+5. Fix seed and study name, start one worker, and permit one worker per GPU only after capacity admission passes again. Let the sampler suggest configurations, let the tuning script materialize and freeze the current trial's effective in-memory config, let the pruner terminate relatively weak trials earlier, and let `120/9` determine actual epochs for the remaining trials; do not manually redirect a running study.
 6. Monitor objective, CPU, physical memory, commit memory, per-GPU VRAM, OOM, zombie trials, storage, and artifacts without touching strict test. Diagnose the failure and pass capacity admission again before resuming the same study; never delete unfavorable trials.
-7. Freeze the incumbent only after the study reaches its wall-clock or convergence stop. Reproduce with independent seeds where needed, then run strict test/backtest once with the project-authorized validation-loss checkpoint.
+7. Continuously report both the validation-business incumbent and whether a trial has naturally completed 120 epochs; neither replaces the other. Freeze the incumbent only after the study reaches its wall-clock or convergence stop. Reproduce with independent seeds where needed, then run strict test/backtest once with the project-authorized validation-loss checkpoint.
 
 ## Extreme-Imbalance Objective
 
@@ -78,14 +87,14 @@ Run:
 
     python scripts/analyze_hpo_progress.py path/to/ledger.json path/to/analysis
 
-The ledger contains `data_scope`, `optimizer`, `objective`, `resource_policy`, `trials`, and `strict_test_used_for_selection`. `optimizer` records tool, sampler, pruner, and persistent storage. Each trial records `number/state/value/params/intermediate_values/completed_epochs` plus validation, resource, failure, and artifact facts.
+The ledger contains `data_scope`, `optimizer`, `objective`, `resource_policy`, `trials`, and `strict_test_used_for_selection`. `optimizer` records tool, sampler, pruner, and persistent storage. Each trial records `number/state/value/params/actual_config/intermediate_values/completed_epochs` plus validation, resource, failure, and artifact facts.
 
-The analyzer validates and summarizes the study; it never replaces the sampler's next suggestion. Output includes state counts, incumbent, actual epochs, failure reasons, available parameter importance, and proof that strict test did not select trials.
+The analyzer validates and summarizes the study; it never replaces the sampler's next suggestion. Output includes state counts, the validation-business incumbent, actual epochs, failure reasons, available parameter importance, and proof that strict test did not select trials. It must not change the existing incumbent rule.
 
 ## Completion Evidence
 
 - Official evidence for tool choice, shared-module/caller audit, and physical removal of the old protocol.
 - Registration start, all eligible entity count, date boundaries, data version, and content digest.
-- Sampler/pruner/storage/resource policy, complete conditional search space, and user-frozen values; the resource policy includes the latest comparable peaks, reserves, serial default, and two-job concurrency ceiling.
-- Admission evidence for one worker and fresh dual-GPU admission, concurrent-storage smoke, per-epoch resource trails, trial states, effective configs, checkpoints, stop reasons, nine-epoch patience counters, and continuous analysis.
-- Validation result and independent reproduction for the incumbent; final strict test with proof that it never entered search.
+- Sampler/pruner/storage/resource policy, complete conditional search space, and user-frozen values; evidence that trials did not rewrite product defaults or shared model/training code; the resource policy includes the latest comparable peaks, reserves, serial default, and two-job concurrency ceiling.
+- Admission evidence for one worker and fresh dual-GPU admission, concurrent-storage smoke, per-epoch resource trails, every trial's effective config snapshot after in-memory overrides, checkpoints, stop reasons, nine-epoch patience counters, and continuous analysis.
+- Validation result for the incumbent, whether any trial naturally completed 120 epochs with nine-epoch early stopping still active, and any needed independent reproduction; final strict test with proof that it never entered search.
