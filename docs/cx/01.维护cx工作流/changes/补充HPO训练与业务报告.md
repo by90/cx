@@ -19,18 +19,23 @@
 
 1. 修改 `00.设计.md` 和原任务 `tasks/04.同步双语安装包.md` 的当前规则与验证方式。
 2. 修改中文 `$cx-pytorch-hpo` 技能源及中文安装包镜像。
-3. 同步英文 `$cx-pytorch-hpo` 技能源及英文安装包镜像。
-4. 执行双语技能、安装包、镜像、编码和静态规则验证。
-5. 使用 `$cx-review` 完成交付物质量审查和完成证据门禁。
+3. 修改中文轨迹分析工具，使机器可读分析真实生成理论损失完善度、业务排名和平台轮次字段。
+4. 同步英文 `$cx-pytorch-hpo` 技能源、轨迹分析工具及英文安装包镜像。
+5. 执行双语技能、安装包、镜像、编码和静态规则验证。
+6. 使用 `$cx-review` 完成交付物质量审查和完成证据门禁。
 
 ## 文件范围
 
 - `docs/cx/01.维护cx工作流/00.设计.md`
 - `docs/cx/01.维护cx工作流/tasks/04.同步双语安装包.md`
 - `SKILLS/zh/cx-pytorch-hpo/SKILL.md`
+- `SKILLS/zh/cx-pytorch-hpo/scripts/analyze_hpo_progress.py`
 - `packages/zh/.agents/skills/cx-pytorch-hpo/SKILL.md`
+- `packages/zh/.agents/skills/cx-pytorch-hpo/scripts/analyze_hpo_progress.py`
 - `SKILLS/en/cx-pytorch-hpo/SKILL.md`
+- `SKILLS/en/cx-pytorch-hpo/scripts/analyze_hpo_progress.py`
 - `packages/en/.agents/skills/cx-pytorch-hpo/SKILL.md`
+- `packages/en/.agents/skills/cx-pytorch-hpo/scripts/analyze_hpo_progress.py`
 
 ## 验证方式
 
