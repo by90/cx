@@ -58,6 +58,222 @@ def _number(value: Any, field: str) -> float:
     return result
 
 
+def _epoch_reports(
+    trial: dict,
+    number: int,
+    completed_epochs: int,
+    patience: int,
+) -> list[dict]:
+    """验证并规范化一个参数试验的逐轮训练与业务报告。
+
+    Args:
+        trial: 当前参数试验台账对象。
+        number: 参数试验序号。
+        completed_epochs: 已完成的完整训练轮数。
+        patience: study 冻结的早停忍耐轮数。
+
+    Returns:
+        按一基轮次连续排列的规范化逐轮报告。
+    """
+    # 逐轮报告是完成训练诊断所需的唯一轨迹来源。
+    reports = trial.get("epoch_reports")
+    # 台账必须显式保存每个完整训练轮，不能只保留最终状态。
+    if not isinstance(reports, list):
+        raise ValueError(f"trial {number} epoch_reports must be an array")
+    # 已完成轮数与报告数量必须一致，避免缺轮仍生成完成结论。
+    if len(reports) != completed_epochs:
+        raise ValueError(f"trial {number} epoch_reports must match completed_epochs")
+    # 规范化结果只保留统一报告合同中的当前字段。
+    normalized = []
+    # 验证损失累计改进次数必须随训练单调不减。
+    previous_improvements = 0
+    # 一基轮次连续性使平台开始轮次可以直接解释。
+    for expected_epoch, report in enumerate(reports, start=1):
+        # 每个轮次报告必须是具名字段对象。
+        if not isinstance(report, dict):
+            raise ValueError(f"trial {number} epoch report must be an object")
+        # 实际轮次必须与完整报告顺序一致。
+        epoch = int(report.get("epoch", 0))
+        if epoch != expected_epoch:
+            raise ValueError(f"trial {number} epoch reports must be contiguous")
+        # 累计严格改进次数独立于早停选择目标计数。
+        improvements = int(report.get("validation_loss_improvement_count", -1))
+        if improvements < previous_improvements:
+            raise ValueError(
+                f"trial {number} validation loss improvement count must not decrease"
+            )
+        # 当前值成为下一轮累计次数的下界。
+        previous_improvements = improvements
+        # 早停计数必须处于零到冻结忍耐之间。
+        early_stopping_count = int(report.get("early_stopping_count", -1))
+        if early_stopping_count < 0 or early_stopping_count > patience:
+            raise ValueError(f"trial {number} early stopping count is out of range")
+        # 股票业务报告必须同时提供动态与固定前排口径。
+        business = _mapping(report, "business_report")
+        # 当前轮次的训练、验证和业务事实形成一个不可变分析行。
+        normalized.append(
+            {
+                "epoch": epoch,
+                "train_loss": _number(
+                    report.get("train_loss"), f"trial {number} train loss"
+                ),
+                "validation_loss": _number(
+                    report.get("validation_loss"),
+                    f"trial {number} validation loss",
+                ),
+                "validation_loss_improvement_count": improvements,
+                "early_stopping_count": early_stopping_count,
+                "business_report": {
+                    "dynamic_topn": _number(
+                        business.get("dynamic_topn"),
+                        f"trial {number} dynamic TopN",
+                    ),
+                    "fixed_top1": _number(
+                        business.get("fixed_top1"), f"trial {number} fixed Top1"
+                    ),
+                    "fixed_top3": _number(
+                        business.get("fixed_top3"), f"trial {number} fixed Top3"
+                    ),
+                    "fixed_top10": _number(
+                        business.get("fixed_top10"),
+                        f"trial {number} fixed Top10",
+                    ),
+                },
+            }
+        )
+    # 返回值供损失完善度、平台和 Markdown 报告共同复用。
+    return normalized
+
+
+def _loss_report(
+    trial: dict,
+    number: int,
+    state: str,
+    reports: list[dict],
+    reference: float,
+    floor: float | None,
+    precision: float,
+    plateau_window: int,
+) -> dict | None:
+    """计算理论损失完善度、平台轮次和人工拟合结论字段。
+
+    Args:
+        trial: 当前参数试验台账对象。
+        number: 参数试验序号。
+        state: 规范化参数试验状态。
+        reports: 已验证的逐轮训练与业务报告。
+        reference: 无信息理论基准损失。
+        floor: 可用时的理论损失下界。
+        precision: 判断有意义损失变化的冻结精度。
+        plateau_window: 判定平台所需的连续完整轮数。
+
+    Returns:
+        没有完整训练轮时返回空值，否则返回统一完成报告。
+    """
+    # 没有完整训练轮时不存在损失完善度或平台证据。
+    if not reports:
+        return None
+    # 最小验证损失轮是完成报告的固定比较点。
+    best = min(reports, key=lambda row: row["validation_loss"])
+    # 最终完整训练轮保留停止时真实状态。
+    final = reports[-1]
+    # 冻结精度相对的运行最佳用于识别有意义改善。
+    meaningful_best = reports[0]["validation_loss"]
+    # 第一轮建立初始可比损失基线。
+    last_meaningful_epoch = reports[0]["epoch"]
+    # 后续轮次只在超过冻结精度时刷新平台起点。
+    for report in reports[1:]:
+        # 累积超过精度的小变化最终仍可形成一次有意义改善。
+        if report["validation_loss"] < meaningful_best - precision:
+            # 新的有意义最佳成为后续平台比较基线。
+            meaningful_best = report["validation_loss"]
+            # 当前轮次是最近一次有意义验证改善轮。
+            last_meaningful_epoch = report["epoch"]
+    # 只有终止前完整覆盖观察窗口时才声明平台开始轮次。
+    plateau_start = (
+        last_meaningful_epoch + 1
+        if final["epoch"] - last_meaningful_epoch >= plateau_window
+        else None
+    )
+    # 参数试验必须明确训练与验证损失是否允许相减。
+    comparable = trial.get("losses_comparable")
+    if not isinstance(comparable, bool):
+        raise ValueError(f"trial {number} losses_comparable must be boolean")
+    # 不可比时保留项目给出的具体口径原因。
+    incomparable_reason = None
+    if not comparable:
+        # 明确原因阻止分析器生成误导性泛化差距。
+        incomparable_reason = _text(trial, "loss_incomparability_reason")
+    # 已结束的有效参数试验必须具有人工拟合判断。
+    fit_assessment = trial.get("fit_assessment")
+    # 只有完成或剪枝状态需要冻结人工结论。
+    if state in ("complete", "pruned"):
+        # 固定值域保持机器可读，同时不让工具自动替代人工判断。
+        if fit_assessment not in (
+            "overfitting",
+            "underfitting",
+            "healthy_fit",
+            "insufficient_evidence",
+        ):
+            raise ValueError(f"trial {number} fit_assessment is invalid")
+    # 运行中和失败参数试验可以尚未形成人工判断。
+    elif fit_assessment is not None:
+        # 已提供的非终态人工判断仍必须使用相同值域。
+        fit_assessment = _text(trial, "fit_assessment")
+    # 人工判断必须列出所依据的具体轮次。
+    evidence_epochs = trial.get("fit_evidence_epochs", [])
+    if not isinstance(evidence_epochs, list):
+        raise ValueError(f"trial {number} fit_evidence_epochs must be an array")
+    # 证据轮次转换为稳定的一基整数列表。
+    evidence_epochs = [int(epoch) for epoch in evidence_epochs]
+    # 任何证据都必须落在当前参数试验的真实训练范围内。
+    if any(epoch < 1 or epoch > final["epoch"] for epoch in evidence_epochs):
+        raise ValueError(f"trial {number} fit evidence epoch is out of range")
+    # 相对理论基准的绝对改善直接使用最小验证损失。
+    absolute_improvement = reference - best["validation_loss"]
+    # 理论基准为零时相对改善百分比没有定义。
+    relative_improvement = (
+        None if reference == 0 else absolute_improvement / abs(reference) * 100
+    )
+    # 只有有效理论下界才能计算可改善损失完成率。
+    completion = (
+        None
+        if floor is None or reference <= floor
+        else absolute_improvement / (reference - floor) * 100
+    )
+    # 同口径损失才生成训练与验证差值。
+    best_gap = best["validation_loss"] - best["train_loss"] if comparable else None
+    # 最终差值只用于人工拟合诊断，不参与选择。
+    final_gap = final["validation_loss"] - final["train_loss"] if comparable else None
+    # 完成报告同时保存理论、训练、验证、业务和人工证据。
+    return {
+        "validation_best_epoch": best["epoch"],
+        "train_loss_at_validation_best": best["train_loss"],
+        "validation_loss_best": best["validation_loss"],
+        "gap_at_validation_best": best_gap,
+        "final_epoch": final["epoch"],
+        "final_train_loss": final["train_loss"],
+        "final_validation_loss": final["validation_loss"],
+        "final_gap": final_gap,
+        "loss_reference": reference,
+        "loss_floor": floor,
+        "absolute_improvement": absolute_improvement,
+        "relative_improvement_percent": relative_improvement,
+        "reducible_loss_completion_percent": completion,
+        "plateau_start_epoch": plateau_start,
+        "plateau_window": plateau_window,
+        "loss_report_precision": precision,
+        "losses_comparable": comparable,
+        "loss_incomparability_reason": incomparable_reason,
+        "fit_assessment": fit_assessment,
+        "fit_evidence_epochs": evidence_epochs,
+        "business_at_validation_best": best["business_report"],
+        "business_at_final": final["business_report"],
+        "validation_loss_improvement_count": final["validation_loss_improvement_count"],
+        "early_stopping_count": final["early_stopping_count"],
+    }
+
+
 def analyze(payload: dict) -> dict:
     """验证自动调参范围、工具合同、停止规则、试验状态和当前最优。
 
@@ -111,6 +327,25 @@ def analyze(payload: dict) -> dict:
     if direction not in ("maximize", "minimize"):
         raise ValueError("objective.direction must be maximize or minimize")
 
+    # 无信息理论基准是训练完善度的固定起点，不能来自任一参数试验。
+    loss_reference = _number(payload.get("loss_reference"), "loss_reference")
+    # 理论下界允许显式为空，表示当前损失没有可证明的完善度分母。
+    loss_floor_value = payload.get("loss_floor")
+    # 有限理论下界保留为统一浮点数供全部参数试验复用。
+    loss_floor = (
+        None if loss_floor_value is None else _number(loss_floor_value, "loss_floor")
+    )
+    # 损失报告精度决定哪些变化可以解释为有意义改善。
+    loss_report_precision = _number(
+        payload.get("loss_report_precision"), "loss_report_precision"
+    )
+    if loss_report_precision <= 0:
+        raise ValueError("loss_report_precision must be positive")
+    # 平台观察窗口必须包含至少一个完整训练轮。
+    plateau_window = int(payload.get("plateau_window", 0))
+    if plateau_window <= 0:
+        raise ValueError("plateau_window must be positive")
+
     # 参数试验列表保留完整、剪枝、失败、运行中和等待状态。
     trials = payload.get("trials")
     if not isinstance(trials, list):
@@ -147,6 +382,36 @@ def analyze(payload: dict) -> dict:
         # 剪枝、失败或正常完成都不能记录超过统一训练上限的实际轮数。
         if epochs > max_epochs:
             raise ValueError("completed_epochs must not exceed 120")
+        # 完整逐轮训练与业务报告支撑理论完善度和平台诊断。
+        epoch_reports = _epoch_reports(
+            trial,
+            number,
+            epochs,
+            int(resource["early_stopping_patience"]),
+        )
+        # 股票排名刻度和动态 N 口径必须与数值一同冻结。
+        business_context = _mapping(trial, "business_context")
+        # 四个文本字段使跨刻度 TopN 比较可以复核。
+        business_context = {
+            field: _text(business_context, field)
+            for field in (
+                "scale",
+                "opportunity_definition",
+                "daily_n_source",
+                "aggregation",
+            )
+        }
+        # 统一完成报告由逐轮轨迹和 study 理论损失合同计算。
+        loss_report = _loss_report(
+            trial,
+            number,
+            state,
+            epoch_reports,
+            loss_reference,
+            loss_floor,
+            loss_report_precision,
+            plateau_window,
+        )
         value = trial.get("value")
         if state == "complete":
             value = _number(value, f"trial {number} value")
@@ -159,7 +424,12 @@ def analyze(payload: dict) -> dict:
             "params": params,
             "completed_epochs": epochs,
             "business_best_epoch": trial.get("business_best_epoch"),
-            "validation_loss_best": trial.get("validation_loss_best"),
+            "validation_loss_best": (
+                None if loss_report is None else loss_report["validation_loss_best"]
+            ),
+            "epoch_reports": epoch_reports,
+            "business_context": business_context,
+            "training_report": loss_report,
             "duration_seconds": trial.get("duration_seconds"),
             "gpu_peak_reserved_bytes": trial.get("gpu_peak_reserved_bytes"),
             "failure": trial.get("failure"),
@@ -184,7 +454,7 @@ def analyze(payload: dict) -> dict:
     }
     # 返回值同时保留资源策略、失败原因、参数重要性和严格测试隔离事实。
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "data_scope_id": scope["id"],
         "data_scope_start_date": scope["start_date"],
         "business_metric": metric,
@@ -194,11 +464,23 @@ def analyze(payload: dict) -> dict:
             for field in ("tool", "sampler", "pruner", "storage")
         },
         "resource_policy": resource,
+        "loss_reference": loss_reference,
+        "loss_floor": loss_floor,
+        "loss_report_precision": loss_report_precision,
+        "plateau_window": plateau_window,
         "counts": {"total": len(rows), **counts},
         "best_trial": best,
         "parameter_importance": importance,
         "failures": [row for row in rows if row["failure"]],
         "trials": rows,
+        # 选择合同明确只有冻结目标对应的参数试验值参与选参。
+        "used_for_selection": {
+            "trial_value": True,
+            "objective_metric": metric,
+            "epoch_reports": False,
+            "training_report": False,
+            "strict_test": False,
+        },
         "strict_test_used_for_selection": False,
     }
 
@@ -219,16 +501,17 @@ def markdown(result: dict) -> str:
         else f"trial {best['number']} value={best['value']:.8f} epochs={best['completed_epochs']}"
     )
     lines = [
-        "# Automatic HPO progress analysis",
+        "# 自动调参进度分析",
         "",
-        f"- Data scope: {result['data_scope_id']} from {result['data_scope_start_date']}; all eligible entities.",
-        f"- Objective: {result['business_metric']} ({result['direction']}).",
-        f"- Tool: {result['optimizer']['tool']}; sampler={result['optimizer']['sampler']}; pruner={result['optimizer']['pruner']}.",
-        f"- Trials: complete={result['counts']['complete']}, pruned={result['counts']['pruned']}, failed={result['counts']['failed']}, running={result['counts']['running']}.",
-        f"- Incumbent: {best_text}.",
-        "- Strict test used for selection: false.",
+        f"- 数据范围：{result['data_scope_id']}，起始日 {result['data_scope_start_date']}，覆盖全部合格实体。",
+        f"- 选择目标：{result['business_metric']}（{result['direction']}）。",
+        f"- 工具：{result['optimizer']['tool']}；采样器={result['optimizer']['sampler']}；剪枝器={result['optimizer']['pruner']}。",
+        f"- 损失基准：{result['loss_reference']:.8f}；理论下界={result['loss_floor']}；报告精度={result['loss_report_precision']}；平台窗口={result['plateau_window']}。",
+        f"- 参数试验：完成={result['counts']['complete']}，剪枝={result['counts']['pruned']}，失败={result['counts']['failed']}，运行中={result['counts']['running']}。",
+        f"- 当前选择结果：{best_text}。",
+        f"- 选择合同：只使用 trial.value 对应的 {result['used_for_selection']['objective_metric']}；逐轮报告、训练诊断和严格测试不参与选参。",
         "",
-        "## Parameter importance",
+        "## 参数重要性",
         "",
     ]
     lines.extend(
@@ -236,21 +519,121 @@ def markdown(result: dict) -> str:
             f"- {name}: {value:.6f}"
             for name, value in result["parameter_importance"].items()
         ]
-        or ["- Not enough completed trials."]
+        or ["- 完成参数试验不足，暂不可用。"]
     )
     lines.extend(
         [
             "",
-            "## Trial trail",
+            "## 参数试验摘要",
             "",
-            "| Trial | State | Value | Epochs | Failure |",
-            "| ---: | --- | ---: | ---: | --- |",
+            "| 参数试验 | 状态 | 目标值 | 完成轮数 | 最优轮次 | 该轮训练损失 | 最小验证损失 | 理论基准绝对改善 | 理论基准相对改善 | 可改善损失完成率 | 平台开始轮次 | 拟合判断 | 验证损失改进次数 | 早停计数 | 失败原因 |",
+            "| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | --- |",
         ]
     )
     for row in result["trials"]:
+        # 未完成首轮的参数试验没有可展示的训练完成报告。
+        report = row["training_report"]
+        # 统一空值避免 Markdown 把不可用百分比误写成零。
+        best_validation = (
+            "" if report is None else f"{report['validation_loss_best']:.8f}"
+        )
+        # 最优轮次把训练损失、验证损失和业务报告绑定到同一检查点。
+        best_epoch = "" if report is None else str(report["validation_best_epoch"])
+        # 同轮训练损失用于人工核对训练与验证是否开始背离。
+        train_at_best = (
+            "" if report is None else f"{report['train_loss_at_validation_best']:.8f}"
+        )
+        # 绝对改善直接回答实际损失比无信息理论基准降低多少。
+        absolute = "" if report is None else f"{report['absolute_improvement']:.8f}"
+        # 理论基准为零时相对改善不可用，必须保持为空。
+        relative = (
+            ""
+            if report is None or report["relative_improvement_percent"] is None
+            else f"{report['relative_improvement_percent']:.4f}%"
+        )
+        # 可改善损失完成率保留百分号以区别原始损失。
+        completion = (
+            ""
+            if report is None or report["reducible_loss_completion_percent"] is None
+            else f"{report['reducible_loss_completion_percent']:.4f}%"
+        )
+        # 平台不足一个完整窗口时不写虚构轮次。
+        plateau = (
+            ""
+            if report is None or report["plateau_start_epoch"] is None
+            else str(report["plateau_start_epoch"])
+        )
+        # 人工拟合结论只读取台账冻结值，不由渲染器推断。
+        fit = (
+            ""
+            if report is None or report["fit_assessment"] is None
+            else report["fit_assessment"]
+        )
+        # 末轮验证损失改进次数用于回顾训练畅通性。
+        improvements = (
+            "" if report is None else str(report["validation_loss_improvement_count"])
+        )
+        # 末轮早停计数与改进次数保持独立列。
+        early_stop = "" if report is None else str(report["early_stopping_count"])
         value = "" if row["value"] is None else f"{row['value']:.8f}"
         lines.append(
-            f"| {row['number']} | {row['state']} | {value} | {row['completed_epochs']} | {row['failure'] or ''} |"
+            f"| {row['number']} | {row['state']} | {value} | {row['completed_epochs']} | {best_epoch} | {train_at_best} | {best_validation} | {absolute} | {relative} | {completion} | {plateau} | {fit} | {improvements} | {early_stop} | {row['failure'] or ''} |"
+        )
+    # 逐轮表格完整呈现用户要求的训练状态和股票业务报告。
+    lines.extend(
+        [
+            "",
+            "## 逐轮训练与业务报告",
+            "",
+            "| 参数试验 | 轮次 | 训练损失 | 验证损失 | 验证损失改进次数 | 早停计数 | 动态 TopN | 固定 Top1 | 固定 Top3 | 固定 Top10 |",
+            "| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    # 每个参数试验按真实完整轮次依次展开，运行中参数试验也可以持续查看。
+    for row in result["trials"]:
+        # 最大轮数与早停忍耐来自冻结资源合同，禁止由单个参数试验改写。
+        max_epochs = result["resource_policy"]["max_resource"]
+        # 早停分母固定为 study 忍耐轮数。
+        patience = result["resource_policy"]["early_stopping_patience"]
+        # 每个完整训练轮同时展示损失、计数与四个业务口径。
+        for report in row["epoch_reports"]:
+            # 当前轮股票业务事实与同一轮损失绑定。
+            business = report["business_report"]
+            # 百分比保留四位，避免显示精度掩盖真实变化。
+            lines.append(
+                f"| {row['number']} | {report['epoch']}/{max_epochs} | "
+                f"{report['train_loss']:.8f} | {report['validation_loss']:.8f} | "
+                f"{report['validation_loss_improvement_count']} | "
+                f"{report['early_stopping_count']}/{patience} | "
+                f"{business['dynamic_topn'] * 100:.4f}% | "
+                f"{business['fixed_top1'] * 100:.4f}% | "
+                f"{business['fixed_top3'] * 100:.4f}% | "
+                f"{business['fixed_top10'] * 100:.4f}% |"
+            )
+    # 股票排名业务值单列，避免与损失完成百分比混淆。
+    lines.extend(
+        [
+            "",
+            "## 最小验证损失轮的业务排名",
+            "",
+            "| 参数试验 | 刻度 | 动态 TopN | 固定 Top1 | 固定 Top3 | 固定 Top10 |",
+            "| ---: | --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    # 每个已有完整训练轮的参数试验报告同一验证损失最佳轮业务值。
+    for row in result["trials"]:
+        # 没有训练报告时跳过业务空行。
+        if row["training_report"] is None:
+            continue
+        # 业务值来自与最小验证损失相同的训练轮。
+        business = row["training_report"]["business_at_validation_best"]
+        # 百分比统一保留四位，避免两位显示掩盖真实变化。
+        lines.append(
+            f"| {row['number']} | {row['business_context']['scale']} | "
+            f"{business['dynamic_topn'] * 100:.4f}% | "
+            f"{business['fixed_top1'] * 100:.4f}% | "
+            f"{business['fixed_top3'] * 100:.4f}% | "
+            f"{business['fixed_top10'] * 100:.4f}% |"
         )
     return "\n".join(lines) + "\n"
 
