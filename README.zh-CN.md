@@ -27,7 +27,7 @@ cx 不是组件库，也不是某个项目的业务实现。它只约束协作�
 
 本地 Codex skills 只能从仓库默认的 `main` 分支安装或更新。不要从工作分支安装本机长期使用的 skills。
 
-推荐在已经 clone 本仓库的机器上使用安装脚本；它会从远端 `main` 更新 skills，并自动覆盖全局 `AGENTS.md`：
+推荐在已经 clone 本仓库的机器上使用安装脚本；它会从远端 `main` 完整重装全部中文 cx 技能，逐个核对文件集合与文件哈希，并自动覆盖和核对全局 `AGENTS.md`：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tools\install_cx_zh.ps1

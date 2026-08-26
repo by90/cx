@@ -38,6 +38,8 @@ Install or update from the repository default `main` branch only:
 powershell -ExecutionPolicy Bypass -File .\tools\install_cx_en.ps1
 ```
 
+The installer fetches the complete current English skill set, uninstalls every cx skill with the same name, reinstalls all skills, and verifies every installed file and global `AGENTS.md` by SHA-256 hash. It never skips a skill because an installation manifest says that skill is current.
+
 Raw install:
 
 ```powershell

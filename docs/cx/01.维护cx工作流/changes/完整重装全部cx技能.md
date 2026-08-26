@@ -35,17 +35,17 @@
 
 | 顺序 | 原任务或文档 | 当前动作 | 状态 |
 | --- | --- | --- | --- |
-| 01 | `tasks/04.同步双语安装包.md` | 更新完整重装与安装后核对要求 | 进行中 |
-| 02 | `tools/install_cx_zh.ps1` | 实现中文技能完整重装与核对 | 待处理 |
-| 03 | `tools/install_cx_en.ps1` | 同步英文技能完整重装与核对 | 待处理 |
-| 04 | 双语说明与专题文档 | 更新当前安装行为 | 待处理 |
-| 05 | 发布文件 | 准备并发布补丁版本 | 待处理 |
+| 01 | `tasks/04.同步双语安装包.md` | 更新完整重装与安装后核对要求 | 完成 |
+| 02 | `tools/install_cx_zh.ps1` | 实现中文技能完整重装与核对 | 完成 |
+| 03 | `tools/install_cx_en.ps1` | 同步英文技能完整重装与核对 | 完成 |
+| 04 | 双语说明与专题文档 | 更新当前安装行为 | 完成 |
+| 05 | 发布文件 | 准备并发布补丁版本 | 进行中 |
 
 ## 文件范围
 
-- 正式文档：`docs/cx/01.维护cx工作流/tasks/04.同步双语安装包.md`、`docs/cx/docs/05.双语包同步.md`、`README.zh-CN.md`、`README.md`、`packages/zh/README.md`、`packages/en/README.md`
+- 正式文档：`docs/cx/01.维护cx工作流/00.设计.md`、`docs/cx/01.维护cx工作流/tasks/04.同步双语安装包.md`、`docs/cx/docs/05.双语包同步.md`、`README.zh-CN.md`、`README.md`、`packages/zh/README.md`、`packages/en/README.md`
 - 代码文件：`tools/install_cx_zh.ps1`、`tools/install_cx_en.ps1`
-- 发布文件：`VERSION`、`packages/zh/manifest.json`、`packages/en/manifest.json`、`CHANGELOG.md`
+- 发布文件：`VERSION`、`packages/zh/manifest.json`、`packages/en/manifest.json` 和根目录发行说明
 - 单元测试文件：无；cx 源仓库禁止单元测试。
 
 ## 验证方式

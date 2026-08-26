@@ -1,4 +1,4 @@
-# This file installs the Chinese cx skills and refreshes the global Codex AGENTS.md file.
+﻿# This file installs the Chinese cx skills and refreshes the global Codex AGENTS.md file.
 # It intentionally has no param block, so callers cannot change behavior with command-line arguments.
 
 # Stop immediately when a command fails, which keeps a partial install from looking successful.
@@ -29,6 +29,8 @@ $globalAgentsPath = Join-Path -Path $codexHome -ChildPath "AGENTS.md"
 $temporaryRoot = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ("cx-install-" + [System.Guid]::NewGuid().ToString("N"))
 # The source AGENTS.md path inside the temporary clone mirrors the repository package layout.
 $sourceAgentsPath = Join-Path -Path $temporaryRoot -ChildPath "packages\zh\AGENTS.md"
+# The cloned Chinese skill directory is the authoritative installation source.
+$sourceSkillsDirectory = Join-Path -Path $temporaryRoot -ChildPath "SKILLS\$languageSubpath"
 
 # The try/finally block guarantees temporary files are removed after success or failure.
 try {
@@ -42,11 +44,77 @@ try {
     # Ensure the skills directory exists before shskills writes into it.
     New-Item -ItemType Directory -Force -Path $skillsDirectory | Out-Null
 
-    # Install or update only the Chinese cx skills from the repository default main branch.
-    & shskills install --url $repositoryUrl --agent custom --dest $skillsDirectory --subpath $languageSubpath --force --clean
-
-    # Clone a shallow copy of main so AGENTS.md comes from the same source policy as the skills.
+    # Clone main before changing installed skills so the complete source is already available.
     & git clone --depth 1 --branch $mainBranch $repositoryUrl $temporaryRoot
+    # Preserve the native git failure code instead of continuing with a partial source tree.
+    if ($LASTEXITCODE -ne 0) {
+        # Exit with the original git failure code.
+        exit $LASTEXITCODE
+    }
+
+    # Enumerate every Chinese cx skill from the cloned main branch.
+    $sourceSkills = Get-ChildItem -LiteralPath $sourceSkillsDirectory -Directory | Sort-Object -Property Name
+    # Remove every current Chinese cx skill registration and directory before reinstalling.
+    foreach ($sourceSkill in $sourceSkills) {
+        # Use the supported shskills removal path for the current skill name.
+        & shskills uninstall --agent custom --dest $skillsDirectory --name $sourceSkill.Name
+        # Preserve any native shskills removal failure without wrapping it.
+        if ($LASTEXITCODE -ne 0) {
+            # Exit with the original shskills failure code.
+            exit $LASTEXITCODE
+        }
+    }
+
+    # Install every Chinese cx skill from the repository default main branch.
+    & shskills install --url $repositoryUrl --agent custom --dest $skillsDirectory --subpath $languageSubpath --force --clean
+    # Preserve any native shskills installation failure without reporting success.
+    if ($LASTEXITCODE -ne 0) {
+        # Exit with the original shskills failure code.
+        exit $LASTEXITCODE
+    }
+
+    # Verify every source skill against the files installed globally.
+    foreach ($sourceSkill in $sourceSkills) {
+        # Resolve the expected global directory for the current skill.
+        $installedSkillDirectory = Join-Path -Path $skillsDirectory -ChildPath $sourceSkill.Name
+        # Stop when an expected skill directory is absent after installation.
+        if (-not (Test-Path -LiteralPath $installedSkillDirectory -PathType Container)) {
+            # Report the exact skill whose directory is missing.
+            throw "Installed Chinese cx skill directory is missing: $($sourceSkill.Name)"
+        }
+
+        # Build the authoritative relative-path and hash signature for every source file.
+        $sourceSignature = @(
+            # Read every source file in stable path order.
+            Get-ChildItem -LiteralPath $sourceSkill.FullName -File -Recurse | Sort-Object -Property FullName | ForEach-Object {
+                # Convert the source path into a skill-relative path.
+                $relativePath = $_.FullName.Substring($sourceSkill.FullName.Length + 1)
+                # Read the exact source file hash.
+                $fileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash
+                # Emit one comparable signature entry.
+                "$relativePath|$fileHash"
+            }
+        )
+        # Build the installed relative-path and hash signature for every global file.
+        $installedSignature = @(
+            # Read every installed file in stable path order.
+            Get-ChildItem -LiteralPath $installedSkillDirectory -File -Recurse | Sort-Object -Property FullName | ForEach-Object {
+                # Convert the installed path into a skill-relative path.
+                $relativePath = $_.FullName.Substring($installedSkillDirectory.Length + 1)
+                # Read the exact installed file hash.
+                $fileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash
+                # Emit one comparable signature entry.
+                "$relativePath|$fileHash"
+            }
+        )
+        # Compare both complete file sets and their hashes.
+        $signatureDifference = Compare-Object -ReferenceObject $sourceSignature -DifferenceObject $installedSignature
+        # Stop when any file is missing, extra, or different.
+        if ($signatureDifference) {
+            # Report the exact skill whose installed content differs.
+            throw "Installed Chinese cx skill content does not match main: $($sourceSkill.Name)"
+        }
+    }
 
     # Replace the global Codex AGENTS.md with the Chinese package template.
     Copy-Item -LiteralPath $sourceAgentsPath -Destination $globalAgentsPath -Force
@@ -61,8 +129,8 @@ try {
         throw "Global AGENTS.md hash does not match the Chinese cx package template."
     }
 
-    # Tell the user which files were updated.
-    Write-Host "Updated Chinese cx skills under $skillsDirectory"
+    # Tell the user that every current skill was reinstalled and verified.
+    Write-Host "Reinstalled and verified all Chinese cx skills under $skillsDirectory"
     # Tell the user that global AGENTS.md was overwritten intentionally.
     Write-Host "Overwrote global AGENTS.md at $globalAgentsPath"
     # Remind the user that Codex needs a restart to load updated skill instructions.
