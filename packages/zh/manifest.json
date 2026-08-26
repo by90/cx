@@ -1,7 +1,7 @@
 {
   "package": "cx",
   "language": "zh",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "purpose": "以项目规则、通用包教程、当前状态文档、固定任务、临时变更、最新接口和统一交付审查约束 Codex 研发流程",
   "skills": [
     {
