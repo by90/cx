@@ -9,6 +9,9 @@ import math
 from pathlib import Path
 from typing import Any
 
+# Twenty-one strict validation-loss improvements is the fixed evidence threshold.
+MIN_EVIDENCE_IMPROVEMENTS = 21
+
 
 def _mapping(payload: dict, field: str) -> dict:
     """Read one required object field.
@@ -177,6 +180,16 @@ def _loss_report(
     best = min(reports, key=lambda row: row["validation_loss"])
     # The last complete epoch preserves the true stopping state.
     final = reports[-1]
+    # Evidence eligibility depends only on the final cumulative improvement count.
+    evidence_eligible = (
+        final["validation_loss_improvement_count"] >= MIN_EVIDENCE_IMPROVEMENTS
+    )
+    # The machine reason prevents a local business peak from hiding invalid evidence.
+    eligibility_reason = (
+        "validation_loss_improvements_reached_21"
+        if evidence_eligible
+        else "validation_loss_improvements_below_21"
+    )
     # Precision-relative running best identifies meaningful improvements.
     meaningful_best = reports[0]["validation_loss"]
     # Epoch one establishes the initial comparable loss level.
@@ -204,10 +217,10 @@ def _loss_report(
     if not comparable:
         # An explicit reason prevents a misleading generalization gap.
         incomparable_reason = _text(trial, "loss_incomparability_reason")
-    # An ended effective trial must freeze a manual fit assessment.
+    # Only ended evidence-eligible trials may include a directional fit assessment.
     fit_assessment = trial.get("fit_assessment")
-    # Complete and pruned states both require the human assessment contract.
-    if state in ("complete", "pruned"):
+    # Complete and pruned eligible trials require the human assessment contract.
+    if state in ("complete", "pruned") and evidence_eligible:
         # A fixed value set stays machine-readable without automating judgment.
         if fit_assessment not in (
             "overfitting",
@@ -216,6 +229,12 @@ def _loss_report(
             "insufficient_evidence",
         ):
             raise ValueError(f"trial {number} fit_assessment is invalid")
+    # An ineligible terminal state allows only the explicit invalid-evidence value.
+    elif state in ("complete", "pruned"):
+        if fit_assessment not in (None, "invalid_evidence"):
+            raise ValueError(f"trial {number} invalid evidence cannot assess fit")
+        # Normalize every ineligible terminal result to one machine-readable value.
+        fit_assessment = "invalid_evidence"
     # Running and failed trials may not yet have a manual assessment.
     elif fit_assessment is not None:
         # A supplied non-terminal value still uses the same text contract.
@@ -226,6 +245,9 @@ def _loss_report(
         raise ValueError(f"trial {number} fit_evidence_epochs must be an array")
     # Convert evidence to a stable list of one-based integer epochs.
     evidence_epochs = [int(epoch) for epoch in evidence_epochs]
+    # Invalid evidence cannot retain epochs that imply a directional fit conclusion.
+    if not evidence_eligible and evidence_epochs:
+        raise ValueError(f"trial {number} invalid evidence cannot have fit epochs")
     # Every evidence epoch must exist in this trial's real trail.
     if any(epoch < 1 or epoch > final["epoch"] for epoch in evidence_epochs):
         raise ValueError(f"trial {number} fit evidence epoch is out of range")
@@ -265,6 +287,8 @@ def _loss_report(
         "loss_report_precision": precision,
         "losses_comparable": comparable,
         "loss_incomparability_reason": incomparable_reason,
+        "evidence_eligible": evidence_eligible,
+        "eligibility_reason": eligibility_reason,
         "fit_assessment": fit_assessment,
         "fit_evidence_epochs": evidence_epochs,
         "business_at_validation_best": best["business_report"],
@@ -296,10 +320,26 @@ def analyze(payload: dict) -> dict:
     if payload.get("strict_test_used_for_selection") is not False:
         raise ValueError("strict test must not participate in HPO")
 
+    # The formal release is the sole project-level business starting point.
+    formal_baseline = _mapping(payload, "formal_baseline")
+    # The tag and frozen-artifact reference prove a read-only formal baseline.
+    formal_baseline = {
+        "tag": _text(formal_baseline, "tag"),
+        "artifact_reference": _text(formal_baseline, "artifact_reference"),
+    }
+    # The note path proves that problem-oriented research preceded training.
+    research_note = _text(payload, "research_note")
+
     # The optimizer records its sampler, pruner, and recoverable storage explicitly.
     optimizer = _mapping(payload, "optimizer")
     for field in ("tool", "sampler", "pruner", "storage"):
         _text(optimizer, field)
+    # The sampler cannot learn the next direction from invalid evidence.
+    if optimizer.get("sampler_uses_only_evidence_eligible_trials") is not True:
+        raise ValueError("sampler must use only evidence-eligible trials")
+    # Model-effectiveness pruning can use only evidence-eligible trials.
+    if optimizer.get("pruner_uses_only_evidence_eligible_trials") is not True:
+        raise ValueError("pruner must use only evidence-eligible trials")
     resource = _mapping(payload, "resource_policy")
     if _number(resource.get("max_wallclock_seconds"), "max_wallclock_seconds") <= 0:
         raise ValueError("max_wallclock_seconds must be positive")
@@ -319,6 +359,12 @@ def analyze(payload: dict) -> dict:
         != 0
     ):
         raise ValueError("early stopping min_delta must equal zero")
+    # Resource policy freezes the evidence gate before model-effectiveness pruning.
+    if (
+        int(resource.get("minimum_evidence_validation_loss_improvements", 0))
+        != MIN_EVIDENCE_IMPROVEMENTS
+    ):
+        raise ValueError("minimum evidence improvements must equal 21")
 
     # The single validation business objective defines direction and the incumbent.
     objective = _mapping(payload, "objective")
@@ -417,6 +463,21 @@ def analyze(payload: dict) -> dict:
             value = _number(value, f"trial {number} value")
         elif value is not None:
             value = _number(value, f"trial {number} value")
+        # A trial without a complete epoch is ineligible and has no loss trail.
+        evidence_eligible = (
+            False if loss_report is None else loss_report["evidence_eligible"]
+        )
+        # Model-effectiveness pruning starts only after this trial crosses the evidence gate.
+        if state == "pruned" and not evidence_eligible:
+            raise ValueError(
+                f"trial {number} pruning requires 21 validation loss improvements"
+            )
+        # Every row carries the reason so callers cannot inspect value alone.
+        eligibility_reason = (
+            "no_complete_epoch"
+            if loss_report is None
+            else loss_report["eligibility_reason"]
+        )
         row = {
             "number": number,
             "state": state,
@@ -429,6 +490,8 @@ def analyze(payload: dict) -> dict:
             ),
             "epoch_reports": epoch_reports,
             "business_context": business_context,
+            "evidence_eligible": evidence_eligible,
+            "eligibility_reason": eligibility_reason,
             "training_report": loss_report,
             "duration_seconds": trial.get("duration_seconds"),
             "gpu_peak_reserved_bytes": trial.get("gpu_peak_reserved_bytes"),
@@ -436,7 +499,8 @@ def analyze(payload: dict) -> dict:
             "artifacts": trial.get("artifacts", {}),
         }
         rows.append(row)
-        if state == "complete":
+        # Only complete evidence-eligible trials enter the incumbent candidate set.
+        if state == "complete" and evidence_eligible:
             completed.append(row)
 
     # Only completed trials can become incumbent; other states remain audit evidence.
@@ -452,16 +516,47 @@ def analyze(payload: dict) -> dict:
         str(name): _number(value, f"parameter importance {name}")
         for name, value in importance.items()
     }
+    # The caller must declare that parameter importance excludes invalid evidence.
+    if (
+        payload.get("parameter_importance_uses_only_evidence_eligible_trials")
+        is not True
+    ):
+        raise ValueError("parameter importance must use only evidence-eligible trials")
+    # Parameter importance cannot exist when no eligible complete trial exists.
+    if not completed and importance:
+        raise ValueError("parameter importance requires evidence-eligible trials")
+    # Separate eligible, terminal-invalid, and still-pending trial evidence states.
+    eligibility_counts = {
+        "eligible": sum(row["evidence_eligible"] for row in rows),
+        "invalid": sum(
+            row["state"] in ("complete", "pruned", "failed")
+            and not row["evidence_eligible"]
+            for row in rows
+        ),
+        "pending": sum(
+            row["state"] in ("running", "waiting") and not row["evidence_eligible"]
+            for row in rows
+        ),
+    }
     # Preserve resources, failures, importance, and strict-test isolation in the result.
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "data_scope_id": scope["id"],
         "data_scope_start_date": scope["start_date"],
+        "formal_baseline": formal_baseline,
+        "research_note": research_note,
         "business_metric": metric,
         "direction": direction,
         "optimizer": {
             field: optimizer[field]
-            for field in ("tool", "sampler", "pruner", "storage")
+            for field in (
+                "tool",
+                "sampler",
+                "pruner",
+                "storage",
+                "sampler_uses_only_evidence_eligible_trials",
+                "pruner_uses_only_evidence_eligible_trials",
+            )
         },
         "resource_policy": resource,
         "loss_reference": loss_reference,
@@ -469,6 +564,7 @@ def analyze(payload: dict) -> dict:
         "loss_report_precision": loss_report_precision,
         "plateau_window": plateau_window,
         "counts": {"total": len(rows), **counts},
+        "eligibility_counts": eligibility_counts,
         "best_trial": best,
         "parameter_importance": importance,
         "failures": [row for row in rows if row["failure"]],
@@ -476,6 +572,7 @@ def analyze(payload: dict) -> dict:
         # The selection contract makes the frozen trial value the sole selection input.
         "used_for_selection": {
             "trial_value": True,
+            "evidence_eligibility_gate": True,
             "objective_metric": metric,
             "epoch_reports": False,
             "training_report": False,
@@ -504,12 +601,15 @@ def markdown(result: dict) -> str:
         "# Automatic HPO progress analysis",
         "",
         f"- Data scope: {result['data_scope_id']} from {result['data_scope_start_date']}; all eligible entities.",
+        f"- Formal baseline: {result['formal_baseline']['tag']}; frozen artifacts={result['formal_baseline']['artifact_reference']}.",
+        f"- Pre-training research: {result['research_note']}.",
         f"- Objective: {result['business_metric']} ({result['direction']}).",
         f"- Tool: {result['optimizer']['tool']}; sampler={result['optimizer']['sampler']}; pruner={result['optimizer']['pruner']}.",
         f"- Loss reference: {result['loss_reference']:.8f}; floor={result['loss_floor']}; precision={result['loss_report_precision']}; plateau window={result['plateau_window']}.",
         f"- Trials: complete={result['counts']['complete']}, pruned={result['counts']['pruned']}, failed={result['counts']['failed']}, running={result['counts']['running']}.",
+        f"- Evidence eligibility: eligible={result['eligibility_counts']['eligible']}, invalid={result['eligibility_counts']['invalid']}, pending={result['eligibility_counts']['pending']}; the gate is at least twenty-one strict validation-loss improvements.",
         f"- Incumbent: {best_text}.",
-        f"- Selection contract: only trial.value for {result['used_for_selection']['objective_metric']}; epoch reports, training diagnostics, and strict test are report-only.",
+        f"- Selection contract: only trial.value for {result['used_for_selection']['objective_metric']} from evidence-eligible trials; invalid runs, epoch reports, training diagnostics, and strict test are report-only.",
         "",
         "## Parameter importance",
         "",
@@ -526,8 +626,8 @@ def markdown(result: dict) -> str:
             "",
             "## Trial trail",
             "",
-            "| Trial | State | Value | Epochs | Best epoch | Train loss at best | Best validation loss | Absolute reference improvement | Relative reference improvement | Reducible-loss completion | Plateau start | Fit | Validation improvements | Early stop | Failure |",
-            "| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | --- |",
+            "| Trial | State | Evidence eligible | Eligibility reason | Value | Epochs | Best epoch | Train loss at best | Best validation loss | Absolute reference improvement | Relative reference improvement | Reducible-loss completion | Plateau start | Fit | Validation improvements | Early stop | Failure |",
+            "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | --- |",
         ]
     )
     for row in result["trials"]:
@@ -577,7 +677,7 @@ def markdown(result: dict) -> str:
         early_stop = "" if report is None else str(report["early_stopping_count"])
         value = "" if row["value"] is None else f"{row['value']:.8f}"
         lines.append(
-            f"| {row['number']} | {row['state']} | {value} | {row['completed_epochs']} | {best_epoch} | {train_at_best} | {best_validation} | {absolute} | {relative} | {completion} | {plateau} | {fit} | {improvements} | {early_stop} | {row['failure'] or ''} |"
+            f"| {row['number']} | {row['state']} | {row['evidence_eligible']} | {row['eligibility_reason']} | {value} | {row['completed_epochs']} | {best_epoch} | {train_at_best} | {best_validation} | {absolute} | {relative} | {completion} | {plateau} | {fit} | {improvements} | {early_stop} | {row['failure'] or ''} |"
         )
     # The epoch table exposes every requested training state and stock business measure.
     lines.extend(

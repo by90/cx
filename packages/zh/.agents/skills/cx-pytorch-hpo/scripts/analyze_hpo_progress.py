@@ -9,6 +9,9 @@ import math
 from pathlib import Path
 from typing import Any
 
+# 二十一次验证损失严格改进是训练取得模型证据资格的固定下界。
+MIN_EVIDENCE_IMPROVEMENTS = 21
+
 
 def _mapping(payload: dict, field: str) -> dict:
     """读取一个必需的对象字段。
@@ -177,6 +180,16 @@ def _loss_report(
     best = min(reports, key=lambda row: row["validation_loss"])
     # 最终完整训练轮保留停止时真实状态。
     final = reports[-1]
+    # 证据资格只由末轮累计验证损失严格改进次数确定。
+    evidence_eligible = (
+        final["validation_loss_improvement_count"] >= MIN_EVIDENCE_IMPROVEMENTS
+    )
+    # 资格原因进入机器报告，使无效训练不能被局部业务峰值覆盖。
+    eligibility_reason = (
+        "validation_loss_improvements_reached_21"
+        if evidence_eligible
+        else "validation_loss_improvements_below_21"
+    )
     # 冻结精度相对的运行最佳用于识别有意义改善。
     meaningful_best = reports[0]["validation_loss"]
     # 第一轮建立初始可比损失基线。
@@ -204,10 +217,10 @@ def _loss_report(
     if not comparable:
         # 明确原因阻止分析器生成误导性泛化差距。
         incomparable_reason = _text(trial, "loss_incomparability_reason")
-    # 已结束的有效参数试验必须具有人工拟合判断。
+    # 只有取得证据资格的已结束参数试验才允许人工拟合判断。
     fit_assessment = trial.get("fit_assessment")
-    # 只有完成或剪枝状态需要冻结人工结论。
-    if state in ("complete", "pruned"):
+    # 完成或剪枝且证据有效时必须冻结人工结论。
+    if state in ("complete", "pruned") and evidence_eligible:
         # 固定值域保持机器可读，同时不让工具自动替代人工判断。
         if fit_assessment not in (
             "overfitting",
@@ -216,6 +229,12 @@ def _loss_report(
             "insufficient_evidence",
         ):
             raise ValueError(f"trial {number} fit_assessment is invalid")
+    # 未取得资格的终态只允许明确的无效证据状态，禁止方向结论。
+    elif state in ("complete", "pruned"):
+        if fit_assessment not in (None, "invalid_evidence"):
+            raise ValueError(f"trial {number} invalid evidence cannot assess fit")
+        # 分析结果统一使用一个机器值表达无效训练。
+        fit_assessment = "invalid_evidence"
     # 运行中和失败参数试验可以尚未形成人工判断。
     elif fit_assessment is not None:
         # 已提供的非终态人工判断仍必须使用相同值域。
@@ -226,6 +245,9 @@ def _loss_report(
         raise ValueError(f"trial {number} fit_evidence_epochs must be an array")
     # 证据轮次转换为稳定的一基整数列表。
     evidence_epochs = [int(epoch) for epoch in evidence_epochs]
+    # 无效训练不得保留貌似支持方向判断的人工证据轮次。
+    if not evidence_eligible and evidence_epochs:
+        raise ValueError(f"trial {number} invalid evidence cannot have fit epochs")
     # 任何证据都必须落在当前参数试验的真实训练范围内。
     if any(epoch < 1 or epoch > final["epoch"] for epoch in evidence_epochs):
         raise ValueError(f"trial {number} fit evidence epoch is out of range")
@@ -265,6 +287,8 @@ def _loss_report(
         "loss_report_precision": precision,
         "losses_comparable": comparable,
         "loss_incomparability_reason": incomparable_reason,
+        "evidence_eligible": evidence_eligible,
+        "eligibility_reason": eligibility_reason,
         "fit_assessment": fit_assessment,
         "fit_evidence_epochs": evidence_epochs,
         "business_at_validation_best": best["business_report"],
@@ -296,10 +320,26 @@ def analyze(payload: dict) -> dict:
     if payload.get("strict_test_used_for_selection") is not False:
         raise ValueError("strict test must not participate in HPO")
 
+    # 正式标签基线是新方向训练前的唯一项目级业务起点。
+    formal_baseline = _mapping(payload, "formal_baseline")
+    # 标签和冻结产物引用共同证明基线来自只读正式事实。
+    formal_baseline = {
+        "tag": _text(formal_baseline, "tag"),
+        "artifact_reference": _text(formal_baseline, "artifact_reference"),
+    }
+    # 研究笔记路径证明新的方向在训练前已经完成问题导向研究。
+    research_note = _text(payload, "research_note")
+
     # 调参工具必须明确记录采样器、剪枝器和可恢复存储。
     optimizer = _mapping(payload, "optimizer")
     for field in ("tool", "sampler", "pruner", "storage"):
         _text(optimizer, field)
+    # 采样器不得从无效训练学习下一配置方向。
+    if optimizer.get("sampler_uses_only_evidence_eligible_trials") is not True:
+        raise ValueError("sampler must use only evidence-eligible trials")
+    # 模型效果剪枝只能使用已经取得证据资格的参数试验。
+    if optimizer.get("pruner_uses_only_evidence_eligible_trials") is not True:
+        raise ValueError("pruner must use only evidence-eligible trials")
     resource = _mapping(payload, "resource_policy")
     if _number(resource.get("max_wallclock_seconds"), "max_wallclock_seconds") <= 0:
         raise ValueError("max_wallclock_seconds must be positive")
@@ -319,6 +359,12 @@ def analyze(payload: dict) -> dict:
         != 0
     ):
         raise ValueError("early stopping min_delta must equal zero")
+    # 资源合同显式冻结模型效果剪枝可以开始的证据资格下界。
+    if (
+        int(resource.get("minimum_evidence_validation_loss_improvements", 0))
+        != MIN_EVIDENCE_IMPROVEMENTS
+    ):
+        raise ValueError("minimum evidence improvements must equal 21")
 
     # 唯一验证业务目标决定参数试验方向和当前最优。
     objective = _mapping(payload, "objective")
@@ -417,6 +463,21 @@ def analyze(payload: dict) -> dict:
             value = _number(value, f"trial {number} value")
         elif value is not None:
             value = _number(value, f"trial {number} value")
+        # 没有完整训练轮时证据资格固定为假并说明缺少轨迹。
+        evidence_eligible = (
+            False if loss_report is None else loss_report["evidence_eligible"]
+        )
+        # 模型效果剪枝只能发生在当前参数试验越过证据门禁以后。
+        if state == "pruned" and not evidence_eligible:
+            raise ValueError(
+                f"trial {number} pruning requires 21 validation loss improvements"
+            )
+        # 每个分析行都携带资格原因，避免调用者只看目标值。
+        eligibility_reason = (
+            "no_complete_epoch"
+            if loss_report is None
+            else loss_report["eligibility_reason"]
+        )
         row = {
             "number": number,
             "state": state,
@@ -429,6 +490,8 @@ def analyze(payload: dict) -> dict:
             ),
             "epoch_reports": epoch_reports,
             "business_context": business_context,
+            "evidence_eligible": evidence_eligible,
+            "eligibility_reason": eligibility_reason,
             "training_report": loss_report,
             "duration_seconds": trial.get("duration_seconds"),
             "gpu_peak_reserved_bytes": trial.get("gpu_peak_reserved_bytes"),
@@ -436,7 +499,8 @@ def analyze(payload: dict) -> dict:
             "artifacts": trial.get("artifacts", {}),
         }
         rows.append(row)
-        if state == "complete":
+        # 当前最优候选集合只接收已经取得证据资格的完整参数试验。
+        if state == "complete" and evidence_eligible:
             completed.append(row)
 
     # 只有完整参数试验参与当前最优选择，剪枝和失败试验仅供审计。
@@ -452,16 +516,47 @@ def analyze(payload: dict) -> dict:
         str(name): _number(value, f"parameter importance {name}")
         for name, value in importance.items()
     }
+    # 参数重要性调用方必须声明只使用有效证据参数试验。
+    if (
+        payload.get("parameter_importance_uses_only_evidence_eligible_trials")
+        is not True
+    ):
+        raise ValueError("parameter importance must use only evidence-eligible trials")
+    # 没有任何有效完整试验时不得伪造参数重要性。
+    if not completed and importance:
+        raise ValueError("parameter importance requires evidence-eligible trials")
+    # 资格计数把有效、终态无效和仍在运行等待的状态分开。
+    eligibility_counts = {
+        "eligible": sum(row["evidence_eligible"] for row in rows),
+        "invalid": sum(
+            row["state"] in ("complete", "pruned", "failed")
+            and not row["evidence_eligible"]
+            for row in rows
+        ),
+        "pending": sum(
+            row["state"] in ("running", "waiting") and not row["evidence_eligible"]
+            for row in rows
+        ),
+    }
     # 返回值同时保留资源策略、失败原因、参数重要性和严格测试隔离事实。
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "data_scope_id": scope["id"],
         "data_scope_start_date": scope["start_date"],
+        "formal_baseline": formal_baseline,
+        "research_note": research_note,
         "business_metric": metric,
         "direction": direction,
         "optimizer": {
             field: optimizer[field]
-            for field in ("tool", "sampler", "pruner", "storage")
+            for field in (
+                "tool",
+                "sampler",
+                "pruner",
+                "storage",
+                "sampler_uses_only_evidence_eligible_trials",
+                "pruner_uses_only_evidence_eligible_trials",
+            )
         },
         "resource_policy": resource,
         "loss_reference": loss_reference,
@@ -469,6 +564,7 @@ def analyze(payload: dict) -> dict:
         "loss_report_precision": loss_report_precision,
         "plateau_window": plateau_window,
         "counts": {"total": len(rows), **counts},
+        "eligibility_counts": eligibility_counts,
         "best_trial": best,
         "parameter_importance": importance,
         "failures": [row for row in rows if row["failure"]],
@@ -476,6 +572,7 @@ def analyze(payload: dict) -> dict:
         # 选择合同明确只有冻结目标对应的参数试验值参与选参。
         "used_for_selection": {
             "trial_value": True,
+            "evidence_eligibility_gate": True,
             "objective_metric": metric,
             "epoch_reports": False,
             "training_report": False,
@@ -504,12 +601,15 @@ def markdown(result: dict) -> str:
         "# 自动调参进度分析",
         "",
         f"- 数据范围：{result['data_scope_id']}，起始日 {result['data_scope_start_date']}，覆盖全部合格实体。",
+        f"- 正式基线：{result['formal_baseline']['tag']}；冻结产物={result['formal_baseline']['artifact_reference']}。",
+        f"- 训练前研究：{result['research_note']}。",
         f"- 选择目标：{result['business_metric']}（{result['direction']}）。",
         f"- 工具：{result['optimizer']['tool']}；采样器={result['optimizer']['sampler']}；剪枝器={result['optimizer']['pruner']}。",
         f"- 损失基准：{result['loss_reference']:.8f}；理论下界={result['loss_floor']}；报告精度={result['loss_report_precision']}；平台窗口={result['plateau_window']}。",
         f"- 参数试验：完成={result['counts']['complete']}，剪枝={result['counts']['pruned']}，失败={result['counts']['failed']}，运行中={result['counts']['running']}。",
+        f"- 证据资格：有效={result['eligibility_counts']['eligible']}，无效={result['eligibility_counts']['invalid']}，等待={result['eligibility_counts']['pending']}；门禁为至少二十一次验证损失严格改进。",
         f"- 当前选择结果：{best_text}。",
-        f"- 选择合同：只使用 trial.value 对应的 {result['used_for_selection']['objective_metric']}；逐轮报告、训练诊断和严格测试不参与选参。",
+        f"- 选择合同：只使用取得证据资格参数试验的 trial.value 对应的 {result['used_for_selection']['objective_metric']}；无效训练、逐轮报告、训练诊断和严格测试不参与选参。",
         "",
         "## 参数重要性",
         "",
@@ -526,8 +626,8 @@ def markdown(result: dict) -> str:
             "",
             "## 参数试验摘要",
             "",
-            "| 参数试验 | 状态 | 目标值 | 完成轮数 | 最优轮次 | 该轮训练损失 | 最小验证损失 | 理论基准绝对改善 | 理论基准相对改善 | 可改善损失完成率 | 平台开始轮次 | 拟合判断 | 验证损失改进次数 | 早停计数 | 失败原因 |",
-            "| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | --- |",
+            "| 参数试验 | 状态 | 证据资格 | 资格原因 | 目标值 | 完成轮数 | 最优轮次 | 该轮训练损失 | 最小验证损失 | 理论基准绝对改善 | 理论基准相对改善 | 可改善损失完成率 | 平台开始轮次 | 拟合判断 | 验证损失改进次数 | 早停计数 | 失败原因 |",
+            "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | --- |",
         ]
     )
     for row in result["trials"]:
@@ -577,7 +677,7 @@ def markdown(result: dict) -> str:
         early_stop = "" if report is None else str(report["early_stopping_count"])
         value = "" if row["value"] is None else f"{row['value']:.8f}"
         lines.append(
-            f"| {row['number']} | {row['state']} | {value} | {row['completed_epochs']} | {best_epoch} | {train_at_best} | {best_validation} | {absolute} | {relative} | {completion} | {plateau} | {fit} | {improvements} | {early_stop} | {row['failure'] or ''} |"
+            f"| {row['number']} | {row['state']} | {row['evidence_eligible']} | {row['eligibility_reason']} | {value} | {row['completed_epochs']} | {best_epoch} | {train_at_best} | {best_validation} | {absolute} | {relative} | {completion} | {plateau} | {fit} | {improvements} | {early_stop} | {row['failure'] or ''} |"
         )
     # 逐轮表格完整呈现用户要求的训练状态和股票业务报告。
     lines.extend(

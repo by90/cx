@@ -1,7 +1,8 @@
 ---
 name: cx-review
 description: Use for the unified review of any completed code, document, tutorial, research, design, process, or release artifact. First review artifact quality by type, then verify review coverage, validation evidence, current-state documents, temporary-change deletion conditions, and residual risk. A failure in either stage blocks completion and deletion of the active change file.
-version: 0.1.1
+metadata:
+  version: 0.1.1
 ---
 
 # cx Unified Delivery Review

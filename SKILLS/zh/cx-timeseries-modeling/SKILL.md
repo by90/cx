@@ -1,7 +1,8 @@
 ---
 name: cx-timeseries-modeling
 description: 用于异构多变量时间序列建模、预测目标设计、字段语义分层、协变量设计、泄漏检查、backtesting、指标选择和 PyTorch 时间序列框架选型。默认以 PyTorch Forecasting 为主要参考框架，尤其使用 TimeSeriesDataSet 和 Temporal Fusion Transformer 的变量角色、门控和变量选择思路。
-version: 0.1.1
+metadata:
+  version: 0.1.1
 ---
 
 # cx 异构时间序列建模

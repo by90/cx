@@ -19,7 +19,7 @@ metadata:
 4. 验证业务指标是 sampler、pruner 和 incumbent 的目标。验证损失只用于梯度、诊断和规定检查点；不得仅因损失下降晋级。
 5. 严格测试不进入 study、中间值、剪枝、参数重要性或下一配置。最终只审计验证选择的 incumbent；若测试参与选择，立即声明污染并停止。
 6. 明确使用成熟 HPO 工具。单机 PyTorch/Lightning 默认优先 Optuna；若改用 Ray Tune、Syne Tune、SMAC 等，先以官方文档核对系统支持、进程/内存成本、恢复存储、条件空间、并行 sampler 和多保真剪枝，再记录选择理由。
-7. 普通单候选和正式自动 HPO trial 都最多训练 `120` 轮，并以项目明确的验证选择目标执行忍耐 `9` 轮的早停。最低提高量必须为零；目标只要出现任何严格提高就立即重置忍耐计数。pruner 可以依据逐轮验证业务指标更早淘汰相对劣势 trial，但不能取消、替代或延长 `120/9` 规则。调参研究应寻找在该规则真实生效时自然完成 120 轮的跑通参数试验，但不得把完成轮数改成 incumbent 门禁。
+7. 普通单候选和正式自动 HPO trial 都最多训练 `120` 轮，并以项目明确的验证选择目标执行忍耐 `9` 轮的早停。最低提高量必须为零；目标只要出现任何严格提高就立即重置忍耐计数。当前 trial 达到二十一次验证损失严格改进后，pruner 才可以依据逐轮验证业务指标淘汰相对劣势 trial；剪枝不能取消、替代或延长 `120/9` 规则。调参研究应寻找在该规则真实生效时自然完成 120 轮的跑通参数试验，但不得把完成轮数改成 incumbent 门禁。
 8. 搜索范围不能缩成 latent 宽度。按任务覆盖数据/窗口、字段表示、时间模型、纵横摘要、优化器、学习率、weight decay、批次、调度器及其 warmup/周期/min-lr/restart、dropout 和损失；用户冻结项不得进入搜索。
 9. 使用 define-by-run 条件空间：只有被选中的优化器、调度器、结构或损失才采样其有效参数；结构组合必须满足整除、形状和显存约束。类别权重已被项目证据否定时不重复搜索。
 10. 高资源工作默认串行，同时运行绝不超过两个；每张显卡同时只运行一个独立参数试验工作进程。双卡并行必须通过主机和逐卡容量门禁，并占满两个并发名额。
@@ -35,7 +35,7 @@ metadata:
 
 早停比较使用严格提高语义，最低提高量固定为零。只要当前验证选择目标优于此前最佳值，无论提高幅度多小，忍耐计数都立即归零；只有连续九个完整训练轮没有任何提高才触发早停。
 
-正式自动 HPO 同时向 pruner 报告逐轮验证业务指标。pruner 可以在九轮早停之前淘汰相对劣势 trial；如果未被剪枝，trial 仍必须遵守上述 `120/9` 规则。剪枝不是训练早停的替代品，不能把无改善 trial 延长到第一百二十轮以后，也不能绕过任何提高即重置的语义。
+正式自动 HPO 同时保存逐轮验证业务指标，但当前 trial 达到二十一次验证损失严格改进前不得向 pruner 提交模型效果剪枝判断。越过证据门禁后，pruner 可以在九轮早停之前淘汰相对劣势 trial；如果未被剪枝，trial 仍必须遵守上述 `120/9` 规则。剪枝不是训练早停的替代品，不能把无改善 trial 延长到第一百二十轮以后，也不能绕过任何提高即重置的语义。
 
 `120/9` 只规定训练生命周期，不授予模型证据资格。早停、剪枝、异常或资源终止使验证损失累计严格改进次数不足二十一次时，该运行只保留配置、轨迹和停止事实并标记为无效证据；不得据此判断过拟合、欠拟合、目标有效或目标无效。正式模型效果剪枝只能在当前参数试验已经达到二十一次严格改进后生效；资源失败可以随时终止，但不得影响 sampler、参数重要性、incumbent 或下一方向。不得延迟早停、扩大忍耐或伪造微小改进来凑足二十一次。
 
@@ -117,6 +117,8 @@ study 预先冻结损失报告精度和平台观察窗口。`plateau_start_epoch
     python scripts/analyze_hpo_progress.py path/to/ledger.json path/to/analysis
 
 台账包含 `data_scope`、`formal_baseline`、`research_note`、`optimizer`、`objective`、`loss_reference`、`loss_floor`、`loss_report_precision`、`plateau_window`、`resource_policy`、`trials` 和 `strict_test_used_for_selection`。`optimizer` 记录工具、sampler、pruner 和持久化存储；trial 记录 `number/state/value/params/actual_config/intermediate_values/completed_epochs`、`epoch_reports`、`business_context`、`evidence_eligible`、`eligibility_reason`、`losses_comparable`、`fit_assessment` 和 `fit_evidence_epochs`。每个 `epoch_reports` 行包含轮次、训练/验证损失、验证损失改进次数、早停计数、动态 TopN 和固定 Top1/Top3/Top10；`business_context` 记录刻度、机会定义、每日 N 来源和跨日聚合方式。
+
+`formal_baseline` 明确记录 `tag` 和 `artifact_reference`；`research_note` 保存训练前当前研究笔记路径。`optimizer` 还必须把 `sampler_uses_only_evidence_eligible_trials` 和 `pruner_uses_only_evidence_eligible_trials` 固定为真，`resource_policy.minimum_evidence_validation_loss_improvements` 固定为 `21`，顶层 `parameter_importance_uses_only_evidence_eligible_trials` 固定为真。轨迹分析器从逐轮计数计算 `evidence_eligible` 和 `eligibility_reason`，调用方不得自行把无效训练声明为有效。
 
 工具只验证和汇总当前 study，不替 sampler 选择下一配置。输出必须包含状态计数、证据资格计数及原因、从有效证据参数试验中按验证业务指标选择的 incumbent、实际轮数、失败原因、只基于有效证据的参数重要性，以及每个已结束参数试验的理论损失完善度、业务排名、允许时的人工拟合判断和平台开始轮次，并分别说明这些报告项是否参与选择、证明无效证据和严格测试未参与选择；不得改变现有 incumbent 选择规则。
 

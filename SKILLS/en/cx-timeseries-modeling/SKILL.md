@@ -1,7 +1,8 @@
 ---
 name: cx-timeseries-modeling
 description: Use for heterogeneous multivariate time-series modeling, forecasting-target design, field-role classification, covariate design, leakage checks, backtesting, metric selection, and PyTorch time-series framework choice. PyTorch Forecasting is the default primary reference, especially TimeSeriesDataSet and Temporal Fusion Transformer variable roles, gating, and variable selection.
-version: 0.1.1
+metadata:
+  version: 0.1.1
 ---
 
 # cx Heterogeneous Time-Series Modeling
