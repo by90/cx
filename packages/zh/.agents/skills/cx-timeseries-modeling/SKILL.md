@@ -1,7 +1,7 @@
 ---
 name: cx-timeseries-modeling
 description: 用于异构多变量时间序列建模、预测目标设计、字段语义分层、协变量设计、泄漏检查、backtesting、指标选择和 PyTorch 时间序列框架选型。默认以 PyTorch Forecasting 为主要参考框架，尤其使用 TimeSeriesDataSet 和 Temporal Fusion Transformer 的变量角色、门控和变量选择思路。
-version: 0.1.0
+version: 0.1.1
 ---
 
 # cx 异构时间序列建模
@@ -18,16 +18,19 @@ version: 0.1.0
 ## 必须执行的流程
 
 1. 先定义预测目标、预测 horizon、时间粒度、实体分组、训练/验证/测试时间范围和业务指标。
-2. 建立字段语义表：target、group id、static categorical、static real、time-varying known categorical/real、time-varying observed/unknown categorical/real、不可用未来字段、缺失策略、缩放策略和泄漏风险。
-3. 默认使用 PyTorch Forecasting 作为主要参考框架：用 `TimeSeriesDataSet` 表达字段角色，用 Temporal Fusion Transformer 参考变量选择、静态上下文、门控和多 horizon 预测。
-4. 不要默认使用普通 CNN、普通 Transformer 或把变量维度直接当 token；只有字段已经过角色化编码、泄漏检查和 baseline 对比后才允许。
-5. 先建立 naive、seasonal naive、linear 或 tree baseline，再比较深度模型；不能只拿复杂模型互相比。
-6. 深度模型候选按数据规模和目标选择：小数据优先 baseline/N-BEATS/N-HiTS，中等以上且有丰富协变量时考虑 TFT，概率预测需要 DeepAR 或分位数损失。
-7. 多变量字段的注意力权重不能直接当作特征重要性；变量重要性需要结合变量选择网络、ablation、permutation 和业务审查。
-8. 切分必须按时间或 rolling origin backtesting；禁止随机行切分导致未来信息泄漏。
-9. 指标必须匹配业务目标：point forecast 可用 MAE/RMSE/SMAPE/MASE，分位数或概率预测必须记录 quantile loss、coverage 或 calibration。
-10. 需要调参时叠加 `$cx-pytorch-hpo`：复用项目公共调参模块，在固定数据边界上明确使用成熟 HPO sampler/pruner 联合提出参数并分配训练资源，以验证业务指标为首要目标持续分析完整、剪枝和失败 trial。股票任务使用注册制起点后的全部合格实体，不抽取十分之一实体，也不切换所谓轻量与全量阶段。
-11. 默认不创建单元测试；明确要求单元测试时，只验证数据窗口、字段角色、泄漏检查、指标和模型输入输出形状，不在单元测试里跑长训练。
+2. 项目存在正式模型时，先从项目授权的 Git 标签和冻结产物直接读取正式源码、实际配置、权重说明和业务报告，建立同数据范围、同标签、同切分、同聚合口径的正式基线。除非用户明确要求，不得为了比较基线而检出标签、恢复工作树、创建工作树副本或重训历史版本；简单统计基线只能补充，不能替代正式模型基线。
+3. 启动新的模型、损失、特征、容量、优化或调度方向前，先使用 `$cx-research` 对明确问题展开联网研究，把正式版本事实与一手来源、同行评议论文和可靠复现综合成 `docs/cx/notes/` 中的当前结论；研究未形成可证伪假设、唯一变量和同口径验收标准前不得训练。
+4. 每次训练独立累计验证损失的严格改进次数。只有累计至少二十一次严格改进的训练才是有效模型证据；不足二十一次的训练统一标记为无效证据，不得据此肯定或否定模型、损失、特征、容量、优化或调度方向，不得把它作为基线、候选晋级、扩容或下一改动的依据，也不得用业务指标的局部峰值绕过本门禁。
+5. 建立字段语义表：target、group id、static categorical、static real、time-varying known categorical/real、time-varying observed/unknown categorical/real、不可用未来字段、缺失策略、缩放策略和泄漏风险。
+6. 默认使用 PyTorch Forecasting 作为主要参考框架：用 `TimeSeriesDataSet` 表达字段角色，用 Temporal Fusion Transformer 参考变量选择、静态上下文、门控和多 horizon 预测。
+7. 不要默认使用普通 CNN、普通 Transformer 或把变量维度直接当 token；只有字段已经过角色化编码、泄漏检查和 baseline 对比后才允许。
+8. 先建立 naive、seasonal naive、linear 或 tree baseline，再比较深度模型；不能只拿复杂模型互相比。
+9. 深度模型候选按数据规模和目标选择：小数据优先 baseline/N-BEATS/N-HiTS，中等以上且有丰富协变量时考虑 TFT，概率预测需要 DeepAR 或分位数损失。
+10. 多变量字段的注意力权重不能直接当作特征重要性；变量重要性需要结合变量选择网络、ablation、permutation 和业务审查。
+11. 切分必须按时间或 rolling origin backtesting；禁止随机行切分导致未来信息泄漏。
+12. 指标必须匹配业务目标：point forecast 可用 MAE/RMSE/SMAPE/MASE，分位数或概率预测必须记录 quantile loss、coverage 或 calibration。
+13. 需要调参时叠加 `$cx-pytorch-hpo`：复用项目公共调参模块，在固定数据边界上明确使用成熟 HPO sampler/pruner 联合提出参数并分配训练资源，以验证业务指标为首要目标持续分析完整、剪枝和失败 trial。股票任务使用注册制起点后的全部合格实体，不抽取十分之一实体，也不切换所谓轻量与全量阶段。
+14. 默认不创建单元测试；明确要求单元测试时，只验证数据窗口、字段角色、泄漏检查、指标和模型输入输出形状，不在单元测试里跑长训练。
 
 ## 框架选择
 
@@ -40,7 +43,9 @@ version: 0.1.0
 
 - 字段语义表和泄漏检查。
 - Horizon、granularity、group id、target 和 label 定义。
-- Baseline 指标和深度模型指标。
+- 直接读取的正式版本标签、冻结配置、冻结报告和同口径正式基线；项目没有正式版本时明确记录这一事实。
+- 训练前研究问题、来源、综合结论、可证伪假设、唯一变量和验收标准。
+- Baseline 指标和深度模型指标，以及每次训练的验证损失累计严格改进次数和证据资格。
 - Rolling-origin 或时间切分说明。
 - 协变量是否在预测时可用的证明。
 - 选择 PyTorch Forecasting、NeuralForecast、Darts 或其他框架的理由。

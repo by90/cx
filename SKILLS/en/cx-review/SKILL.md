@@ -1,7 +1,7 @@
 ---
 name: cx-review
 description: Use for the unified review of any completed code, document, tutorial, research, design, process, or release artifact. First review artifact quality by type, then verify review coverage, validation evidence, current-state documents, temporary-change deletion conditions, and residual risk. A failure in either stage blocks completion and deletion of the active change file.
-version: 0.1.0
+version: 0.1.1
 ---
 
 # cx Unified Delivery Review
@@ -68,6 +68,14 @@ Run two consecutive stages in one skill: determine whether artifacts are correct
 - The note under `docs/cx/notes/` answers the question, explains it plainly, and states applicability, limits, and work impact.
 - No search scratchpad, material pile, candidate history, or replaced conclusion remains.
 
+### Machine-learning experiments
+
+- When the project has formal models, the experiment read project-authorized Git tags and frozen artifacts directly and froze the strongest formal-model baseline with the same data scope, label, split, and aggregation contract. It did not check out a tag, restore the working tree, create a worktree, or retrain a historical release merely to compare baselines.
+- Before training a new model, loss, feature, capacity, optimization, or scheduling direction, the work used `$cx-research` for online research. The research note synthesizes formal-release facts with reliable sources and states a falsifiable hypothesis, one changed variable, and contract-comparable acceptance criteria.
+- Every run used to accept or reject a direction, compare candidates, promote, scale, calculate parameter importance, or select the next configuration has at least twenty-one cumulative strict validation-loss improvements. A run below twenty-one is only invalid evidence, and no local business-metric peak entered a conclusion.
+- HPO samplers, pruners, parameter importance, and incumbents use only trials with at least twenty-one strict validation-loss improvements. Resource failures and invalid evidence retain only their original state and reason.
+- Business comparisons between formal baselines and candidates use the same population, target dates, labels, daily-N source, and cross-day aggregation. Stock ranking checks dynamic TopN, fixed TopK, highest target levels, and lowest target-level contamination together rather than substituting one aggregate metric.
+
 ### Temporary change and process
 
 - Changes, implementation direction shifts, and code errors in an existing story entered `changes/` and were committed before work.
@@ -90,6 +98,7 @@ Verify:
 9. No failed review, unresolved finding, or blocker is marked complete.
 10. The active change file can be deleted without losing current knowledge because durable documents are updated.
 11. Residual risks are explicit and do not block the current goal.
+12. Machine-learning experiment deliverables prove the formal baseline, pre-training research, and twenty-one-improvement eligibility of every run supporting a conclusion; invalid evidence did not affect direction selection.
 
 ## Output
 
