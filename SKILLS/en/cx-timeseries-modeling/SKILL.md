@@ -2,7 +2,7 @@
 name: cx-timeseries-modeling
 description: Use for heterogeneous multivariate time-series modeling, forecasting-target design, field-role classification, covariate design, leakage checks, backtesting, metric selection, and PyTorch time-series framework choice. PyTorch Forecasting is the default primary reference, especially TimeSeriesDataSet and Temporal Fusion Transformer variable roles, gating, and variable selection.
 metadata:
-  version: 0.1.1
+  version: 0.1.2
 ---
 
 # cx Heterogeneous Time-Series Modeling
@@ -31,7 +31,9 @@ Handle multivariate time series where each field has a different meaning. Do not
 11. Splits must be temporal or rolling-origin backtests. Random row splits are forbidden when they can leak future information.
 12. Metrics must match the business objective: point forecasts can use MAE/RMSE/SMAPE/MASE; quantile or probabilistic forecasts must record quantile loss, coverage, or calibration.
 13. Add `$cx-pytorch-hpo` for tuning: reuse the project's shared tuner, explicitly use a mature HPO sampler/pruner to jointly suggest parameters and allocate training resources on a fixed data boundary, and continuously analyze completed, pruned, and failed trials with the validation business metric first. Stock tasks use every eligible registration-regime entity; they neither sample one tenth of entities nor switch between lightweight and full-data stages.
-14. Do not create unit tests by default; when unit tests are explicitly requested, verify only windows, field roles, leakage checks, metrics, and model input/output shapes. Do not run long training in unit tests.
+14. A trial should copy a typed configuration and override it in memory, or it may use a temporary configuration file owned only by that trial. It must not modify the product default configuration used for formal-release inference. Candidate values such as learning rate, weight decay, batch size, and scheduler parameters are not unit-test contracts: when only a candidate value changes, do not create or edit unit tests and do not pin the concrete value in an assertion.
+15. The agent must continuously read the file-backed training trail and immediately report epoch position, elapsed seconds, early-stopping counter, validation loss, and training loss after every complete epoch. A stock-ranking run must also report highest-three hit rate and lowest-three contamination separately, each ordered as dynamic TopN and fixed Top1, Top3, Top5, and Top10.
+16. Do not create unit tests by default; when unit tests are explicitly requested, verify only windows, field roles, leakage checks, metrics, model input/output shapes, and changed configuration parsing, typing, propagation, or freezing behavior. Do not run long training in unit tests or pin a trial candidate value.
 
 ## Framework Selection
 
@@ -47,6 +49,7 @@ Handle multivariate time series where each field has a different meaning. Do not
 - Directly read formal-release tags, frozen configurations and reports, and the contract-comparable formal baseline; explicitly record when the project has no formal release.
 - The pre-training research question, sources, synthesis, falsifiable hypothesis, one changed variable, and acceptance criteria.
 - Baseline and deep-model metrics, together with each run's cumulative strict validation-loss improvement count and evidence eligibility.
+- The trial's effective-configuration snapshot, evidence that the product default configuration remained unchanged, and the per-epoch loss, early-stopping, elapsed-time, highest-three-hit, and lowest-three-contamination reports continuously read by the agent.
 - Rolling-origin or temporal split description.
 - Proof that covariates are available at prediction time.
 - Reason for choosing PyTorch Forecasting, NeuralForecast, Darts, or another framework.
